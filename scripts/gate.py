@@ -134,7 +134,7 @@ def main(argv: list[str]) -> int:
         g.run("pip-audit", [py, "-m", "pip_audit", "-r", "requirements.txt"])
     gitleaks = shutil.which("gitleaks")
     if gitleaks:
-        g.run("gitleaks", [gitleaks, "git", "--redact", "--no-banner", str(ROOT)])
+        g.run("gitleaks", [gitleaks, "git", "--redact", "--no-banner", "--no-color", str(ROOT)])
     else:
         g.record("gitleaks", "SKIP", "gitleaks is not on PATH")
     g.run("bandit", [py, "-m", "bandit", "-r", "app", "-q"])
