@@ -1,0 +1,28 @@
+# Runtime dependencies only. Test and lint tools live in requirements-dev.txt.
+# The deploy installs exactly this file, so only what production needs belongs here.
+#
+# Version policy (Auxi_Connector's): every dependency is version-bounded, with an
+# upper bound at the next major, or tighter where a minor release has broken us or
+# where we rely on internals. Minor/patch drift inside a bound is allowed so security
+# fixes still flow; CI's pip-audit and the gate's pin check catch the rest. The
+# floors are the versions the tests last ran against.
+
+# FastAPI: ONE minor. 0.x minors change behaviour, and the route-controls test and
+# the per-endpoint metric read scope["route"], which 0.14x reworked (routes are now
+# included lazily). Re-run the whole suite when bumping.
+fastapi>=0.143.0,<0.144
+# Imported directly (middleware types, HTTPException). FastAPI bounds it too.
+starlette>=1.7.0,<2.0.0
+pydantic>=2.14.0,<3.0.0
+pydantic-settings>=2.15.0,<3.0.0
+uvicorn>=0.54.0,<1.0.0
+# redis-py: ONE minor, as in Auxi_Connector. 8.0 silently changed two defaults
+# (socket_timeout None -> 5s, pool cap unbounded -> 100) and each caused an
+# incident there. app/core/redis_client.py sets both explicitly regardless.
+redis>=8.1.0,<8.2
+# App Insights export (app/core/telemetry.py); inert without
+# APPLICATIONINSIGHTS_CONNECTION_STRING.
+azure-monitor-opentelemetry>=1.8.11,<2.0.0
+# Imported directly for request spans (telemetry.instrument_app). A 0.x beta line
+# that moves with the distro above, which bounds it to one minor; keep them in step.
+opentelemetry-instrumentation-fastapi>=0.66b0,<0.67b0

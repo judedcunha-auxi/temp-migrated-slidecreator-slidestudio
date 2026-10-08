@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+
+# Virtual environments (.venv-ci311 etc. too)
+.venv/
+.venv-*/
+venv/
+
+# Secrets and local configuration. Only .env.example is committed.
+.env
+.env.*
+!.env.example
+
+# Tool caches
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+*.log
+
+# Local Redis data files, written to whatever directory redis-server starts in.
+*.rdb
+*.aof
+appendonlydir/
+
+# CI and deploy outputs: written by pytest/pip-audit and scripts/package_deploy.py.
+ci-reports/
+staging-deploy.zip
+# Build identity, stamped into the deploy package at build time (served by /healthz).
+# A checkout has no build identity, so it is never committed.
+build_info.json
+
+# Local tooling
+.azure/
+.claude/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

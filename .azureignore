@@ -1,0 +1,22 @@
+# What stays out of the package deployed to Azure. scripts/package_deploy.py builds
+# from an explicit include list (app/, requirements.txt, startup.txt,
+# build_info.json), so this matters for any tool that zips the working directory
+# instead (az webapp up, the VS Code extension): it must never ship these.
+.git/
+.github/
+.claude/
+.azure/
+.venv/
+.venv-*/
+.env
+.env.*
+tests/
+docs/
+scripts/
+ci-reports/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+__pycache__/
+*.pyc
+*.zip

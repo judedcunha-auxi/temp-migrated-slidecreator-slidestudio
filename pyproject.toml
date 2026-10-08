@@ -1,0 +1,44 @@
+# Lint, type-check and test settings, shared by local runs (scripts/gate.py) and CI
+# (.github/workflows/ci.yml) so both give the same result. Dependencies are in
+# requirements.txt / requirements-dev.txt, not here: the deploy installs those files.
+
+[project]
+name = "slideforge-service"
+version = "0.1.0"
+description = "auxi SlideForge service: slide design, export and Darwin's /api, on FastAPI."
+requires-python = ">=3.11,<3.12"
+
+[tool.ruff]
+target-version = "py311"
+line-length = 120
+extend-exclude = [".venv", ".venv-*"]
+
+[tool.ruff.lint]
+# E4/E7/E9: import, statement and syntax errors. F: pyflakes. B: likely bugs.
+# I: import order. UP: modern syntax for the target version.
+select = ["E4", "E7", "E9", "F", "B", "I", "UP"]
+# B008: FastAPI's Depends()/Query() in argument defaults is the framework's idiom.
+ignore = ["B008"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["app", "tests"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_unused_ignores = false
+plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+# No type information shipped for these.
+module = ["fakeredis.*", "azure.monitor.opentelemetry.*", "opentelemetry.instrumentation.*"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# `app` must resolve the same under bare `pytest` (CI) and `python -m pytest` (gate).
+pythonpath = ["."]
+# Explicit, so a pytest-asyncio release cannot change the default under us: every
+# async test carries @pytest.mark.asyncio.
+asyncio_mode = "strict"
+asyncio_default_fixture_loop_scope = "function"

@@ -1,0 +1,3 @@
+# Line endings are LF in the repo and in checkouts, on every OS (matches .editorconfig),
+# so hashes and diffs agree between Windows and the Linux CI and deploy hosts.
+* text=auto eol=lf
