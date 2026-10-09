@@ -46,6 +46,35 @@ class RedisStore(Protocol):
 
     async def close(self) -> None: ...
 
+    # --- Phase 4: the job queue and the in-flight limiter (core/jobs) ----------
+    async def set_if_absent(self, key: str, value: str, *, ttl_ms: int) -> bool:
+        """SET NX PX: True when this call created the key (a lease was taken)."""
+        ...
+
+    async def pexpire(self, key: str, ttl_ms: int) -> bool: ...
+
+    async def expire(self, key: str, ttl_seconds: int) -> bool: ...
+
+    async def zadd(self, key: str, mapping: dict[str, float], *, only_existing: bool = False) -> int: ...
+
+    async def zrange(self, key: str, start: int, stop: int) -> list[str]:
+        """Members by rank, lowest score first."""
+        ...
+
+    async def zrem(self, key: str, *members: str) -> int: ...
+
+    async def zcard(self, key: str) -> int: ...
+
+    async def zremrangebyscore(self, key: str, min_score: float, max_score: float) -> int: ...
+
+    async def hset(self, key: str, mapping: dict[str, str]) -> int: ...
+
+    async def hgetall(self, key: str) -> dict[str, str]: ...
+
+    async def hincrby(self, key: str, field: str, amount: int = 1) -> int: ...
+
+    async def incr(self, key: str) -> int: ...
+
 
 class RedisClient:
     """`RedisStore` over a redis-py asyncio client (real Redis, or fakeredis in tests)."""
@@ -81,3 +110,40 @@ class RedisClient:
 
     async def close(self) -> None:
         await self._client.aclose()
+
+    async def set_if_absent(self, key: str, value: str, *, ttl_ms: int) -> bool:
+        return bool(await self._client.set(key, value, nx=True, px=ttl_ms))
+
+    async def pexpire(self, key: str, ttl_ms: int) -> bool:
+        return bool(await self._client.pexpire(key, ttl_ms))
+
+    async def expire(self, key: str, ttl_seconds: int) -> bool:
+        return bool(await self._client.expire(key, ttl_seconds))
+
+    async def zadd(self, key: str, mapping: dict[str, float], *, only_existing: bool = False) -> int:
+        return int(await self._client.zadd(key, mapping, xx=only_existing) or 0)
+
+    async def zrange(self, key: str, start: int, stop: int) -> list[str]:
+        return [str(m) for m in await self._client.zrange(key, start, stop)]
+
+    async def zrem(self, key: str, *members: str) -> int:
+        return int(await self._client.zrem(key, *members)) if members else 0
+
+    async def zcard(self, key: str) -> int:
+        return int(await self._client.zcard(key))
+
+    async def zremrangebyscore(self, key: str, min_score: float, max_score: float) -> int:
+        return int(await self._client.zremrangebyscore(key, min_score, max_score))
+
+    async def hset(self, key: str, mapping: dict[str, str]) -> int:
+        return int(await self._client.hset(key, mapping=mapping))  # type: ignore[arg-type]
+
+    async def hgetall(self, key: str) -> dict[str, str]:
+        raw = await self._client.hgetall(key)
+        return {str(k): str(v) for k, v in raw.items()}
+
+    async def hincrby(self, key: str, field: str, amount: int = 1) -> int:
+        return int(await self._client.hincrby(key, field, amount))
+
+    async def incr(self, key: str) -> int:
+        return int(await self._client.incr(key))

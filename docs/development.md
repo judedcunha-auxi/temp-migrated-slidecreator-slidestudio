@@ -32,6 +32,12 @@ Settings come from environment variables or `.env` (see `app/config/settings.py`
 every problem `check_config()` finds; `ENVIRONMENT=development` keeps the production-only rules
 off.
 
+Storage: `STORAGE_BACKEND=fake` (the default) keeps everything in memory, so a restart starts
+empty. `STORAGE_BACKEND=local` keeps it in files under `SCRATCH_ROOT` (default
+`<system temp>/slideforge-scratch/store`), so it survives a restart. `general` is the General
+service, which is a stub until its repo exists: it leaves `/readyz` at 503. See
+[architecture.md](architecture.md#storage-and-jobs-phase-4).
+
 ## Tests
 
 ```bash
@@ -44,6 +50,11 @@ off.
 - No test needs Redis, a network or a `.env`: `tests/conftest.py` builds `Settings` from explicit
   values and uses fakeredis behind the real `RedisClient`.
 - Async tests carry `@pytest.mark.asyncio` (strict mode, set in `pyproject.toml`).
+- Anything that stores data uses the General service fake, `tests/fakes/general_service.py`.
+- `tests/core/storage/contract/` is the storage contract suite: every test runs once per adapter
+  (the fake and the local adapter now, the General service later). A new port operation needs a
+  contract test, an entry in `REQUIRED_ENDPOINTS` and a row in
+  [general-service-requirements.md](general-service-requirements.md); a test fails otherwise.
 
 Before pushing, run the whole gate: `.venv/Scripts/python.exe scripts/gate.py` (see
 [scripts/README.md](../scripts/README.md)).

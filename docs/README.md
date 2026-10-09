@@ -9,6 +9,8 @@ everything else readable. Then pick by what you are trying to do.
 |---|---|
 | [how-it-works.md](how-it-works.md) | **Start here.** What the service is for, what happens to a request, and what is still to come. |
 | [route-controls.md](route-controls.md) | Every route, who may call it and what protects it. Generated from a table the tests hold to the code. |
+| [architecture.md](architecture.md) | The design, one section per area: storage through the General service port, and the Redis job queue. |
+| [general-service-requirements.md](general-service-requirements.md) | What this service needs from the General service: every operation, the access rules, idempotency and request ids. The hand-over spec for the .NET team. |
 
 ## I want to change it
 
@@ -34,7 +36,8 @@ test, it is one:
 - `tests/test_route_controls.py` regenerates and checks the table in `route-controls.md`.
 - `tests/config/test_env_example.py` checks that `.env.example` lists every variable the code reads.
 - `tests/test_ci_workflow.py` checks the CI workflow keeps the standard job and step names.
+- `tests/core/storage/test_fake_and_stub.py` checks that `general-service-requirements.md` covers
+  every storage port operation.
 
-Still to write, when there is something to say: `architecture.md` (once the engine and jobs
-arrive), `testing.md`, `security.md` and `observability-runbook.md` (once there is traffic to
+Still to write, when there is something to say: `testing.md`, `security.md` and `observability-runbook.md` (once there is traffic to
 ask questions about).

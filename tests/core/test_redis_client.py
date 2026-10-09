@@ -40,3 +40,24 @@ async def test_from_settings_sets_explicit_timeouts_and_pool_cap():
     assert kwargs["db"] == 2
     assert pool.max_connections == POOL_MAX_CONNECTIONS
     await store.close()
+
+
+@pytest.mark.asyncio
+async def test_queue_primitives():
+    store = RedisClient(fakeredis.FakeAsyncRedis(decode_responses=True))
+    assert await store.set_if_absent("lock", "a", ttl_ms=10_000) is True
+    assert await store.set_if_absent("lock", "b", ttl_ms=10_000) is False
+    assert await store.get("lock") == "a"
+    assert await store.pexpire("lock", 20_000) is True
+    assert await store.expire("lock", 30) is True
+    assert await store.zadd("z", {"x": 2.0, "y": 1.0}) == 2
+    assert await store.zadd("z", {"nope": 0.0}, only_existing=True) == 0
+    assert await store.zrange("z", 0, -1) == ["y", "x"]
+    assert await store.zcard("z") == 2
+    assert await store.zremrangebyscore("z", float("-inf"), 1.5) == 1
+    assert await store.zrem("z", "x") == 1 and await store.zrem("z") == 0
+    assert await store.hset("h", {"a": "1"}) == 1
+    assert await store.hincrby("h", "a", 2) == 3
+    assert await store.hgetall("h") == {"a": "3"}
+    assert [await store.incr("seq"), await store.incr("seq")] == [1, 2]
+    await store.close()
