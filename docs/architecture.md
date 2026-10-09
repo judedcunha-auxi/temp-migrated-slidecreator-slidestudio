@@ -674,11 +674,21 @@ app/api/
   routes/storyline.py  /api/storyline, /api/storyline-status, /api/intake
   routes/exports.py    /api/pptx-{submit,status,result}, /api/pptx-deck-{submit,status,result},
                        /api/image-to-slide
+  routes/decks.py      /api/decks
+  routes/generate.py   /api/generate, /api/retry, /api/status
+  routes/refine.py     /api/refine, /api/revert, /api/slide-transcript
+  routes/media.py      /api/image, /api/pdf, /api/pdf-deck
+  routes/quick.py      /api/quick-generate, /api/quick-status, /api/quick-image
 app/core/
   auth.py            TokenVerifier: a JWKS-verified JWT (issuer, audience, keys by configuration)
   darwin/            usage.py (the ledger, C10), image_gen.py (gpt-image port, D28), caps.py,
                      jobs.py (status shapes), exports.py (export job inputs, the deck job),
-                     runtime.py (registry, queue, models, workers)
+                     runtime.py (registry, queue, models, workers),
+                     prompt.py + prompt_text.py (Darwin's image prompt, byte-for-byte; the storyline
+                     job's SlidePrompter), deck_state.py (Darwin's JobState read from the slides port),
+                     generate.py / refine.py / quick.py (the -background functions as jobs),
+                     compose.py (Pillow: tile knock-out and composite, layout wireframe, PDF writer),
+                     media.py (version pictures, tile preview), js.py (JavaScript value semantics)
   brand/kit.py       normalize_kit (a partial port of brandKit.ts)
 tests/contract/      the contract harness: data/ (the oracle), cases/ (how to provoke each entry)
 ```
@@ -720,9 +730,30 @@ session", 403 "Admin access required"; an unreachable issuer is 500 "Internal er
 
 `app/core/darwin/runtime.py: build_runtime` wires one `JobRegistry` and `JobQueue` for the routes
 (`app.state.darwin`, built in the lifespan): the `storyline` job, the pipeline's jobs
-(`slides.design_and_export`, `exports.stitch_deck`, ...) and `darwin.pptx_deck` (resolves the
-caller's finished slide jobs, then stitches). Every type is registered NOT expensive: Darwin had no
-per-user in-flight limit, so the queue's limit of 3 would be a new 429 (TODO-P5 in-flight).
+(`slides.design_and_export`, `exports.stitch_deck`, ...), `darwin.pptx_deck` (resolves the
+caller's finished slide jobs, then stitches), and the generation batch's `darwin.generate`
+(generate and retry), `darwin.refine` and `darwin.quick_generate`, which were the `-background`
+functions (D31; they ran unauthenticated with a user id from the body, C12, and now run as the job's
+owner). Every type is registered NOT expensive: Darwin had no per-user in-flight limit, so the queue's
+limit of 3 would be a new 429 (TODO-P5 in-flight). The three generation jobs run once
+(`max_attempts=1`): a re-run would pay for every image again, and a failure is recorded per slide, as
+Darwin did. The storyline job's `prompter` is `DarwinSlidePrompter`, so each slide of a storyline
+result carries Darwin's image prompt.
+
+**Darwin's deck job state.** Darwin kept a per-deck `JobState` blob (each slide's status, error,
+versions and current version; the deck's master decision). Here those facts live in the General
+service: the slide rows (`status`, `error`, `versions`, `current`, `master_kind`, `is_tile`) and the
+deck (`master_used`, `master_skip_reason`). `deck_state.py` reads them back into `/api/status`'s
+body; "no job state yet" is a deck with no slide rows. Versions are append-only, so a retried slide
+gains a version where Darwin overwrote v1's image (which also fixes Darwin's broken `&v=` URL after
+retrying a done slide).
+
+**Darwin's image prompt.** `prompt.py` is `prompt.ts` (with `layoutMatcher.ts`, the workzone tile size
+of `workzone.ts`, and `refine.ts: buildSteeredPrompt`); the strings in `prompt_text.py` were dumped
+from the bundled TypeScript, not retyped, and tests/core/darwin/test_prompt.py compares 128 assembled
+prompts with Darwin's own output (by SHA-256; five in full). The brand kit's pass-through fields the
+prompt reads (`styleTemplate`, `layouts`, `typographyScale`, `allColors`, ...) are read beside the
+prompt (`prompt_kit`), leaving `BrandKit`'s CRUD-side shape to the brand routes.
 
 `WORKER_CONCURRENCY` (default 0) worker loops run inside the API process, started and stopped by
 the lifespan; with 0, jobs wait in Redis for a worker process. Tests run jobs inline
@@ -738,7 +769,8 @@ unfinished id, no ownership check, `# TODO-P5 ownership`).
 cost in `est_cost_usd` (Darwin's five-for-six argument slip put the cost in `model` and $0 in the
 cost column). Successful storyline and design jobs are ledgered by a wrapper in the runtime
 (`ledgered`, keyed by job id so a replay is not counted twice); intake turns by the route; images
-(Darwin's `EST_COST_PER_IMAGE` / `EST_COST_MASTER`) by the generation routes when they are ported.
+(Darwin's `EST_COST_PER_IMAGE` / `EST_COST_MASTER`, kind `image`) by the generation jobs, one row per
+image keyed by job and slide; quick-generate's storyline call too (Darwin's quick path recorded nothing).
 
 ### Caps (D12)
 
@@ -769,8 +801,11 @@ negative tests (the over-the-limit one is TODO-P5).
 
 ### Not done yet
 
-- The 27 other Darwin routes (two parallel porting efforts; see darwin-api.md).
-- The per-slide image `prompt` in the storyline result (`SlidePrompter`, with `prompt.ts`).
+- The brand, admin and analytics routes (the parallel porting effort; see darwin-api.md §1).
+- `/api/image` for HTML-mode slides (rendering an HTML version to PNG; 7c). Image mode is served.
+- The legacy per-user brand assets (`brand-assets/<userId>/master.png`, Darwin's fallback for a
+  migrated first brand): the port keeps assets under a brand, so the migration (D29) must move them
+  under one; until then a generation without a brand-scoped master renders without it.
 - Phase 5: Redis rate limits, in-flight caps, licensing, the pptx ownership decision (D33), and the
   over-the-limit tests. The route-controls rows mark each as TODO-P5.
 - A worker-only entry point.

@@ -17,8 +17,9 @@ place, written in Python and run on Azure:
   answered by this service instead of Netlify.
 
 The frame (Phase 1), the export engine (Phase 2) and the AI design core (Phase 3) are here, and
-the first of Darwin's routes have moved in (Phase 7a): the storyline, the intake chat, and the
-PowerPoint exports.
+the first of Darwin's routes have moved in (Phase 7a): the storyline, the intake chat, the
+PowerPoint exports, and deck generation itself (the slide images, retry, refine and revert, the
+deck's status, the picture and PDF downloads, and the one-shot "quick" generation).
 
 ## 2. What is here today
 
@@ -164,13 +165,16 @@ structured data"; in the service that is Claude, through the same model layer th
 and in the tests a scripted stand-in, so they cost nothing. [architecture.md](architecture.md#the-storyline-phase-3) has the design.
 
 **Darwin's first routes.** Darwin's web app and the auxi Connector call addresses like
-`/api/storyline` and `/api/pptx-submit`. The first ten of them are answered here now, exactly as
+`/api/storyline` and `/api/pptx-submit`. Twenty-three of them are answered here now, exactly as
 Netlify answers them today, down to the odd corners (an unknown job id says "pending" forever; a
 broken request body gets "Internal error", not "Bad request"), because the callers depend on them.
 The plan's recorded contract for each route is the test: every documented answer is reproduced, or
 the test says why it can no longer happen. Behind the routes, the old background functions are
 jobs on the queue, and "send it to Slide Studio" is a call to the design pipeline inside this
-service. [darwin-api.md](darwin-api.md) explains the layer and how to move the remaining routes.
+service. Those jobs run as the user who asked for them: Darwin's background functions could be
+called by anyone with any user id. The slide image prompt is Darwin's, byte for byte (a test
+compares it with Darwin's own output), and every image's cost now lands in the cost ledger.
+[darwin-api.md](darwin-api.md) explains the layer and how to move the remaining routes.
 
 **Who is calling.** Darwin's routes need a signed-in user. The caller sends a token from the
 identity provider; the service checks its signature against the provider's published keys, that

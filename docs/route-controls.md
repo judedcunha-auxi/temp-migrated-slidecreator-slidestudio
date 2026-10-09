@@ -74,11 +74,42 @@ routes are served so far; the other 27 and the new routes arrive in Phase 7a and
 | **Darwin PPTX submit**<br>`/api/pptx-submit` (every method)<br>`/api/pptx-deck-submit` (every method) | any signed-in user (bearer JWT, verified in-service: app/core/auth.py); the deck's owner (403 'Not your deck') | route | expensive | one design_and_export / stitch job per call (paid design turn + export) | not checked yet (D10) | legacy | rate-limit, in-flight, licence, over-the-limit-test | 405 is checked BEFORE auth (Darwin's order). Success is 200, not 202. |
 | **Darwin PPTX status + result**<br>`/api/pptx-status` (every method)<br>`/api/pptx-result` (every method)<br>`/api/pptx-deck-status` (every method)<br>`/api/pptx-deck-result` (every method) | any signed-in user (bearer JWT, verified in-service: app/core/auth.py); NO ownership check today (any job id), kept for the Connector | route | standard | a read of one job record (and one .pptx) | no | legacy | rate-limit, ownership, over-the-limit-test | Unknown or unfinished id: 502 (the Connector reads it as still running). Adding the ownership check is a D33 behaviour change; someone else's job must then answer the same 502. |
 | **Darwin image-to-slide**<br>`/api/image-to-slide` (every method) | any signed-in user (bearer JWT, verified in-service: app/core/auth.py) (the Auxi Connector) | route | expensive | multipart image <= 4 MiB; one design_and_export job (paid design turn) per call | not checked yet (D10) | legacy | rate-limit, in-flight, licence, over-the-limit-test | 405 'POST only' AFTER auth. JSON bodies are a 400. |
+| **Darwin decks**<br>`/api/decks` (every method) | any signed-in user (bearer JWT, verified in-service: app/core/auth.py); the deck's owner (another user's deck is 404 'Deck not found'; DELETE is a no-op) | route | standard | reads of the caller's decks; DELETE of one owned deck | no | legacy | rate-limit, over-the-limit-test | Only DELETE is told apart; every other method is a GET. Non-uuid id: 500. |
+| **Darwin generate**<br>`/api/generate` (every method) | any signed-in user (bearer JWT, verified in-service: app/core/auth.py) | route | expensive | one darwin.generate job: one paid image per slide (global image cap; no slide or deck cap, as Darwin) | not checked yet (D10) | legacy | rate-limit, in-flight, licence, over-the-limit-test | Method not checked. Any storyline validation failure is 500 'Internal error' (the Connector relies on it). |
+| **Darwin retry + refine**<br>`/api/retry` (every method)<br>`/api/refine` (every method) | any signed-in user (bearer JWT, verified in-service: app/core/auth.py); the deck's owner (403 'Not your deck') | route | expensive | one darwin.generate (listed slides) or darwin.refine (one slide) job: paid images under the global image cap; refine instruction <= 600 chars | not checked yet (D10) | legacy | rate-limit, in-flight, licence, over-the-limit-test | Method not checked. The jobs run as the job's owner: the -background bodies' userId is gone (C12). |
+| **Darwin status + revert**<br>`/api/status` (every method)<br>`/api/revert` (every method) | any signed-in user (bearer JWT, verified in-service: app/core/auth.py); the deck's owner (403 'Not your deck') | route | standard | reads of one deck's slides; revert moves a version pointer (no paid call) | no | legacy | rate-limit, over-the-limit-test |  |
+| **Darwin slide-transcript**<br>`/api/slide-transcript` (every method) | any signed-in user (bearer JWT, verified in-service: app/core/auth.py); the deck's owner (403 'Not your deck') | route | standard | one transcript upsert per call (attachment payloads stripped) | no | legacy | rate-limit, over-the-limit-test | 405 is checked BEFORE auth (Darwin's order). Storage errors are swallowed. |
+| **Darwin image + pdf**<br>`/api/image` (every method)<br>`/api/pdf` (every method) | any signed-in user (bearer JWT, verified in-service: app/core/auth.py); the deck's owner (403 'Not your deck') | route | standard | one stored picture per call (a tile is composited at 2560x1440; the PDF wraps one PNG) | no | legacy | rate-limit, over-the-limit-test | No method check. image: cache-control private, max-age=3600; pdf: none (every download counted). |
+| **Darwin pdf-deck**<br>`/api/pdf-deck` (every method) | any signed-in user (bearer JWT, verified in-service: app/core/auth.py); the deck's owner (403 'Not your deck') | route | expensive | one PDF of every done slide (CPU-bound, no paid call) | no | legacy | rate-limit, in-flight, licence, over-the-limit-test | The Connector reads 5xx/429 as 'still running' and any other 4xx as terminal. |
+| **Darwin quick-generate**<br>`/api/quick-generate` (every method) | any signed-in user (bearer JWT, verified in-service: app/core/auth.py) (external API users; no caller in Darwin or the Connector) | route | expensive | one darwin.quick_generate job: one paid storyline call and one paid image per slide; the global image cap now applies (C12); inline layout PNG <= 4 MiB | not checked yet (D10) | legacy | rate-limit, in-flight, licence, over-the-limit-test | No upper bound on numSlides, as Darwin. |
+| **Darwin quick-status**<br>`/api/quick-status` (every method) | any signed-in user (bearer JWT, verified in-service: app/core/auth.py); the job's owner (403 'Not your job'); an unknown id is 200 pending | route | standard | a read of one job record | no | legacy | rate-limit, over-the-limit-test |  |
+| **Darwin quick-image**<br>`/api/quick-image` (every method) | any signed-in user (bearer JWT, verified in-service: app/core/auth.py); the job's owner (403 'Not your job'; unknown id 404) | route | standard | one stored picture per call | no | legacy | rate-limit, over-the-limit-test |  |
 
 ### Every served route, and the row that covers it
 
 | Route | Row |
 |---|---|
+| `DELETE /api/decks` | Darwin decks |
+| `GET /api/decks` | Darwin decks |
+| `HEAD /api/decks` | Darwin decks |
+| `OPTIONS /api/decks` | Darwin decks |
+| `PATCH /api/decks` | Darwin decks |
+| `POST /api/decks` | Darwin decks |
+| `PUT /api/decks` | Darwin decks |
+| `DELETE /api/generate` | Darwin generate |
+| `GET /api/generate` | Darwin generate |
+| `HEAD /api/generate` | Darwin generate |
+| `OPTIONS /api/generate` | Darwin generate |
+| `PATCH /api/generate` | Darwin generate |
+| `POST /api/generate` | Darwin generate |
+| `PUT /api/generate` | Darwin generate |
+| `DELETE /api/image` | Darwin image + pdf |
+| `GET /api/image` | Darwin image + pdf |
+| `HEAD /api/image` | Darwin image + pdf |
+| `OPTIONS /api/image` | Darwin image + pdf |
+| `PATCH /api/image` | Darwin image + pdf |
+| `POST /api/image` | Darwin image + pdf |
+| `PUT /api/image` | Darwin image + pdf |
 | `DELETE /api/image-to-slide` | Darwin image-to-slide |
 | `GET /api/image-to-slide` | Darwin image-to-slide |
 | `HEAD /api/image-to-slide` | Darwin image-to-slide |
@@ -93,6 +124,20 @@ routes are served so far; the other 27 and the new routes arrive in Phase 7a and
 | `PATCH /api/intake` | Darwin storyline + intake |
 | `POST /api/intake` | Darwin storyline + intake |
 | `PUT /api/intake` | Darwin storyline + intake |
+| `DELETE /api/pdf` | Darwin image + pdf |
+| `GET /api/pdf` | Darwin image + pdf |
+| `HEAD /api/pdf` | Darwin image + pdf |
+| `OPTIONS /api/pdf` | Darwin image + pdf |
+| `PATCH /api/pdf` | Darwin image + pdf |
+| `POST /api/pdf` | Darwin image + pdf |
+| `PUT /api/pdf` | Darwin image + pdf |
+| `DELETE /api/pdf-deck` | Darwin pdf-deck |
+| `GET /api/pdf-deck` | Darwin pdf-deck |
+| `HEAD /api/pdf-deck` | Darwin pdf-deck |
+| `OPTIONS /api/pdf-deck` | Darwin pdf-deck |
+| `PATCH /api/pdf-deck` | Darwin pdf-deck |
+| `POST /api/pdf-deck` | Darwin pdf-deck |
+| `PUT /api/pdf-deck` | Darwin pdf-deck |
 | `DELETE /api/pptx-deck-result` | Darwin PPTX status + result |
 | `GET /api/pptx-deck-result` | Darwin PPTX status + result |
 | `HEAD /api/pptx-deck-result` | Darwin PPTX status + result |
@@ -135,6 +180,62 @@ routes are served so far; the other 27 and the new routes arrive in Phase 7a and
 | `PATCH /api/pptx-submit` | Darwin PPTX submit |
 | `POST /api/pptx-submit` | Darwin PPTX submit |
 | `PUT /api/pptx-submit` | Darwin PPTX submit |
+| `DELETE /api/quick-generate` | Darwin quick-generate |
+| `GET /api/quick-generate` | Darwin quick-generate |
+| `HEAD /api/quick-generate` | Darwin quick-generate |
+| `OPTIONS /api/quick-generate` | Darwin quick-generate |
+| `PATCH /api/quick-generate` | Darwin quick-generate |
+| `POST /api/quick-generate` | Darwin quick-generate |
+| `PUT /api/quick-generate` | Darwin quick-generate |
+| `DELETE /api/quick-image` | Darwin quick-image |
+| `GET /api/quick-image` | Darwin quick-image |
+| `HEAD /api/quick-image` | Darwin quick-image |
+| `OPTIONS /api/quick-image` | Darwin quick-image |
+| `PATCH /api/quick-image` | Darwin quick-image |
+| `POST /api/quick-image` | Darwin quick-image |
+| `PUT /api/quick-image` | Darwin quick-image |
+| `DELETE /api/quick-status` | Darwin quick-status |
+| `GET /api/quick-status` | Darwin quick-status |
+| `HEAD /api/quick-status` | Darwin quick-status |
+| `OPTIONS /api/quick-status` | Darwin quick-status |
+| `PATCH /api/quick-status` | Darwin quick-status |
+| `POST /api/quick-status` | Darwin quick-status |
+| `PUT /api/quick-status` | Darwin quick-status |
+| `DELETE /api/refine` | Darwin retry + refine |
+| `GET /api/refine` | Darwin retry + refine |
+| `HEAD /api/refine` | Darwin retry + refine |
+| `OPTIONS /api/refine` | Darwin retry + refine |
+| `PATCH /api/refine` | Darwin retry + refine |
+| `POST /api/refine` | Darwin retry + refine |
+| `PUT /api/refine` | Darwin retry + refine |
+| `DELETE /api/retry` | Darwin retry + refine |
+| `GET /api/retry` | Darwin retry + refine |
+| `HEAD /api/retry` | Darwin retry + refine |
+| `OPTIONS /api/retry` | Darwin retry + refine |
+| `PATCH /api/retry` | Darwin retry + refine |
+| `POST /api/retry` | Darwin retry + refine |
+| `PUT /api/retry` | Darwin retry + refine |
+| `DELETE /api/revert` | Darwin status + revert |
+| `GET /api/revert` | Darwin status + revert |
+| `HEAD /api/revert` | Darwin status + revert |
+| `OPTIONS /api/revert` | Darwin status + revert |
+| `PATCH /api/revert` | Darwin status + revert |
+| `POST /api/revert` | Darwin status + revert |
+| `PUT /api/revert` | Darwin status + revert |
+| `DELETE /api/slide-transcript` | Darwin slide-transcript |
+| `GET /api/slide-transcript` | Darwin slide-transcript |
+| `HEAD /api/slide-transcript` | Darwin slide-transcript |
+| `OPTIONS /api/slide-transcript` | Darwin slide-transcript |
+| `PATCH /api/slide-transcript` | Darwin slide-transcript |
+| `POST /api/slide-transcript` | Darwin slide-transcript |
+| `PUT /api/slide-transcript` | Darwin slide-transcript |
+| `DELETE /api/status` | Darwin status + revert |
+| `GET /api/status` | Darwin status + revert |
+| `HEAD /api/status` | Darwin status + revert |
+| `OPTIONS /api/status` | Darwin status + revert |
+| `PATCH /api/status` | Darwin status + revert |
+| `POST /api/status` | Darwin status + revert |
+| `PUT /api/status` | Darwin status + revert |
 | `DELETE /api/storyline` | Darwin storyline + intake |
 | `GET /api/storyline` | Darwin storyline + intake |
 | `HEAD /api/storyline` | Darwin storyline + intake |

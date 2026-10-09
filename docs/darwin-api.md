@@ -18,7 +18,12 @@ service). This page is the guide for porting the remaining routes. Read it with:
 | `/api/storyline`, `/api/storyline-status`, `/api/intake` | **ported** | `app/api/routes/storyline.py` |
 | `/api/pptx-submit`, `-status`, `-result`, `/api/pptx-deck-submit`, `-status`, `-result` | **ported** | `app/api/routes/exports.py` |
 | `/api/image-to-slide` | **ported** | `app/api/routes/exports.py` |
-| the other 27 routes | pending (xfail "not yet ported" in the harness) | |
+| `/api/decks` | **ported** | `app/api/routes/decks.py` |
+| `/api/generate`, `/api/retry`, `/api/status` | **ported** (`generate-background` is the `darwin.generate` job) | `app/api/routes/generate.py`, `app/core/darwin/generate.py` |
+| `/api/refine`, `/api/revert`, `/api/slide-transcript` | **ported** (`refine-background` is the `darwin.refine` job) | `app/api/routes/refine.py`, `app/core/darwin/refine.py` |
+| `/api/image`, `/api/pdf`, `/api/pdf-deck` | **ported** (image mode; sharp/pdf-lib -> Pillow) | `app/api/routes/media.py`, `app/core/darwin/{media,compose}.py` |
+| `/api/quick-generate`, `/api/quick-status`, `/api/quick-image` | **ported** (`quick-generate-background` is the `darwin.quick_generate` job) | `app/api/routes/quick.py`, `app/core/darwin/quick.py` |
+| the brand, admin, analytics and userinfo routes | pending (xfail "not yet ported" in the harness) | |
 | the 7 `*-background` paths | **not served**, by decision (D31); the harness checks they 404 | |
 
 ## 2. The pieces you build on
@@ -49,6 +54,11 @@ service). This page is the guide for porting the remaining routes. Read it with:
 | The image cap / per-user caps | `reserve_image_slot(redis)`, `reserve_intake_turn(...)`, `reserve_brand_extract(...)` | `app/core/darwin/caps.py` |
 | Generate an image | `runtime.images.generate(prompt, size=..., transparent=...)`, `.edit(prompt, [png])` | `app/core/darwin/image_gen.py` |
 | The brand kit | `normalize_kit(raw, legacy)`, `archetype_for_type(type)` (partial port of `brandKit.ts`) | `app/core/brand/kit.py` |
+| The kit as the image prompt reads it; the brand to use | `prompt_kit(raw, legacy)`, `resolve_brand_source(storage, ctx, brand_id)` | `app/core/darwin/prompt.py` |
+| Darwin's image prompt | `assemble_slide_prompt(...)`, `steered_prompt(...)`, `match_layout`, `layout_hint_text` | `app/core/darwin/prompt.py` |
+| A deck's job state (`/api/status`) | `status_body`, `current_version`, `version_list`, `image_ref_for` | `app/core/darwin/deck_state.py` |
+| `Number(x)`, `Number.isInteger`, `Math.round`, `String(n)`, `trim`, `.length` | `js_number`, `is_js_integer`, `js_round`, `js_str`, `js_trim`, `js_length` | `app/core/darwin/js.py` |
+| PNG -> PDF, tile composite | `pdf_from_pngs`, `composite_tile`, `knock_out_background` | `app/core/darwin/compose.py` |
 
 ## 3. The quirks, and the helper for each
 
@@ -141,6 +151,14 @@ ROUTES = [decks]
   (a real signed token), `env.user(...)`, `env.seed_deck(...)`, `env.run_jobs()`, `env.job(...)`,
   `env.store` (the General service fake), `env.model` (scripted storyline model: append steps),
   `env.images` (fake image generator), `env.call(async_fn, ...)` (run on the app's loop).
+- **Deck fixtures** for the generation routes are in `tests/fakes/darwin_decks.py`: `generated_deck`
+  (through `/api/generate` and its job), `empty_deck` (no job state yet), `put_version`, `tile_brand`,
+  `fill_image_cap`, and `memo(env)` to hand an id from a probe's `run` to its `check`.
+- **How the shape check reads the contract's prose:** a key whose description says it may be left out
+  ("omitted", "present only") is optional, like `key?`; a `<placeholder>` key (`"<slideNumber as
+  string key>"`) is a map whose every value has that shape; a literal with `{placeholders}`
+  (`'Generated {doneCount} of {totalSlides} slides…'`) and a documented header with `<placeholders>`
+  (`attachment; filename="slide_<slide>.pdf"`) are templates.
 - The harness fails an entry with neither a case nor a reason, and a case for an entry the contract
   does not document. Run it: `pytest tests/contract -q`.
 
@@ -165,7 +183,47 @@ Deliberate, and to go in the release notes:
 - **image-to-slide accepts GIF as before, converted to PNG** (its first frame) for the pipeline.
 - **Job ids are the durable record's UUIDs** (Slide Studio's were `j_xxxxxxxxxxxx`); the Connector
   only checks `[A-Za-z0-9_-]{1,128}`, which they meet.
-- **The storyline job result has no per-slide `prompt` yet.** Darwin's image prompt (`prompt.ts`)
-  is ported with the generation routes; it plugs in as the runtime's `prompter`.
+- **The storyline job result carries each slide's `prompt` again**, assembled by the port of
+  `prompt.ts` (`DarwinSlidePrompter`, the runtime's default `prompter`), byte-for-byte Darwin's.
+- If the brand kit cannot be read while a storyline's prompts are built (a storage outage), the
+  prompts use the default kit; Darwin failed the job (here a failed job would be re-run and the
+  storyline call paid again).
+- **The `-background` functions are internal jobs that run as their owner** (D31, closes C12):
+  `darwin.generate` (generate, retry), `darwin.refine`, `darwin.quick_generate`. Darwin's ran
+  unauthenticated with a `userId` from the body. They run once (`max_attempts=1`): no paid re-run.
+- **quick-generate is under the global image cap** (plan §6.5, C12): Darwin's background skipped
+  `reserveImageSlot`. No slot left fails the job with "Free capacity reached, try again tomorrow.";
+  the first failure cancels the images still being drawn (Darwin let them run and pay).
+- **Every generated or refined image is in the cost ledger** (kind `image`, Darwin's estimates, the
+  image model in `model`), and quick-generate's storyline call too; Darwin's rows were $0 (C10) and
+  quick-generate recorded none. A failed ledger write no longer turns a rendered slide into an error.
+- **Versions are append-only.** A retried slide gains a version and points at it; Darwin overwrote
+  v1's image in place and bumped a cache-bust counter, so a retried *done* slide got an `&v=` URL
+  that `/api/image` could not find (a Darwin bug, fixed by this). An errored slide keeps the versions
+  it had; Darwin's job state dropped them until the next success.
+- **Refine on a slide number the deck does not have** answers 202 as before but adds no phantom
+  slide (Darwin added one to the job state, and `/api/status` counted it); the job fails quietly.
+- **A refined slide keeps its master kind** (Darwin dropped it, so a second refine of a title or
+  divider slide fell back to the Layout master). Like Darwin, it is no longer a workzone tile.
+- **Refine's attachment** is stored as a blob for the job and deleted after; only the first image was
+  ever used, as before.
+- **Error texts without internals:** an image-provider failure still shows the provider's message
+  (a content-policy refusal reads as the slide's error, as in Darwin); any other failure reads "Image
+  generation failed", "Refinement failed" or "Generation failed" where Darwin showed the exception's
+  text. A quick job whose storyline fails validation shows Darwin's storyline text ("Claude returned
+  an incomplete storyline — ...") instead of the raw zod message.
+- **Darwin's per-user legacy master** (`brand-assets/<userId>/master.png`, the pre-multi-brand
+  fallback) is not read: the port keeps assets under a brand, so the migration (D29) must move it.
+- **"No job state yet"** (`/api/status`'s `Starting…` body, revert's and pdf-deck's 404) is a deck with
+  no slide rows; `/api/generate` writes them before it answers, as Darwin wrote the job state.
+- **PDFs** are written by a small Flate writer (lossless, page size = picture size, as pdf-lib); the
+  tile composite and the layout wireframe are drawn with Pillow (pixel-level differences from sharp
+  and an SVG raster are expected; the shapes, colours and labels are Darwin's).
+- **`/api/decks?id=`** returns the deck and slide rows built from the port's records with Darwin's
+  column names (`owner`, `variant_a_status`, `variant_a_blob_key` = the current version's picture
+  ref, `variant_b_*` null, ...) and a stable synthetic slide `id`. `inputs` is `{}` where Darwin
+  stored `null` (no inputs posted).
+- **`/api/generate`** truncates a title over 500 characters and drops a `creationMethod` over 32
+  (Darwin's fire-and-forget update failed silently on them; the response is the same).
 - **Model and limits** of the storyline and intake: see architecture.md, "Behaviour changes against
   Darwin today" in the storyline section.
