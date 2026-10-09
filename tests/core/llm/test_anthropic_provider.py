@@ -161,3 +161,12 @@ def test_a_full_turn_through_the_provider_with_a_continuation():
 def test_no_key_means_no_client():
     with pytest.raises(ProviderUnavailable):
         _ = AnthropicProvider(build_ai_settings()).client
+
+
+def test_a_json_schema_becomes_structured_output_beside_the_effort():
+    schema = {"type": "object", "properties": {"title": {"type": "string"}}, "required": ["title"],
+              "additionalProperties": False}
+    params = AnthropicProvider(build_ai_settings(), client=object()).params(request(output_schema=schema),
+                                                                            streaming=False)
+    assert params["output_config"] == {"effort": "high", "format": {"type": "json_schema", "schema": schema}}
+    assert "tool_choice" not in params, "no forced tool call: the 5.5 models reject it"

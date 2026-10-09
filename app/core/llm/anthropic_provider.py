@@ -106,8 +106,13 @@ class AnthropicProvider:
                 params["thinking"] = dict(model.minimal_thinking)
         elif model.adaptive:
             params["thinking"] = {"type": "adaptive", "display": "summarized"}
+        output: dict[str, Any] = {}
         if model.effort:
-            params["output_config"] = {"effort": request.effort}
+            output["effort"] = request.effort
+        if request.output_schema is not None:
+            output["format"] = {"type": "json_schema", "schema": request.output_schema}
+        if output:
+            params["output_config"] = output
         if request.tools:
             params["tools"] = request.tools
         if streaming:

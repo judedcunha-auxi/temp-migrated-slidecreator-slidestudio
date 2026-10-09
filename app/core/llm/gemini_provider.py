@@ -62,6 +62,8 @@ class GeminiProvider:
         return self._client
 
     def params(self, request: RoundRequest, *, stream: bool) -> JSON:
+        if request.output_schema is not None:
+            raise ProviderError("structured output is not wired for Gemini; use a Claude model")
         params: JSON = {
             "model": request.model,
             "input": history.to_gemini(request.messages, request.attachments_root),

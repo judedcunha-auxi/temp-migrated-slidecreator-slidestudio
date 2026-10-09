@@ -164,9 +164,7 @@ def check_config(s: Settings, engine: EngineSettings | None = None, ai: AISettin
     problems: list[str] = []
     production = is_production(s)
     engine = engine if engine is not None else engine_settings
-    ai = ai if ai is not None else ai_settings
     problems.extend(check_engine_config(engine))
-    problems.extend(check_ai_config(ai))
 
     # --- always, any environment ------------------------------------------------
     if s.environment and s.environment not in PRODUCTION_ENVIRONMENTS | NON_PRODUCTION_ENVIRONMENTS:
@@ -202,6 +200,10 @@ def check_config(s: Settings, engine: EngineSettings | None = None, ai: AISettin
             problems.append("GENERAL_SERVICE_URL must use https in production.")
     if s.scratch_root and not Path(s.scratch_root).is_absolute():
         problems.append("SCRATCH_ROOT must be an absolute path.")
+
+    # --- the AI features (app/config/ai.py) -------------------------------------
+    ai = ai if ai is not None else ai_settings
+    problems.extend(check_ai_config(ai))
 
     # --- production only --------------------------------------------------------
     if production:

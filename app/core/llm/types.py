@@ -91,6 +91,9 @@ class RoundRequest:
     attachments_root: Any = None
     #: Ask for as little reasoning as the model allows (the critic, the role annotator).
     minimal_thinking: bool = False
+    #: A JSON schema the answer must match (structured output, `output_config.format`): what the
+    #: storyline asks for instead of a forced tool call, which the 5.5 models reject.
+    output_schema: JSON | None = None
 
 
 @dataclass
