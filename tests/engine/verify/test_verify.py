@@ -383,8 +383,8 @@ def test_lint_flags_a_weight_the_theme_fonts_lack(sample_manifest: Manifest, mas
     assert "font-weight" in _rules(weight("600"), calibri)               # no 600 face either way
     message = next(f.message for f in lint(weight("600"), calibri).findings if f.rule == "font-weight")
     assert "neither Calibri Light nor Calibri" in message
-    if installed("Calibri"):
-        assert "(Calibri Bold)" in message
+    # The nearest face it names: Calibri Bold, or on Linux its metric twin Carlito Bold.
+    assert ("(Calibri Bold)" if installed("Calibri") else "(Carlito Bold)") in message
     for fine in ("400", "700", "bold", "normal", "lighter", "bolder"):
         assert "font-weight" not in _rules(weight(fine), sample_manifest), fine
     assert "font-weight" not in _rules(weight("300")), "no manifest, no guess"

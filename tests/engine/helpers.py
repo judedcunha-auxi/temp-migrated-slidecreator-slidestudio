@@ -89,10 +89,15 @@ WINDOWS_ONLY_REASON = ("needs {missing}, which ship only with Windows or Office 
 
 
 def installed(family: str, weight: int = 400, italic: bool = False) -> bool:
-    """Whether `family` itself (not a stand-in) is installed in the font folders the engine scans."""
-    from app.engine.emit.text import face_for_exact
+    """Whether `family` itself (not a stand-in) is installed in the font folders the engine scans.
 
-    return face_for_exact(family, weight, italic) is not None
+    A metric twin filed under the family's name (`text.METRIC_TWINS`, Carlito for Calibri) does not
+    count: tests that need the face itself skip without it.
+    """
+    from app.engine.emit.text import face_for_exact, twin_stands_in
+
+    face = face_for_exact(family, weight, italic)
+    return face is not None and not twin_stands_in(face, family)
 
 
 def available(families: Any) -> list[str]:

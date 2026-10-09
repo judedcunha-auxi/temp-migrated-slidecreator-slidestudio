@@ -382,6 +382,29 @@ def test_font_size_keeps_hundredth_of_a_point_precision(emitted):
     assert rPr.get("sz") == str(round(20.0 * config.FONT_SZ_PER_PX))     # 1500 = 15.00 pt
 
 
+def _measured_here(lines: list[dict]) -> bool:
+    """Whether this machine's fonts reproduce the line widths a fixture recorded (within the width
+    lock's 0.25 px dead band). The emitter fixtures were measured with Windows' Arial and Calibri;
+    Linux has an older Arial (ttf-mscorefonts-installer) and Carlito for Calibri, whose advances
+    differ by a fraction of a pixel on a line. Where they differ, the width lock rightly tracks the
+    line by a few hundredths of a point, so an assertion of exactly zero tracking is platform-bound.
+    """
+    for line in lines:
+        predicted = sum(
+            text_engine.text_width_px(str(r.get("text") or ""), r.get("font"), float(r.get("sizePx") or 0),
+                                      int(r.get("weight") or 400), bool(r.get("italic")))
+            + float(r.get("letterSpacingPx") or 0) * len(str(r.get("text") or ""))
+            for r in line["runs"])
+        if abs(predicted - float(line["box"]["w"])) > 0.25:
+            return False
+    return True
+
+
+#: The largest width-lock tracking (hundredths of a point) a fraction-of-a-pixel font difference
+#: produces on these fixture lines: far below any deliberate letter spacing or squeeze.
+FONT_VERSION_TRACKING = 5
+
+
 def test_run_properties_round_trip(emitted):
     out, _, _, _, _ = emitted["emit-text"]
     runs = by_name(out, "mixed-runs").text_frame.paragraphs[0].runs
@@ -390,7 +413,12 @@ def test_run_properties_round_trip(emitted):
     assert props["italic"].get("i") == "1"
     assert props["underline"].get("u") == "sng"
     assert props["strike"].get("strike") == "sngStrike"
-    assert int(props["wide"].get("spc")) == round(2.5 * config.PT_PER_PX * 100)
+    wide = round(2.5 * config.PT_PER_PX * 100)                            # 2.5 px of letter spacing
+    mixed = next(e for e in load_ir("emit-text").elements if e.name == "mixed-runs")
+    if _measured_here(mixed.paragraphs[0]["lines"]):
+        assert int(props["wide"].get("spc")) == wide
+    else:
+        assert abs(int(props["wide"].get("spc")) - wide) <= FONT_VERSION_TRACKING
     supers = [r for r in runs if r._r.get_or_add_rPr().get("baseline") == "30000"]
     subs = [r for r in runs if r._r.get_or_add_rPr().get("baseline") == "-30000"]
     assert len(supers) == 1 and len(subs) == 1
@@ -2048,9 +2076,15 @@ def test_cell_width_lock_tracking(emitted):
     runs = _rich_cell(emitted, 0, 3).text_frame.paragraphs[0].runs
     assert int(runs[0]._r.get_or_add_rPr().get("spc")) < 0
     for r, c in ((0, 1), (1, 1), (2, 1)):
+        lines = [line for paragraph in _rich_ir_cell(r, c)["paragraphs"] for line in paragraph["lines"]]
         for run in _rich_cell(emitted, r, c).text_frame.paragraphs[0].runs:
             # R3: `spc` is always written, "0" when there is no tracking (a style must not show through).
-            assert run._r.get_or_add_rPr().get("spc") == "0", (r, c)
+            spc = run._r.get_or_add_rPr().get("spc")
+            assert spc is not None, (r, c)
+            if _measured_here(lines):
+                assert spc == "0", (r, c)
+            else:
+                assert abs(int(spc)) <= FONT_VERSION_TRACKING, (r, c, spc)
 
 
 def test_cell_margins_shifted_by_the_vertical_model(emitted):
