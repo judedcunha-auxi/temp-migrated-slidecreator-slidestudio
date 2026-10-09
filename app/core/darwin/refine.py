@@ -25,16 +25,14 @@ divider slide fell back to the Layout master).
 
 from __future__ import annotations
 
-import base64
-import binascii
 import logging
-import re
 from typing import Any
 
 from app.core.darwin import prompt_text as text
 from app.core.darwin.caps import CAP_REACHED, reserve_image_slot
 from app.core.darwin.generate import GenerationDeps, read_brand_asset
 from app.core.darwin.image_gen import GeneratedImage, ImageGenError
+from app.core.darwin.js import node_base64
 from app.core.darwin.prompt import resolve_brand_source, steered_prompt
 from app.core.darwin.usage import EST_COST_MASTER, EST_COST_PER_IMAGE, KIND_IMAGE, record_usage_quietly
 from app.core.errors import ApiError
@@ -54,7 +52,6 @@ NO_SUCH_SLIDE = "No such slide"
 NO_SUCH_VERSION = "No such version"
 
 ATTACHMENT_TYPES = ("image/jpeg", "image/png", "image/gif", "image/webp")
-_B64_JUNK = re.compile(r"[^A-Za-z0-9+/_-]")
 USER_IMAGE_NOTE = ("Image {n} is a reference provided by the user — incorporate its relevant visual elements or "
                    "style into the slide where they align with the refinement request.")
 _ASSET_FOR_KIND = {"title": "titleMaster", "divider": "dividerMaster", "layout": "master"}
@@ -74,12 +71,8 @@ def valid_attachments(attachments: Any) -> list[dict[str, Any]]:
 
 
 def decode_attachment(data: str) -> bytes:
-    """`Buffer.from(data, 'base64')`: lenient (characters outside the alphabet are skipped, padding optional)."""
-    cleaned = _B64_JUNK.sub("", data.split("=", 1)[0]).replace("-", "+").replace("_", "/")
-    try:
-        return base64.b64decode(cleaned + "=" * (-len(cleaned) % 4))
-    except (binascii.Error, ValueError):
-        return b""
+    """`Buffer.from(data, 'base64')`: lenient, never raises (`js.node_base64`)."""
+    return node_base64(data)
 
 
 async def mark_generating(storage: Storage, ctx: CallerContext, deck_id: str, number: int) -> None:

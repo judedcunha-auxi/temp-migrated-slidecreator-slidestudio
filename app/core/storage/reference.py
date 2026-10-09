@@ -33,7 +33,13 @@ from app.core.storage.models import (
     DOMAIN_PATTERN,
     MAX_JSON_BYTES,
     TERMINAL_JOB_STATUSES,
+    AdminActivity,
     AdminAggregates,
+    AdminDeckRow,
+    AdminIntakeRow,
+    AdminOverview,
+    AdminSlideEditRow,
+    AdminUsageRow,
     AnalyticsEvent,
     AnalyticsEventCreate,
     AssetInfo,
@@ -457,6 +463,13 @@ class _Orgs:
             if _DOMAIN.match(domain):
                 c.backend.delete("org_domains", domain)
 
+    async def count_accounts(self, ctx: CallerContext, domain: str) -> int:
+        c = self._c
+        with c.lock:
+            c.require_admin(ctx)
+            suffix = "@" + (domain or "").strip().lower()
+            return sum(1 for p in c.scan(Profile, "profiles") if p.email and p.email.lower().endswith(suffix))
+
 
 class _Brands:
     def __init__(self, core: _Core) -> None:
@@ -590,6 +603,12 @@ class _Brands:
             if raw is not None:
                 c.delete_bytes(str(raw["info"]["ref"]))
                 c.backend.delete("brand_assets", key)
+
+    async def list_org(self, ctx: CallerContext) -> list[Brand]:
+        c = self._c
+        with c.lock:
+            c.require_admin(ctx)
+            return sorted((b for b in c.scan(Brand, "brands") if b.is_org), key=lambda b: b.name)
 
 
 class _Masters:
@@ -1234,6 +1253,58 @@ class _Analytics:
             return AdminAggregates(users=len(c.backend.scan("profiles")), decks=len(c.backend.scan("decks")),
                                    exports=len(c.backend.scan("exports")), events_by_name=events,
                                    spend_usd=round(spend, 4))
+
+    async def admin_overview(self, ctx: CallerContext, *, since: datetime, recent_decks: int = 20) -> AdminOverview:
+        c = self._c
+        if not 1 <= recent_decks <= MAX_PAGE:
+            raise InvalidInput(f"recent_decks must be between 1 and {MAX_PAGE}")
+        with c.lock:
+            c.require_admin(ctx)
+            profiles = sorted(c.scan(Profile, "profiles"), key=lambda p: p.created_at, reverse=True)
+            decks = sorted(c.scan(Deck, "decks"), key=lambda d: d.created_at, reverse=True)
+            rows = [AdminDeckRow(id=d.id, owner_id=d.owner_id, title=d.title, status=d.status,
+                                 creation_method=d.creation_method, slide_count=d.slide_count,
+                                 refine_count=d.refine_count, export_count=d.export_count, created_at=d.created_at)
+                    for d in decks]
+            usage = [AdminUsageRow(created_at=e.created_at, est_cost_usd=e.est_cost_usd)
+                     for e in c.scan(UsageEvent, "usage") if e.created_at >= since]
+            return AdminOverview(profiles=profiles, decks_since=[r for r in rows if r.created_at >= since],
+                                 usage_since=usage, recent_decks=rows[:recent_decks])
+
+    async def admin_activity(
+        self,
+        ctx: CallerContext,
+        *,
+        since: datetime,
+        events: int = 2000,
+        intake: int = 50,
+        slide_edits: int = 100,
+    ) -> AdminActivity:
+        c = self._c
+        if min(events, intake, slide_edits) < 1 or max(events, intake, slide_edits) > 5000:
+            raise InvalidInput("limits must be between 1 and 5000")
+        with c.lock:
+            c.require_admin(ctx)
+            found = sorted((e for e in c.scan(AnalyticsEvent, "analytics") if e.created_at >= since),
+                           key=lambda e: e.created_at, reverse=True)
+            transcripts = sorted(c.scan(IntakeTranscript, "intake"), key=lambda t: t.created_at, reverse=True)
+            edits = sorted(c.scan(SlideEditTranscript, "slide_edits"), key=lambda t: t.updated_at, reverse=True)
+            return AdminActivity(
+                events=found[:events],
+                intake=[AdminIntakeRow(id=_row_id("intake", f"{t.user_id}:{t.session_key}"), user_id=t.user_id,
+                                       deck_id=t.deck_id, turn_count=t.turn_count, total_chars=t.total_chars,
+                                       messages=t.messages, brief=t.brief, created_at=t.created_at,
+                                       completed_at=t.completed_at) for t in transcripts[:intake]],
+                slide_edits=[AdminSlideEditRow(id=_row_id("slide_edit", f"{t.deck_id}:{t.slide_number}"),
+                                               user_id=t.user_id, deck_id=t.deck_id, slide_number=t.slide_number,
+                                               messages=t.messages, refine_count=t.refine_count,
+                                               updated_at=t.updated_at) for t in edits[:slide_edits]],
+            )
+
+
+def _row_id(kind: str, key: str) -> str:
+    """A stable id for a row the reference store keys by its natural key (the General service has ids)."""
+    return str(uuid.uuid5(uuid.NAMESPACE_URL, f"slideforge:{kind}:{key}"))
 
 
 class _Health:

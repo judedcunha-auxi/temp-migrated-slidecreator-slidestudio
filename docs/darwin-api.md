@@ -18,12 +18,15 @@ service). This page is the guide for porting the remaining routes. Read it with:
 | `/api/storyline`, `/api/storyline-status`, `/api/intake` | **ported** | `app/api/routes/storyline.py` |
 | `/api/pptx-submit`, `-status`, `-result`, `/api/pptx-deck-submit`, `-status`, `-result` | **ported** | `app/api/routes/exports.py` |
 | `/api/image-to-slide` | **ported** | `app/api/routes/exports.py` |
+| `/api/brands`, `/api/brand-asset`, `/api/brand-pptx`, `-status`, `/api/brand-archetypes`, `/api/brand-heading`, `/api/brand-extract`, `-status`, `/api/brand-preview`, `-status` | **ported** | `app/api/routes/brands.py` |
+| `/api/admin-metrics`, `/api/admin-org-brands` | **ported** | `app/api/routes/admin.py` |
+| `/api/analytics-event` | **ported** | `app/api/routes/analytics.py` |
+| `/api/userinfo` | **ported** | `app/api/routes/identity.py` |
 | `/api/decks` | **ported** | `app/api/routes/decks.py` |
 | `/api/generate`, `/api/retry`, `/api/status` | **ported** (`generate-background` is the `darwin.generate` job) | `app/api/routes/generate.py`, `app/core/darwin/generate.py` |
 | `/api/refine`, `/api/revert`, `/api/slide-transcript` | **ported** (`refine-background` is the `darwin.refine` job) | `app/api/routes/refine.py`, `app/core/darwin/refine.py` |
 | `/api/image`, `/api/pdf`, `/api/pdf-deck` | **ported** (image mode; sharp/pdf-lib -> Pillow) | `app/api/routes/media.py`, `app/core/darwin/{media,compose}.py` |
 | `/api/quick-generate`, `/api/quick-status`, `/api/quick-image` | **ported** (`quick-generate-background` is the `darwin.quick_generate` job) | `app/api/routes/quick.py`, `app/core/darwin/quick.py` |
-| the brand, admin, analytics and userinfo routes | pending (xfail "not yet ported" in the harness) | |
 | the 7 `*-background` paths | **not served**, by decision (D31); the harness checks they 404 | |
 
 ## 2. The pieces you build on
@@ -53,11 +56,12 @@ service). This page is the guide for porting the remaining routes. Read it with:
 | Record what a paid call cost | `record_usage(storage.usage, ctx, model=..., cost_usd=..., kind=...)` | `app/core/darwin/usage.py` |
 | The image cap / per-user caps | `reserve_image_slot(redis)`, `reserve_intake_turn(...)`, `reserve_brand_extract(...)` | `app/core/darwin/caps.py` |
 | Generate an image | `runtime.images.generate(prompt, size=..., transparent=...)`, `.edit(prompt, [png])` | `app/core/darwin/image_gen.py` |
-| The brand kit | `normalize_kit(raw, legacy)`, `archetype_for_type(type)` (partial port of `brandKit.ts`) | `app/core/brand/kit.py` |
-| The kit as the image prompt reads it; the brand to use | `prompt_kit(raw, legacy)`, `resolve_brand_source(storage, ctx, brand_id)` | `app/core/darwin/prompt.py` |
+| The brand kit | `normalize_kit(raw, legacy)`, `archetype_for_type(type)`; the write side: `sanitize_kit_patch`, `merge_kit`, `brand_asset_key`, `normalize_heading_placeholder` | `app/core/brand/kit.py` |
+| `getBrandAccess` / `requireBrand` | `get_brand_access(storage, ctx, id)` (None: not visible), `require_brand(..., "read" or "edit")` (400/404/403), `editable_or_404(...)` (a member gets 404) | `app/core/darwin/brands.py` |
+| JavaScript's `Number()`, `Number.isInteger`, `Buffer.from(s, "base64")`, `Math.round`, `String(n)`, `trim`, `.length` | `js_number`, `js_is_integer` (= `is_js_integer`), `node_base64`, `js_round`, `js_str`, `js_trim`, `js_length` | `app/core/darwin/js.py` |
+| The kit as the image prompt reads it; the brand to use | `prompt_kit(raw, legacy)`, `kit_for_prompt(kit)`, `resolve_brand_source(storage, ctx, brand_id)` | `app/core/darwin/prompt.py` |
 | Darwin's image prompt | `assemble_slide_prompt(...)`, `steered_prompt(...)`, `match_layout`, `layout_hint_text` | `app/core/darwin/prompt.py` |
 | A deck's job state (`/api/status`) | `status_body`, `current_version`, `version_list`, `image_ref_for` | `app/core/darwin/deck_state.py` |
-| `Number(x)`, `Number.isInteger`, `Math.round`, `String(n)`, `trim`, `.length` | `js_number`, `is_js_integer`, `js_round`, `js_str`, `js_trim`, `js_length` | `app/core/darwin/js.py` |
 | PNG -> PDF, tile composite | `pdf_from_pngs`, `composite_tile`, `knock_out_background` | `app/core/darwin/compose.py` |
 
 ## 3. The quirks, and the helper for each
@@ -90,8 +94,10 @@ Each is in `INDEX.md` "Cross-cutting quirks"; the helper's docstring cites it.
    a D12/D33 behaviour change.
 9. **A failed background trigger was swallowed** (job pending forever): nothing to reproduce; the
    queue keeps a job until a worker runs it.
-10. **`/api/userinfo`**: no verification, Latin-1 `atob`, two 401 bodies, no content-type on errors
-    (`error_response(..., content_type=False)`).
+10. **`/api/userinfo`**: no verification, Latin-1 `atob`, two 401 bodies (`detail` reproduces the
+    JavaScript exception text), and Darwin set no content-type on errors, so the Fetch default
+    `text/plain;charset=UTF-8` went out (the contract records that value; `app/api/routes/identity.py`
+    sends it).
 
 Also: Darwin's `errorResponse` turns any non-`HttpError` into 500 `{"error":"Internal error"}`; on a
 legacy route an unhandled exception does exactly that. A deliberate `ApiError` keeps its message at
@@ -227,3 +233,45 @@ Deliberate, and to go in the release notes:
   (Darwin's fire-and-forget update failed silently on them; the response is the same).
 - **Model and limits** of the storyline and intake: see architecture.md, "Behaviour changes against
   Darwin today" in the storyline section.
+
+Brand, admin, analytics and identity routes (feature/darwin-brands):
+
+- **The brand `-background` functions are internal jobs** (`darwin.brand_pptx`, `darwin.brand_guidelines`,
+  `darwin.brand_preview`) that run as the submitting user (C12 closed for them): the brand ACL is
+  re-checked through the port when the job runs. A job of another user is 403 "Not your job", an
+  unknown one pending, as before.
+- **brand-pptx calls no external brand-extract service.** The extractor runs in-process
+  (`app/core/brand/extract.py`), layout previews come from PptxRender through the `Renderer` port.
+  Failures read differently: a deck the extractor cannot open is `status: error` with the
+  extractor's own text ("The file could not be opened as a PowerPoint deck."), not
+  "SlideForge brand-extract failed (4xx): ...". Rendering stays best-effort.
+- **Logos are auto-extracted only when the extractor labels an image `logo` / `logo_mark`.** That
+  label comes from the role-annotation model pass, which is off; the old upstream service labelled
+  images itself. A logo can still be uploaded through `/api/brand-asset`.
+- **brand-asset's pre-multi-brand fallback is gone.** Darwin served a personal brand's missing
+  `logo` / `master` from a per-user legacy blob; those blobs move into the brand's own assets with
+  the data migration (D29), so a missing asset is 404 "No asset uploaded".
+- **POST /api/brands has the 20-personal-brand cap** of the store (0011's RLS cap, which Darwin's
+  service-role API path bypassed): the 21st is 409 "Brand limit reached (20 personal brands)". New
+  status and text (D33).
+- **Deleting a brand deletes its assets** (the port cascades); Darwin left the blobs behind.
+  `DELETE /api/admin-org-brands?brandId=` likewise.
+- **The brand preview**: no layout wireframe for brands with extracted layouts but no master (Darwin
+  synthesised one with sharp; the preview is then prompt-only); the prompt is `assembleSlidePrompt`
+  for the sample slide, through the generation routes' prompt module (`app/core/darwin/prompt.py`);
+  the cache is per brand (`preview-<hash>`), not per requesting user; a brand that is no longer
+  editable when the job runs fails the job ("Brand not found") instead of falling back to the user's
+  legacy kit; and the image is ledgered (`kind` image, C10).
+- **The guidelines extraction is ledgered** (`kind` brand_guidelines) and uses a structured-output
+  schema instead of a forced tool call (same fields and limits). Its per-user cap is wired and OFF
+  (`BRAND_EXTRACT_CAP_ENABLED`); on, it is a new 429 "Daily guidelines extraction limit reached, try
+  again tomorrow." checked after the PDF and brand checks.
+- **admin-metrics shows real costs** (C10 is fixed in the ledger), so `totalCostUsd` and
+  `dailyActivity[].costUsd` are no longer always 0.
+- **analytics-event**: a `page_exited` event without a session id or path, or a value the store
+  refuses (a negative duration, a 0-100 scroll depth out of range), is dropped (logged), where
+  Postgres stored an empty string or failed the insert silently. The answer is unchanged.
+- **userinfo's error content-type** is sent explicitly (`text/plain;charset=UTF-8`, what Netlify
+  sent by default), and the `detail` text is this service's reproduction of Node's messages for
+  the common failures (no '.', bad base64, bad JSON, a null payload); other JSON parse failures say
+  `SyntaxError: Unexpected token ...` with Python's position.

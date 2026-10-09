@@ -35,7 +35,9 @@ from datetime import date, datetime
 from typing import Literal, Protocol, runtime_checkable
 
 from app.core.storage.models import (
+    AdminActivity,
     AdminAggregates,
+    AdminOverview,
     AnalyticsEvent,
     AnalyticsEventCreate,
     AssetInfo,
@@ -173,6 +175,12 @@ class OrgPort(Protocol):
         """Admin only. Idempotent."""
         ...
 
+    async def count_accounts(self, ctx: CallerContext, domain: str) -> int:
+        """Admin only. How many profiles have an email address at `domain` (case-insensitive; Darwin's
+        `profiles.email ILIKE '%@<domain>'`): an at-a-glance count for the admin page, not the
+        membership rule (that one needs a verified email)."""
+        ...
+
 
 @runtime_checkable
 class BrandPort(Protocol):
@@ -218,6 +226,10 @@ class BrandPort(Protocol):
 
     async def delete_asset(self, ctx: CallerContext, brand_id: str, name: str) -> None:
         """Needs edit. Idempotent."""
+        ...
+
+    async def list_org(self, ctx: CallerContext) -> list[Brand]:
+        """Admin only. Every org brand, by name (the admin org-brands page)."""
         ...
 
 
@@ -454,6 +466,25 @@ class AnalyticsPort(Protocol):
 
     async def admin_aggregates(self, ctx: CallerContext, *, since: datetime | None = None) -> AdminAggregates:
         """Admin only."""
+        ...
+
+    async def admin_overview(self, ctx: CallerContext, *, since: datetime, recent_decks: int = 20) -> AdminOverview:
+        """Admin only. Every profile (newest first), the decks and ledger rows created at or after
+        `since`, and the `recent_decks` newest decks overall (/api/admin-metrics)."""
+        ...
+
+    async def admin_activity(
+        self,
+        ctx: CallerContext,
+        *,
+        since: datetime,
+        events: int = 2000,
+        intake: int = 50,
+        slide_edits: int = 100,
+    ) -> AdminActivity:
+        """Admin only. Analytics events at or after `since` (newest first, at most `events`), the
+        `intake` newest intake transcripts and the `slide_edits` most recently updated slide-edit
+        transcripts, regardless of `since` (/api/admin-metrics)."""
         ...
 
 

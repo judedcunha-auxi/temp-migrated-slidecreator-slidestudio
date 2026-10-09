@@ -12,6 +12,8 @@ Job types registered here:
 | `slides.design_and_export` | `/api/pptx-submit`, `/api/image-to-slide` | `app/core/slides/jobs.py` |
 | `exports.stitch_deck`, `brand.extract`, `masters.render_layouts` | (not yet by a Darwin route) | `app/core/slides/jobs.py` |
 | `darwin.pptx_deck` | `/api/pptx-deck-submit` | `app/core/darwin/exports.py` |
+| `darwin.brand_pptx`, `darwin.brand_guidelines` | `/api/brand-pptx`, `/api/brand-extract` | `app/core/darwin/brand_jobs.py` |
+| `darwin.brand_preview` | `/api/brand-preview` | `app/core/darwin/brand_preview.py` |
 | `darwin.generate` | `/api/generate`, `/api/retry` (was `generate-background`) | `app/core/darwin/generate.py` |
 | `darwin.refine` | `/api/refine` (was `refine-background`) | `app/core/darwin/refine.py` |
 | `darwin.quick_generate` | `/api/quick-generate` (was `quick-generate-background`) | `app/core/darwin/quick.py` |
@@ -40,6 +42,7 @@ from app.config.darwin import DarwinSettings, darwin_settings
 from app.config.engine import EngineSettings, engine_settings
 from app.config.settings import Settings
 from app.config.storyline import StorylineSettings, storyline_settings
+from app.core.darwin import brand_jobs, brand_preview
 from app.core.darwin import exports as darwin_exports
 from app.core.darwin import generate as darwin_generate
 from app.core.darwin import quick as darwin_quick
@@ -177,6 +180,13 @@ def build_runtime(
     registry.handlers[design] = ledgered(registry.handlers[design], storage, kind=KIND_DESIGN,
                                          model=ai.llm_design_model)
 
+    # --- brand routes (brand_jobs.py, brand_preview.py): were the brand -background functions (D31) -----
+    # TODO-P5 in-flight: registered NOT expensive, as the rest (Darwin had no per-user in-flight limit).
+    brand_jobs.register(registry, brand_jobs.BrandJobDeps(
+        storage=storage, renderer_factory=renderer_factory or _renderer_factory(engine),
+        guidelines_model=model, storyline=storyline))
+    brand_preview.register(registry, brand_preview.PreviewDeps(storage=storage, redis=redis, images=image_gen,
+                                                               darwin=darwin))
     # --- the generation batch (Phase 7a): generate/retry, refine, quick-generate ----------------------
     # The `-background` functions as internal jobs (D31), run as the job's owner. TODO-P5 in-flight: each is
     # registered NOT expensive (Darwin had no in-flight limit) and runs once (a re-run would pay again).

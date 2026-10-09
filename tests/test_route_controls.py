@@ -316,6 +316,132 @@ RULES: tuple[Rule, ...] = (
     # --- end of the generation batch
 )
 
+# --- feature/darwin-brands: brand, admin, analytics and identity routes ------------------------------
+_BRAND_ACL = ("; brand access is Darwin's getBrandAccess: owner, admins for org brands, read-only members of "
+              "a mapped VERIFIED email domain; an unreachable brand is 404")
+_ADMIN = "an admin only (profiles.is_admin, server-only): 401, then 403 'Admin access required'"
+
+RULES += (
+    Rule(
+        name="Darwin brands",
+        who=_DARWIN_USER + _BRAND_ACL + " (403 for a member's PATCH)",
+        guard="route",
+        rate_class="standard",
+        budget="kit JSON <= 256K characters; 20 personal brands (the store's cap: 409, new); list/patch/delete",
+        licence="no",
+        errors="legacy",
+        routes=_darwin("brands"),
+        must_call=("require_user", "get_brand_access"),
+        todo_p5=("rate-limit", "over-the-limit-test"),
+        notes="Other methods 405 AFTER auth. DELETE never removes an org brand (admin-org-brands does).",
+    ),
+    Rule(
+        name="Darwin brand assets",
+        who=_DARWIN_USER + _BRAND_ACL + "; uploads need edit (403 for a member)",
+        guard="route",
+        rate_class="standard",
+        budget="one PNG <= 4 MiB decoded per upload; reads of one asset",
+        licence="no",
+        errors="legacy",
+        routes=_darwin("brand-asset"),
+        must_call=("require_user", "require_brand"),
+        todo_p5=("rate-limit", "over-the-limit-test"),
+        notes="Every non-POST method acts as GET. style-default needs no brand.",
+    ),
+    Rule(
+        name="Darwin brand template import + guidelines extraction",
+        who=_DARWIN_USER + "; a named brand must be editable (404 otherwise, members included)",
+        guard="route",
+        rate_class="expensive",
+        budget="brand-pptx: multipart .pptx <= 5 MiB, one extract + layout render job; brand-extract: PDF <= 4 MiB, "
+               "one paid model call per job; per-user daily extraction cap wired, OFF (D12)",
+        licence="not checked yet (D10)",
+        errors="legacy",
+        routes=_darwin("brand-pptx") + _darwin("brand-extract"),
+        must_call=("require_user", "check_method", "editable_or_404", "submit_job"),
+        todo_p5=_DARWIN_TODO,
+        notes="405 'POST only' AFTER auth. The -background functions they triggered are internal jobs (D31).",
+    ),
+    Rule(
+        name="Darwin brand preview",
+        who=_DARWIN_USER + "; the brand must be editable (404 otherwise, members included)",
+        guard="route",
+        rate_class="expensive",
+        budget="one gpt-image call per job unless the content-hash cache hits; global daily image cap (enforced)",
+        licence="not checked yet (D10)",
+        errors="legacy",
+        routes=_darwin("brand-preview"),
+        must_call=("require_user", "editable_or_404", "submit_job"),
+        todo_p5=_DARWIN_TODO,
+        notes="No method check; a bodyless request is 500 (uncaught req.json()).",
+    ),
+    Rule(
+        name="Darwin brand job status",
+        who=_DARWIN_USER + "; the job's owner (403 'Not your job'); an unknown id is 200 pending",
+        guard="route",
+        rate_class="standard",
+        budget="a read of one job record (brand-preview-status: and one PNG)",
+        licence="no",
+        errors="legacy",
+        routes=_darwin("brand-pptx-status") + _darwin("brand-extract-status") + _darwin("brand-preview-status"),
+        must_call=("require_user", "read_owned_job"),
+        todo_p5=("rate-limit", "over-the-limit-test"),
+    ),
+    Rule(
+        name="Darwin brand archetypes + heading",
+        who=_DARWIN_USER + _BRAND_ACL + "; needs edit (403 for a member)",
+        guard="route",
+        rate_class="standard",
+        budget="copies three stored layout PNGs / rewrites one furniture JSON and the kit",
+        licence="no",
+        errors="legacy",
+        routes=_darwin("brand-archetypes") + _darwin("brand-heading"),
+        must_call=("check_method", "require_user", "get_brand_access"),
+        todo_p5=("rate-limit", "over-the-limit-test"),
+        notes="405 'POST only' BEFORE auth. Kept for the contract; deprecation candidates (D33).",
+    ),
+    Rule(
+        name="Darwin admin",
+        who=_ADMIN,
+        guard="route",
+        rate_class="standard",
+        budget="admin-metrics: one overview + one activity read (<= 2000 events); admin-org-brands: one write",
+        licence="no",
+        errors="legacy",
+        routes=_darwin("admin-metrics") + _darwin("admin-org-brands"),
+        must_call=("require_admin",),
+        todo_p5=("rate-limit", "over-the-limit-test"),
+        notes="admin-org-brands: other methods 405 AFTER the admin check.",
+    ),
+    Rule(
+        name="Darwin analytics events",
+        who=_DARWIN_USER,
+        guard="route",
+        rate_class="standard",
+        budget="<= 50 events per call (the rest dropped silently); writes swallowed",
+        licence="no",
+        errors="legacy",
+        routes=_darwin("analytics-event"),
+        must_call=("require_user", "record_batch"),
+        todo_p5=("rate-limit", "over-the-limit-test"),
+        notes="A malformed body is a silent 200 {ok:true}.",
+    ),
+    Rule(
+        name="Darwin userinfo (OIDC shim)",
+        who="anyone presenting a JWT-shaped bearer: it is DECODED, NOT VERIFIED (C8; Supabase Auth's "
+            "custom:auxi provider calls it with a fresh IdP token)",
+        guard="public",
+        rate_class="standard",
+        budget="decodes one header; no storage, no model",
+        licence="no",
+        errors="legacy",
+        routes=_darwin("userinfo"),
+        todo_p5=("rate-limit", "over-the-limit-test"),
+        notes="Reveals only what the presented token says. Kept while the identity flow needs it (D25); "
+              "errors are text/plain (Fetch default), as Darwin.",
+    ),
+)
+
 
 # --------------------------------------------------------------------------- #
 # What the app actually serves

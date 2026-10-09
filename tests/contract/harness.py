@@ -12,11 +12,15 @@ checks the response against the ENTRY, read from the JSON:
 
 * the status code;
 * errors: the body equals the documented `{"error": "..."}` exactly, and the content-type is exactly
-  `application/json` (Darwin's json() helper; `_common.json` jsonHelper);
+  `application/json` (Darwin's json() helper; `_common.json` jsonHelper), or the error's own documented
+  `contentType` (userinfo's errors). A documented text with `<placeholders>` ("<key> must be a string",
+  "No rendered layout at index <n> — ...") matches any text in their place; the probe's `check` pins the
+  exact one. Extra documented members (userinfo's `detail`) must be present as strings;
 * responses: the content-type exactly as documented, every documented header exactly, and the body
   against `bodyShape` (`check_shape`): the same keys (no extras: an optional key must be ABSENT, not
   null), literal values (`'pending'`), and the types the description starts with (string, boolean,
-  number). A probe may add its own assertions (`check`), e.g. on a binary body.
+  number). A key whose description says it appears "only when ..." or is "omitted ..." is optional.
+  A probe may add its own assertions (`check`), e.g. on a binary body.
 
 Entries that cannot happen any more are listed in the case module's `NOT_APPLICABLE` with the reason
 (e.g. the DEV_SECRET_KEY bypass, which this service does not have). An entry with neither a case nor
@@ -120,13 +124,11 @@ def _type_word(desc: str) -> str:
     return desc.strip().split(" ", 1)[0].split("(", 1)[0].lower()
 
 
-#: A key whose description says it may be left out ("key omitted when undefined", "present only when set")
-#: is optional, as if it were written `key?` (api-status.json writes optionality in prose).
-_OPTIONAL_PROSE = re.compile(r"\b(omitted|present only)\b", re.IGNORECASE)
+_OPTIONAL = re.compile(r"\bonly when\b|\bomitted\b", re.IGNORECASE)
 
 
-def _optional(key: str, sub: Any) -> bool:
-    return key.endswith("?") or (isinstance(sub, str) and bool(_OPTIONAL_PROSE.search(sub)))
+def _optional(key: str, description: Any) -> bool:
+    return key.endswith("?") or (isinstance(description, str) and bool(_OPTIONAL.search(description)))
 
 
 def check_shape(actual: Any, shape: Any, path: str = "body") -> None:
@@ -140,7 +142,7 @@ def check_shape(actual: Any, shape: Any, path: str = "body") -> None:
             return
     if isinstance(shape, dict):
         assert isinstance(actual, dict), f"{path}: expected an object, got {actual!r}"
-        required = {k for k, sub in shape.items() if not _optional(k, sub)}
+        required = {k for k, v in shape.items() if not _optional(k, v)}
         allowed = {k.rstrip("?") for k in shape}
         assert required <= set(actual), f"{path}: missing {sorted(required - set(actual))}"
         assert set(actual) <= allowed, f"{path}: undocumented keys {sorted(set(actual) - allowed)}"
@@ -173,14 +175,32 @@ def check_shape(actual: Any, shape: Any, path: str = "body") -> None:
     # anything else is prose: no further check
 
 
+def error_text_matches(actual: Any, documented: str) -> bool:
+    """The documented error text, with each `<placeholder>` standing for any non-empty text."""
+    if not isinstance(actual, str):
+        return False
+    pattern = re.sub(r"<[^<>]+>", ".+", re.escape(documented))
+    return re.fullmatch(pattern, actual, re.DOTALL) is not None
+
+
+def check_error_body(actual: Any, documented: dict[str, Any], where: str) -> None:
+    assert isinstance(actual, dict), f"{where}: body {actual!r}"
+    assert set(actual) == set(documented), f"{where}: body keys {sorted(actual)} != {sorted(documented)}"
+    assert error_text_matches(actual.get("error"), str(documented["error"])), f"{where}: body {actual!r}"
+    for key in documented:
+        if key != "error":
+            assert isinstance(actual[key], str) and actual[key], f"{where}: {key} {actual[key]!r}"
+
+
 def check_entry(entry: Entry, response: httpx.Response) -> None:
     spec = entry.spec
     assert response.status_code == entry.status, (
         f"{entry.route} {entry.id}: status {response.status_code} != {entry.status}; body {response.text[:300]}")
     content_type = response.headers.get("content-type")
     if entry.is_error:
-        assert content_type == JSON_CT, f"{entry.route} {entry.id}: content-type {content_type!r}"
-        assert response.json() == spec["body"], f"{entry.route} {entry.id}: body {response.text[:300]}"
+        wanted = str(spec.get("contentType") or JSON_CT).split(" (", 1)[0]
+        assert content_type == wanted, f"{entry.route} {entry.id}: content-type {content_type!r}"
+        check_error_body(response.json(), spec["body"], f"{entry.route} {entry.id}")
         return
     assert content_type == spec.get("contentType"), f"{entry.route} {entry.id}: content-type {content_type!r}"
     for name, value in (spec.get("headers") or {}).items():

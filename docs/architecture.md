@@ -10,7 +10,8 @@ Add a section rather than editing another area's. The plain-English tour is
 app/
   main.py          the FastAPI app: middleware, error handlers, the ROUTERS registry
   api/             deps.py (who is calling; shared services), legacy.py (Darwin's contract helpers)
-  api/routes/      one router per area of the API: health, and Darwin's storyline and exports
+  api/routes/      one router per area of the API: health, and Darwin's storyline, exports, brands,
+                   admin, analytics and identity (userinfo)
   config/          settings.py (service settings, auth, check_config), engine.py (engine settings),
                    ai.py (models, keys, cost, fan-out), storyline.py, darwin.py (image model, caps)
   core/            logging, telemetry, errors, request ids, Redis, auth (the bearer JWT),
@@ -674,6 +675,11 @@ app/api/
   routes/storyline.py  /api/storyline, /api/storyline-status, /api/intake
   routes/exports.py    /api/pptx-{submit,status,result}, /api/pptx-deck-{submit,status,result},
                        /api/image-to-slide
+  routes/brands.py     /api/brands, /api/brand-asset, /api/brand-{pptx,extract,preview}(-status),
+                       /api/brand-archetypes, /api/brand-heading
+  routes/admin.py      /api/admin-metrics, /api/admin-org-brands
+  routes/analytics.py  /api/analytics-event
+  routes/identity.py   /api/userinfo (the OIDC userinfo shim, C8: decodes, never verifies)
   routes/decks.py      /api/decks
   routes/generate.py   /api/generate, /api/retry, /api/status
   routes/refine.py     /api/refine, /api/revert, /api/slide-transcript
@@ -683,13 +689,20 @@ app/core/
   auth.py            TokenVerifier: a JWKS-verified JWT (issuer, audience, keys by configuration)
   darwin/            usage.py (the ledger, C10), image_gen.py (gpt-image port, D28), caps.py,
                      jobs.py (status shapes), exports.py (export job inputs, the deck job),
-                     runtime.py (registry, queue, models, workers),
-                     prompt.py + prompt_text.py (Darwin's image prompt, byte-for-byte; the storyline
-                     job's SlidePrompter), deck_state.py (Darwin's JobState read from the slides port),
-                     generate.py / refine.py / quick.py (the -background functions as jobs),
-                     compose.py (Pillow: tile knock-out and composite, layout wireframe, PDF writer),
-                     media.py (version pictures, tile preview), js.py (JavaScript value semantics)
-  brand/kit.py       normalize_kit (a partial port of brandKit.ts)
+                     runtime.py (registry, queue, models, workers);
+                     brands.py (getBrandAccess / requireBrand), brand_jobs.py (the .pptx import and
+                     guidelines jobs), brand_preview.py (the preview job), admin.py (the metrics
+                     aggregation, domain rules), analytics.py (the event batch), userinfo.py, js.py
+                     (JavaScript's Number(), Number.isInteger, Buffer.from(base64), Math.round, String(n),
+                     trim, length); prompt.py + prompt_text.py (Darwin's image prompt, byte-for-byte; the
+                     storyline job's SlidePrompter, the brand preview's prompt), deck_state.py (Darwin's
+                     JobState read from the slides port), generate.py / refine.py / quick.py (the
+                     -background functions as jobs), compose.py (Pillow: tile knock-out and composite,
+                     layout wireframe, PDF writer), media.py (version pictures, tile preview)
+  brand/kit.py       normalize_kit and the kit's write side (sanitizeKitPatch, canonical asset keys,
+                     heading placeholders, DEFAULT_STYLE_TEMPLATE)
+  brand/legacy_mapping.py  furniture.ts + layoutPreviews.ts (archetype re-keying, preview alignment)
+  brand/guidelines.py      brandExtract.ts (guidelines PDF -> fields, one model call)
 tests/contract/      the contract harness: data/ (the oracle), cases/ (how to provoke each entry)
 ```
 
@@ -731,7 +744,11 @@ session", 403 "Admin access required"; an unreachable issuer is 500 "Internal er
 `app/core/darwin/runtime.py: build_runtime` wires one `JobRegistry` and `JobQueue` for the routes
 (`app.state.darwin`, built in the lifespan): the `storyline` job, the pipeline's jobs
 (`slides.design_and_export`, `exports.stitch_deck`, ...), `darwin.pptx_deck` (resolves the
-caller's finished slide jobs, then stitches), and the generation batch's `darwin.generate`
+caller's finished slide jobs, then stitches), the brand jobs: `darwin.brand_pptx` (the in-process
+brand extractor with the per-layout furniture capture, plus PptxRender layout previews through the
+`Renderer` port), `darwin.brand_guidelines` (one model call on the guidelines PDF) and
+`darwin.brand_preview` (gpt-image, content-hash cached as the brand asset `preview-<hash>`), each run
+as the submitting user so the port re-checks the brand ACL when it runs; and the generation batch's `darwin.generate`
 (generate and retry), `darwin.refine` and `darwin.quick_generate`, which were the `-background`
 functions (D31; they ran unauthenticated with a user id from the body, C12, and now run as the job's
 owner). Every type is registered NOT expensive: Darwin had no per-user in-flight limit, so the queue's
@@ -751,9 +768,9 @@ retrying a done slide).
 **Darwin's image prompt.** `prompt.py` is `prompt.ts` (with `layoutMatcher.ts`, the workzone tile size
 of `workzone.ts`, and `refine.ts: buildSteeredPrompt`); the strings in `prompt_text.py` were dumped
 from the bundled TypeScript, not retyped, and tests/core/darwin/test_prompt.py compares 128 assembled
-prompts with Darwin's own output (by SHA-256; five in full). The brand kit's pass-through fields the
-prompt reads (`styleTemplate`, `layouts`, `typographyScale`, `allColors`, ...) are read beside the
-prompt (`prompt_kit`), leaving `BrandKit`'s CRUD-side shape to the brand routes.
+prompts with Darwin's own output (by SHA-256; five in full). The prompt reads the kit's pass-through fields
+(`styleTemplate`, `layouts`, `typographyScale`, `allColors`, ...) from `BrandKit` (`kit_for_prompt`),
+and the brand preview builds its sample slide's prompt with it too.
 
 `WORKER_CONCURRENCY` (default 0) worker loops run inside the API process, started and stopped by
 the lifespan; with 0, jobs wait in Redis for a worker process. Tests run jobs inline
@@ -768,9 +785,11 @@ unfinished id, no ownership check, `# TODO-P5 ownership`).
 `app/core/darwin/usage.py: record_usage` takes keywords only, so the model lands in `model` and the
 cost in `est_cost_usd` (Darwin's five-for-six argument slip put the cost in `model` and $0 in the
 cost column). Successful storyline and design jobs are ledgered by a wrapper in the runtime
-(`ledgered`, keyed by job id so a replay is not counted twice); intake turns by the route; images
-(Darwin's `EST_COST_PER_IMAGE` / `EST_COST_MASTER`, kind `image`) by the generation jobs, one row per
-image keyed by job and slide; quick-generate's storyline call too (Darwin's quick path recorded nothing).
+(`ledgered`, keyed by job id so a replay is not counted twice); intake turns by the route; the
+guidelines extraction (`kind` brand_guidelines) and the brand preview image (`kind` image) by their
+jobs; generation images (Darwin's `EST_COST_PER_IMAGE` / `EST_COST_MASTER`, kind `image`) by the
+generation jobs, one row per image keyed by job and slide; quick-generate's storyline call too
+(Darwin's quick path recorded nothing).
 
 ### Caps (D12)
 
@@ -789,23 +808,48 @@ error, never a boot failure; `check_config` requires the key in production. No t
 real OpenAI client (`no_paid_model_calls` in tests/conftest.py); `tests/fakes/image_gen.py` is the
 double.
 
+### Brands, admin, analytics
+
+- **Brand access** is the port's (`BrandPort.get`), Darwin's `getBrandAccess`: owner; admins edit org
+  brands; members of a mapped, VERIFIED email domain read them. A brand id that is not a UUID is "not
+  found" before any lookup. Assets are the port's named brand assets (`logo`, `master`,
+  `titleMaster`, `dividerMaster`, `guidelines`, `furniture`, `furniture-all`,
+  `layout-preview-<n>`, `preview-<hash>`) under the brand OWNER; a kit's `brand/<owner>/<brand>/...`
+  keys only say an asset exists and are never used as a path.
+- **The admin dashboard** reads two port operations: `analytics.admin_overview` (profiles, decks and
+  ledger rows since `days`, the newest decks; a failure is a 500) and `analytics.admin_activity`
+  (events, intake and slide-edit transcripts; best-effort, as Darwin). `admin-org-brands` uses
+  `brands.list_org` and `orgs.count_accounts`. All four are new port operations, admin-only, listed
+  for the General service (docs/general-service-requirements.md).
+- **Analytics events** go to the port (`record_event`, `record_page_view`), as Darwin wrote them to
+  Postgres; every write error is swallowed. PostHog / App Insights (D27) can replace the port's
+  storage later without changing the route.
+
 ### The contract harness
 
 `tests/contract/test_contract.py` reads every `data/api-*.json` and runs each documented outcome
 (`R<i>` responses, `E<status> <text>` errors) through the probes in `tests/contract/cases/`, on the
 service with fakes (`tests/fakes/darwin.py`). The JSON is the oracle: status, exact error body,
-content-type, documented headers and body shape come from it, not from the cases. An entry needs a
+content-type, documented headers and body shape come from it, not from the cases. An error text
+with `<placeholders>` matches any text there (the probe pins the exact one); a body key described as
+appearing "only when ..." or "omitted ..." is optional; an error's own `contentType` (userinfo's
+`text/plain;charset=UTF-8`) replaces `application/json`. An entry needs a
 probe or a stated reason it cannot happen; a route not served yet is xfail "not yet ported"; the
 `-background` paths must 404. `tests/api/routes/test_darwin_negative.py` holds the per-route
 negative tests (the over-the-limit one is TODO-P5).
 
 ### Not done yet
 
-- The brand, admin and analytics routes (the parallel porting effort; see darwin-api.md §1).
 - `/api/image` for HTML-mode slides (rendering an HTML version to PNG; 7c). Image mode is served.
 - The legacy per-user brand assets (`brand-assets/<userId>/master.png`, Darwin's fallback for a
   migrated first brand): the port keeps assets under a brand, so the migration (D29) must move them
   under one; until then a generation without a brand-scoped master renders without it.
+- The brand preview's layout wireframe for brands without a master: `compose.layout_wireframe` exists
+  (the generation job uses it) but the preview does not use it yet.
+- Brand logos are auto-extracted only for images the extractor labels `logo` / `logo_mark`, which
+  needs the role-annotation model pass (off today).
+- A request-size limit in front of the routes (Netlify capped bodies at about 6 MB; the routes check
+  their own limits after reading the body). A gateway concern (P5).
 - Phase 5: Redis rate limits, in-flight caps, licensing, the pptx ownership decision (D33), and the
   over-the-limit tests. The route-controls rows mark each as TODO-P5.
 - A worker-only entry point.

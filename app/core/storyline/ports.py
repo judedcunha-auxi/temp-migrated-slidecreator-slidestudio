@@ -27,7 +27,7 @@ from dataclasses import dataclass, field
 from typing import Any, Literal, Protocol, runtime_checkable
 
 Effort = Literal["low", "medium", "high", "xhigh", "max"]
-Purpose = Literal["storyline", "intake"]
+Purpose = Literal["storyline", "intake", "brand_guidelines"]
 
 #: One Messages API message (see the module docstring for the block shapes).
 Message = dict[str, Any]

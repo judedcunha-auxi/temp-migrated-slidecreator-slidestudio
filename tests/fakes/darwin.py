@@ -39,7 +39,8 @@ from app.core.darwin.runtime import DarwinRuntime, build_runtime
 from app.core.jobs.worker import JobContext, JobOutcome, PermanentJobError
 from app.core.redis_client import RedisClient
 from app.core.slides.jobs import PipelineDeps
-from app.core.storage.models import CallerContext, DeckCreate, SlideSpec, VersionCreate
+from app.core.storage.models import BrandCreate, CallerContext, DeckCreate, SlideSpec, VersionCreate
+from app.core.storage.ports import NotFound
 from app.main import create_app
 from tests.conftest import build_ai_settings, build_darwin_settings, build_settings
 from tests.fakes.general_service import FakeGeneralService
@@ -117,6 +118,53 @@ class DarwinEnv:
 
     def job(self, subject: str, job_id: str) -> Any:
         return self.call(self.store.jobs.get, self.ctx(subject), job_id)
+
+    # ------------------------------------------------------------- brands (feature/darwin-brands)
+    def seed_brand(self, owner: str, *, name: str = "Acme", kit: dict[str, Any] | None = None, org: bool = False,
+                   domain: str | None = None, assets: dict[str, bytes] | None = None) -> str:
+        """A brand and its assets (asset name -> bytes). `org=True`: an org brand created by `owner`, who
+        is made an admin; `domain` maps an email domain to it. Returns the brand id."""
+        self.user(owner, admin=org)
+        ctx = self.ctx(owner)
+
+        async def seed() -> str:
+            data = BrandCreate(name=name, kit=kit or {})
+            brand = await (self.store.brands.create_org(ctx, data) if org else self.store.brands.create(ctx, data))
+            if domain:
+                await self.store.orgs.map_domain(ctx, domain, brand.id)
+            for asset, content in (assets or {}).items():
+                await self.store.brands.put_asset(ctx, brand.id, asset, content, _asset_type(asset, content))
+            return brand.id
+
+        return self.call(seed)
+
+    def member(self, subject: str, email: str) -> dict[str, str]:
+        """Auth headers for a user whose VERIFIED email puts them in an org brand's domain."""
+        self.user(subject, email=email)
+        return self.auth(subject, email=email)
+
+    def brand(self, subject: str, brand_id: str) -> Any:
+        return self.call(self.store.brands.get, self.ctx(subject), brand_id).brand
+
+    def asset(self, subject: str, brand_id: str, name: str) -> bytes | None:
+        async def read() -> bytes | None:
+            try:
+                return (await self.store.brands.get_asset(self.ctx(subject), brand_id, name)).data
+            except NotFound:
+                return None
+
+        return self.call(read)
+
+
+PNG_MAGIC = bytes([0x89]) + b"PNG"
+
+
+def _asset_type(name: str, content: bytes) -> str:
+    if content[:4] == PNG_MAGIC:
+        return "image/png"
+    if content[:4] == b"%PDF":
+        return "application/pdf"
+    return "application/json" if name.startswith("furniture") else "application/octet-stream"
 
 
 def fake_export_handler(store: FakeGeneralService) -> Callable[[JobContext], Awaitable[JobOutcome]]:

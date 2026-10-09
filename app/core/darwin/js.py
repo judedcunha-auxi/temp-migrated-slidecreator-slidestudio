@@ -1,72 +1,120 @@
-"""JavaScript value semantics the generation routes reproduce (Darwin's handlers are TypeScript).
+"""JavaScript value semantics the brand, admin and identity routes reproduce (beyond app/api/legacy.py).
 
-`app/api/legacy.py` holds the request-level ones every route uses (`js_truthy`, `js_parse_int`); these are
-the ones the generation, refine and media routes and the image prompt need on top:
+Darwin's handlers lean on a few JavaScript conversions whose edge cases are part of the contract:
 
-* `js_number(text)`: `Number(searchParams.get(x))` for a query string (`Number(null)` is 0, `Number("")`
-  is 0, `" 2 "` is 2, `"0x10"` is 16, `"abc"` is NaN);
-* `is_js_integer(value)`: `Number.isInteger(value)` for a parsed JSON value (2.0 is an integer, true is not);
+* `Number(x)` (`js_number`): `Number(null)` is 0, `Number("")` is 0, `Number(" 7 ")` is 7, `Number("0x10")`
+  is 16, `Number("1e3")` is 1000, anything else is NaN. brand-asset reads `?index=` with it, so a missing
+  index is layout 0 (contract api-brand-asset.json);
+* `Number.isInteger(x)` (`js_is_integer`): true for 2 and 2.0, false for booleans, strings and NaN;
+* `Buffer.from(s, "base64")` (`node_base64`): Node's lenient decoder. It skips characters outside the
+  alphabet, accepts the URL-safe alphabet too, stops at the first "=", and drops a dangling 6-bit tail,
+  so it never throws. brand-asset and brand-extract decode uploads with it;
+* `String(n)` for a number (`js_number_text`), as a template literal writes it.
+
+The generation routes and Darwin's image prompt add (merged from feature/darwin-generation):
+
 * `js_round(x)`: `Math.round`, which rounds halves up (Python's `round` rounds them to even);
-* `js_str(x)`: `String(n)` / `${n}` for a number (12.0 is "12", 1e21 is "1e+21", 0.00001 is "0.00001");
-* `js_trim(s)` and `js_length(s)`: `String.prototype.trim` (JavaScript's whitespace set) and `.length`
-  (UTF-16 code units, so an emoji counts 2).
+* `js_str(x)`: `String(n)` / `${n}` for any number (12.0 is "12", 1e21 is "1e+21", 0.00001 is
+  "0.00001"), and true/false/null as JavaScript spells them;
+* `js_trim(s)` and `js_length(s)`: `String.prototype.trim` and `.length` (UTF-16 code units, so an emoji
+  counts 2); `is_js_integer` is `js_is_integer`.
 """
 
 from __future__ import annotations
 
+import base64
 import math
 import re
 from decimal import Decimal
 from typing import Any
 
-#: `String.prototype.trim`'s set: WhiteSpace and LineTerminator (ECMA-262 §12.2, §12.3).
-JS_WHITESPACE = "\t\n\v\f\r              " \
-                "    　﻿"
+#: `Number(undefined)`: NaN. Pass it where Darwin read a missing property.
+UNDEFINED: Any = object()
 
 _DECIMAL = re.compile(r"^[+-]?(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?$")
-_RADIX = re.compile(r"^0([xXoObB])([0-9a-fA-F]+)$")
-_RADIX_BASE = {"x": 16, "o": 8, "b": 2}
+_PREFIXED = re.compile(r"^0([xXoObB])([0-9a-fA-F]+)$")
+_BASES = {"x": 16, "o": 8, "b": 2}
+# The characters JavaScript's String.prototype.trim (and so Number()) strips.
+_JS_SPACE = " \t\n\v\f\r             " \
+            "    　﻿"
+_B64_ALPHABET = re.compile(r"[^A-Za-z0-9+/\-_=]")
+
+
+def js_number(value: Any) -> float:
+    """`Number(value)`. NaN is `math.nan`."""
+    if value is UNDEFINED:
+        return math.nan
+    if value is None:
+        return 0.0
+    if isinstance(value, bool):
+        return 1.0 if value else 0.0
+    if isinstance(value, (int, float)):
+        return float(value)
+    if isinstance(value, str):
+        text = value.strip(_JS_SPACE)
+        if not text:
+            return 0.0
+        if text in ("Infinity", "+Infinity"):
+            return math.inf
+        if text == "-Infinity":
+            return -math.inf
+        if _DECIMAL.match(text):
+            return float(text)
+        prefixed = _PREFIXED.match(text)
+        if prefixed:
+            base = _BASES[prefixed.group(1).lower()]
+            try:
+                return float(int(prefixed.group(2), base))
+            except ValueError:
+                return math.nan
+        return math.nan
+    if isinstance(value, list):  # [] -> "" -> 0; [x] -> Number(String(x)); longer -> "a,b" -> NaN
+        if not value:
+            return 0.0
+        if len(value) == 1:
+            item = value[0]
+            if item is None or isinstance(item, (str, list)):
+                return js_number("" if item is None else item)
+            if isinstance(item, (int, float)) and not isinstance(item, bool):
+                return float(item)
+        return math.nan
+    return math.nan
+
+
+def js_is_integer(value: Any) -> bool:
+    """`Number.isInteger(value)`: a number (not a boolean) that is finite and whole."""
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        return False
+    return math.isfinite(value) and float(value).is_integer()
+
+
+def js_number_text(value: float) -> str:
+    """`String(n)` for a whole number below 1e21, as a template literal writes it (`-0` is "0")."""
+    return str(int(value)) if value.is_integer() and abs(value) < 1e21 else repr(value)
+
+
+def node_base64(text: str) -> bytes:
+    """`Buffer.from(text, "base64")`: never raises; see the module docstring."""
+    cleaned = _B64_ALPHABET.sub("", text).replace("-", "+").replace("_", "/")
+    cleaned = cleaned.split("=", 1)[0]
+    if len(cleaned) % 4 == 1:
+        cleaned = cleaned[:-1]
+    if not cleaned:
+        return b""
+    return base64.b64decode(cleaned + "=" * (-len(cleaned) % 4))
+
+
+# --- the generation batch: Math.round, String(n), trim, length ---------------------------------
+is_js_integer = js_is_integer
 
 
 def js_trim(text: str) -> str:
-    return text.strip(JS_WHITESPACE)
+    return text.strip(_JS_SPACE)
 
 
 def js_length(text: str) -> int:
     """`text.length`: UTF-16 code units."""
     return len(text.encode("utf-16-le")) // 2
-
-
-def js_number(text: str | None) -> float:
-    """`Number(text)` for a query parameter (`None` is a missing parameter, which JavaScript reads as null)."""
-    if text is None:
-        return 0.0
-    s = js_trim(text)
-    if s == "":
-        return 0.0
-    if s in ("Infinity", "+Infinity"):
-        return math.inf
-    if s == "-Infinity":
-        return -math.inf
-    radix = _RADIX.match(s)
-    if radix:
-        base = _RADIX_BASE[radix.group(1).lower()]
-        try:
-            return float(int(radix.group(2), base))
-        except ValueError:
-            return math.nan
-    if _DECIMAL.match(s):
-        return float(s)
-    return math.nan
-
-
-def is_js_integer(value: Any) -> bool:
-    """`Number.isInteger(value)` for a JSON value: a finite number with no fraction; booleans are not."""
-    if isinstance(value, bool):
-        return False
-    if isinstance(value, int):
-        return True
-    return isinstance(value, float) and math.isfinite(value) and value.is_integer()
 
 
 def js_round(x: float) -> int:

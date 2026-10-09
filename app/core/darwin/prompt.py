@@ -14,11 +14,9 @@ compares the output with Darwin's for a matrix of slides, kits, languages and mo
 
 Also here, because the prompt and the generation job both need them:
 
-* `PromptKit` / `prompt_kit()`: the brand kit as the prompt reads it. `app/core/brand/kit.py`'s
-  `normalize_kit` gives the colours, fonts, masters, workzone and furniture; the prompt also reads the
-  pass-through fields (`styleTemplate`, `layouts`, `typographyScale`, `allColors`, `masterDecorations`,
-  `logoShapes`), normalised exactly as `brandKit.ts: normalizeKit` does. They are read here, beside the
-  prompt, so the brand routes own `BrandKit`'s CRUD-side shape;
+* `PromptKit` / `prompt_kit()` / `kit_for_prompt()`: the brand kit (`app/core/brand/kit.py:
+  normalize_kit`, with its pass-through fields `styleTemplate`, `layouts`, `typographyScale`,
+  `allColors`, `masterDecorations`, `logoShapes`) as the prompt and the generation job read it;
 * `match_layout` / `layout_hint_text` (`layoutMatcher.ts`) and `workzone_image_size` (`workzone.ts`);
 * `steered_prompt` (`_shared/refine.ts: buildSteeredPrompt`);
 * `DarwinSlidePrompter`: the storyline job's `prompter` (the per-slide `prompt` `/api/storyline-status`
@@ -73,27 +71,24 @@ class PromptKit:
         return self.base.workzone
 
 
-def _nonempty_list(value: Any) -> list[Any] | None:
-    return value if isinstance(value, list) and value else None
+def kit_for_prompt(base: BrandKit) -> PromptKit:
+    """A normalised `BrandKit` as the prompt reads it (its pass-through fields, layouts as objects)."""
+    return PromptKit(
+        base=base,
+        style_template=base.style_template or text.DEFAULT_STYLE_TEMPLATE,
+        layouts=[x if isinstance(x, dict) else {} for x in base.layouts] if base.layouts else None,
+        typography_scale=base.typography_scale,
+        all_colors=list(base.all_colors) if base.all_colors else None,
+        master_decorations=list(base.master_decorations) if base.master_decorations else None,
+        logo_shapes=list(base.logo_shapes) if base.logo_shapes else None,
+    )
 
 
 def prompt_kit(raw: Any, legacy: Mapping[str, Any] | None = None) -> PromptKit:
     """`normalizeKit(raw, legacy)` with the fields the prompt reads. `legacy` is the deck's wizard inputs
     (company, primaryColor, accentColor, fontStyle), as Darwin passes them."""
-    r = raw if isinstance(raw, dict) else {}
-    lg = {k: v for k, v in (legacy or {}).items()} if isinstance(legacy, Mapping) else {}
-    style = r.get("styleTemplate")
-    typo = r.get("typographyScale")
-    layouts = _nonempty_list(r.get("layouts"))
-    return PromptKit(
-        base=normalize_kit(r, lg),
-        style_template=style.strip() if isinstance(style, str) and style.strip() else text.DEFAULT_STYLE_TEMPLATE,
-        layouts=[x if isinstance(x, dict) else {} for x in layouts] if layouts else None,
-        typography_scale=typo if isinstance(typo, dict) else None,
-        all_colors=_nonempty_list(r.get("allColors")),
-        master_decorations=_nonempty_list(r.get("masterDecorations")),
-        logo_shapes=_nonempty_list(r.get("logoShapes")),
-    )
+    lg = dict(legacy.items()) if isinstance(legacy, Mapping) else {}
+    return kit_for_prompt(normalize_kit(raw if isinstance(raw, dict) else {}, lg))
 
 
 def render_style_template(template: str, kit: BrandKit) -> str:

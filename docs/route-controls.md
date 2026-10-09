@@ -55,8 +55,8 @@ checker is proven to catch each failure even while the service has only public r
 4. Commit the code, the row and this page together.
 
 Darwin's `/api/*` routes are registered for every method (the handler answers an unexpected one,
-as Darwin's did), so each row lists them all; the table shows them as "every method". Ten Darwin
-routes are served so far; the other 27 and the new routes arrive in Phase 7a and Phase 5.
+as Darwin's did), so each row lists them all; the table shows them as "every method". All 37 Darwin
+routes are served (Phase 7a); the new routes arrive with Phase 5 and 7c.
 [darwin-api.md](darwin-api.md) is the porting guide.
 
 ## The table
@@ -84,11 +84,111 @@ routes are served so far; the other 27 and the new routes arrive in Phase 7a and
 | **Darwin quick-generate**<br>`/api/quick-generate` (every method) | any signed-in user (bearer JWT, verified in-service: app/core/auth.py) (external API users; no caller in Darwin or the Connector) | route | expensive | one darwin.quick_generate job: one paid storyline call and one paid image per slide; the global image cap now applies (C12); inline layout PNG <= 4 MiB | not checked yet (D10) | legacy | rate-limit, in-flight, licence, over-the-limit-test | No upper bound on numSlides, as Darwin. |
 | **Darwin quick-status**<br>`/api/quick-status` (every method) | any signed-in user (bearer JWT, verified in-service: app/core/auth.py); the job's owner (403 'Not your job'); an unknown id is 200 pending | route | standard | a read of one job record | no | legacy | rate-limit, over-the-limit-test |  |
 | **Darwin quick-image**<br>`/api/quick-image` (every method) | any signed-in user (bearer JWT, verified in-service: app/core/auth.py); the job's owner (403 'Not your job'; unknown id 404) | route | standard | one stored picture per call | no | legacy | rate-limit, over-the-limit-test |  |
+| **Darwin brands**<br>`/api/brands` (every method) | any signed-in user (bearer JWT, verified in-service: app/core/auth.py); brand access is Darwin's getBrandAccess: owner, admins for org brands, read-only members of a mapped VERIFIED email domain; an unreachable brand is 404 (403 for a member's PATCH) | route | standard | kit JSON <= 256K characters; 20 personal brands (the store's cap: 409, new); list/patch/delete | no | legacy | rate-limit, over-the-limit-test | Other methods 405 AFTER auth. DELETE never removes an org brand (admin-org-brands does). |
+| **Darwin brand assets**<br>`/api/brand-asset` (every method) | any signed-in user (bearer JWT, verified in-service: app/core/auth.py); brand access is Darwin's getBrandAccess: owner, admins for org brands, read-only members of a mapped VERIFIED email domain; an unreachable brand is 404; uploads need edit (403 for a member) | route | standard | one PNG <= 4 MiB decoded per upload; reads of one asset | no | legacy | rate-limit, over-the-limit-test | Every non-POST method acts as GET. style-default needs no brand. |
+| **Darwin brand template import + guidelines extraction**<br>`/api/brand-pptx` (every method)<br>`/api/brand-extract` (every method) | any signed-in user (bearer JWT, verified in-service: app/core/auth.py); a named brand must be editable (404 otherwise, members included) | route | expensive | brand-pptx: multipart .pptx <= 5 MiB, one extract + layout render job; brand-extract: PDF <= 4 MiB, one paid model call per job; per-user daily extraction cap wired, OFF (D12) | not checked yet (D10) | legacy | rate-limit, in-flight, licence, over-the-limit-test | 405 'POST only' AFTER auth. The -background functions they triggered are internal jobs (D31). |
+| **Darwin brand preview**<br>`/api/brand-preview` (every method) | any signed-in user (bearer JWT, verified in-service: app/core/auth.py); the brand must be editable (404 otherwise, members included) | route | expensive | one gpt-image call per job unless the content-hash cache hits; global daily image cap (enforced) | not checked yet (D10) | legacy | rate-limit, in-flight, licence, over-the-limit-test | No method check; a bodyless request is 500 (uncaught req.json()). |
+| **Darwin brand job status**<br>`/api/brand-pptx-status` (every method)<br>`/api/brand-extract-status` (every method)<br>`/api/brand-preview-status` (every method) | any signed-in user (bearer JWT, verified in-service: app/core/auth.py); the job's owner (403 'Not your job'); an unknown id is 200 pending | route | standard | a read of one job record (brand-preview-status: and one PNG) | no | legacy | rate-limit, over-the-limit-test |  |
+| **Darwin brand archetypes + heading**<br>`/api/brand-archetypes` (every method)<br>`/api/brand-heading` (every method) | any signed-in user (bearer JWT, verified in-service: app/core/auth.py); brand access is Darwin's getBrandAccess: owner, admins for org brands, read-only members of a mapped VERIFIED email domain; an unreachable brand is 404; needs edit (403 for a member) | route | standard | copies three stored layout PNGs / rewrites one furniture JSON and the kit | no | legacy | rate-limit, over-the-limit-test | 405 'POST only' BEFORE auth. Kept for the contract; deprecation candidates (D33). |
+| **Darwin admin**<br>`/api/admin-metrics` (every method)<br>`/api/admin-org-brands` (every method) | an admin only (profiles.is_admin, server-only): 401, then 403 'Admin access required' | route | standard | admin-metrics: one overview + one activity read (<= 2000 events); admin-org-brands: one write | no | legacy | rate-limit, over-the-limit-test | admin-org-brands: other methods 405 AFTER the admin check. |
+| **Darwin analytics events**<br>`/api/analytics-event` (every method) | any signed-in user (bearer JWT, verified in-service: app/core/auth.py) | route | standard | <= 50 events per call (the rest dropped silently); writes swallowed | no | legacy | rate-limit, over-the-limit-test | A malformed body is a silent 200 {ok:true}. |
+| **Darwin userinfo (OIDC shim)**<br>`/api/userinfo` (every method) | anyone presenting a JWT-shaped bearer: it is DECODED, NOT VERIFIED (C8; Supabase Auth's custom:auxi provider calls it with a fresh IdP token) | public | standard | decodes one header; no storage, no model | no | legacy | rate-limit, over-the-limit-test | Reveals only what the presented token says. Kept while the identity flow needs it (D25); errors are text/plain (Fetch default), as Darwin. |
 
 ### Every served route, and the row that covers it
 
 | Route | Row |
 |---|---|
+| `DELETE /api/admin-metrics` | Darwin admin |
+| `GET /api/admin-metrics` | Darwin admin |
+| `HEAD /api/admin-metrics` | Darwin admin |
+| `OPTIONS /api/admin-metrics` | Darwin admin |
+| `PATCH /api/admin-metrics` | Darwin admin |
+| `POST /api/admin-metrics` | Darwin admin |
+| `PUT /api/admin-metrics` | Darwin admin |
+| `DELETE /api/admin-org-brands` | Darwin admin |
+| `GET /api/admin-org-brands` | Darwin admin |
+| `HEAD /api/admin-org-brands` | Darwin admin |
+| `OPTIONS /api/admin-org-brands` | Darwin admin |
+| `PATCH /api/admin-org-brands` | Darwin admin |
+| `POST /api/admin-org-brands` | Darwin admin |
+| `PUT /api/admin-org-brands` | Darwin admin |
+| `DELETE /api/analytics-event` | Darwin analytics events |
+| `GET /api/analytics-event` | Darwin analytics events |
+| `HEAD /api/analytics-event` | Darwin analytics events |
+| `OPTIONS /api/analytics-event` | Darwin analytics events |
+| `PATCH /api/analytics-event` | Darwin analytics events |
+| `POST /api/analytics-event` | Darwin analytics events |
+| `PUT /api/analytics-event` | Darwin analytics events |
+| `DELETE /api/brand-archetypes` | Darwin brand archetypes + heading |
+| `GET /api/brand-archetypes` | Darwin brand archetypes + heading |
+| `HEAD /api/brand-archetypes` | Darwin brand archetypes + heading |
+| `OPTIONS /api/brand-archetypes` | Darwin brand archetypes + heading |
+| `PATCH /api/brand-archetypes` | Darwin brand archetypes + heading |
+| `POST /api/brand-archetypes` | Darwin brand archetypes + heading |
+| `PUT /api/brand-archetypes` | Darwin brand archetypes + heading |
+| `DELETE /api/brand-asset` | Darwin brand assets |
+| `GET /api/brand-asset` | Darwin brand assets |
+| `HEAD /api/brand-asset` | Darwin brand assets |
+| `OPTIONS /api/brand-asset` | Darwin brand assets |
+| `PATCH /api/brand-asset` | Darwin brand assets |
+| `POST /api/brand-asset` | Darwin brand assets |
+| `PUT /api/brand-asset` | Darwin brand assets |
+| `DELETE /api/brand-extract` | Darwin brand template import + guidelines extraction |
+| `GET /api/brand-extract` | Darwin brand template import + guidelines extraction |
+| `HEAD /api/brand-extract` | Darwin brand template import + guidelines extraction |
+| `OPTIONS /api/brand-extract` | Darwin brand template import + guidelines extraction |
+| `PATCH /api/brand-extract` | Darwin brand template import + guidelines extraction |
+| `POST /api/brand-extract` | Darwin brand template import + guidelines extraction |
+| `PUT /api/brand-extract` | Darwin brand template import + guidelines extraction |
+| `DELETE /api/brand-extract-status` | Darwin brand job status |
+| `GET /api/brand-extract-status` | Darwin brand job status |
+| `HEAD /api/brand-extract-status` | Darwin brand job status |
+| `OPTIONS /api/brand-extract-status` | Darwin brand job status |
+| `PATCH /api/brand-extract-status` | Darwin brand job status |
+| `POST /api/brand-extract-status` | Darwin brand job status |
+| `PUT /api/brand-extract-status` | Darwin brand job status |
+| `DELETE /api/brand-heading` | Darwin brand archetypes + heading |
+| `GET /api/brand-heading` | Darwin brand archetypes + heading |
+| `HEAD /api/brand-heading` | Darwin brand archetypes + heading |
+| `OPTIONS /api/brand-heading` | Darwin brand archetypes + heading |
+| `PATCH /api/brand-heading` | Darwin brand archetypes + heading |
+| `POST /api/brand-heading` | Darwin brand archetypes + heading |
+| `PUT /api/brand-heading` | Darwin brand archetypes + heading |
+| `DELETE /api/brand-pptx` | Darwin brand template import + guidelines extraction |
+| `GET /api/brand-pptx` | Darwin brand template import + guidelines extraction |
+| `HEAD /api/brand-pptx` | Darwin brand template import + guidelines extraction |
+| `OPTIONS /api/brand-pptx` | Darwin brand template import + guidelines extraction |
+| `PATCH /api/brand-pptx` | Darwin brand template import + guidelines extraction |
+| `POST /api/brand-pptx` | Darwin brand template import + guidelines extraction |
+| `PUT /api/brand-pptx` | Darwin brand template import + guidelines extraction |
+| `DELETE /api/brand-pptx-status` | Darwin brand job status |
+| `GET /api/brand-pptx-status` | Darwin brand job status |
+| `HEAD /api/brand-pptx-status` | Darwin brand job status |
+| `OPTIONS /api/brand-pptx-status` | Darwin brand job status |
+| `PATCH /api/brand-pptx-status` | Darwin brand job status |
+| `POST /api/brand-pptx-status` | Darwin brand job status |
+| `PUT /api/brand-pptx-status` | Darwin brand job status |
+| `DELETE /api/brand-preview` | Darwin brand preview |
+| `GET /api/brand-preview` | Darwin brand preview |
+| `HEAD /api/brand-preview` | Darwin brand preview |
+| `OPTIONS /api/brand-preview` | Darwin brand preview |
+| `PATCH /api/brand-preview` | Darwin brand preview |
+| `POST /api/brand-preview` | Darwin brand preview |
+| `PUT /api/brand-preview` | Darwin brand preview |
+| `DELETE /api/brand-preview-status` | Darwin brand job status |
+| `GET /api/brand-preview-status` | Darwin brand job status |
+| `HEAD /api/brand-preview-status` | Darwin brand job status |
+| `OPTIONS /api/brand-preview-status` | Darwin brand job status |
+| `PATCH /api/brand-preview-status` | Darwin brand job status |
+| `POST /api/brand-preview-status` | Darwin brand job status |
+| `PUT /api/brand-preview-status` | Darwin brand job status |
+| `DELETE /api/brands` | Darwin brands |
+| `GET /api/brands` | Darwin brands |
+| `HEAD /api/brands` | Darwin brands |
+| `OPTIONS /api/brands` | Darwin brands |
+| `PATCH /api/brands` | Darwin brands |
+| `POST /api/brands` | Darwin brands |
+| `PUT /api/brands` | Darwin brands |
 | `DELETE /api/decks` | Darwin decks |
 | `GET /api/decks` | Darwin decks |
 | `HEAD /api/decks` | Darwin decks |
@@ -250,6 +350,13 @@ routes are served so far; the other 27 and the new routes arrive in Phase 7a and
 | `PATCH /api/storyline-status` | Darwin storyline status |
 | `POST /api/storyline-status` | Darwin storyline status |
 | `PUT /api/storyline-status` | Darwin storyline status |
+| `DELETE /api/userinfo` | Darwin userinfo (OIDC shim) |
+| `GET /api/userinfo` | Darwin userinfo (OIDC shim) |
+| `HEAD /api/userinfo` | Darwin userinfo (OIDC shim) |
+| `OPTIONS /api/userinfo` | Darwin userinfo (OIDC shim) |
+| `PATCH /api/userinfo` | Darwin userinfo (OIDC shim) |
+| `POST /api/userinfo` | Darwin userinfo (OIDC shim) |
+| `PUT /api/userinfo` | Darwin userinfo (OIDC shim) |
 | `GET /healthz` | health probes |
 | `GET /openapi.json` | OpenAPI spec |
 | `HEAD /openapi.json` | OpenAPI spec |

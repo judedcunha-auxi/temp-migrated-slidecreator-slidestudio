@@ -6,12 +6,11 @@ against them. To port a route: add its RouteCases here (see docs/darwin-api.md, 
 
 from __future__ import annotations
 
-from tests.contract.cases import decks, exports, generate, media, quick, refine, storyline
+from tests.contract.cases import admin, brands, decks, exports, generate, media, quick, refine, storyline
 from tests.contract.harness import RouteCases
 
-_MODULES = (
-    storyline, exports,
-    # the generation batch (Phase 7a): decks, generate/retry/status, refine/revert/slide-transcript, media, quick
-    decks, generate, refine, media, quick,
-)
-ALL: dict[str, RouteCases] = {rc.route: rc for module in _MODULES for rc in module.ROUTES}
+ALL: dict[str, RouteCases] = {rc.route: rc for module in (storyline, exports) for rc in module.ROUTES}
+# --- feature/darwin-brands: brand routes; admin, analytics and userinfo ---
+ALL.update({rc.route: rc for module in (brands, admin) for rc in module.ROUTES})
+# --- the generation batch (Phase 7a): decks, generate/retry/status, refine/revert/slide-transcript, media, quick ---
+ALL.update({rc.route: rc for module in (decks, generate, refine, media, quick) for rc in module.ROUTES})
