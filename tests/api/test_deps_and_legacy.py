@@ -242,7 +242,7 @@ def test_userinfo_style_errors_carry_no_content_type(env: Any):
 # -------------------------------------------------------------------------------- JS semantics
 @pytest.mark.parametrize(("value", "expected"), [
     ("1", 1), ("1abc", 1), ("  7", 7), ("-3", -3), ("+4", 4), (1.9, 1), (12, 12), ("abc", None), ("", None),
-    (True, None), (None, None), ([1], None), (math.nan, None), ("0x10", 0), ("1e3", 1),
+    (True, None), (None, None), ([1], None), (math.nan, None), ("0x10", 0), ("1e3", 1), (1e20, 10**20), (1e21, 1), (2.0, 2),
 ])
 def test_js_parse_int(value: Any, expected: int | None):
     assert js_parse_int(value) == expected

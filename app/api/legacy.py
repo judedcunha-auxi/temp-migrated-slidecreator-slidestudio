@@ -238,7 +238,9 @@ def js_parse_int(value: Any) -> int | None:
     if isinstance(value, float):
         if math.isnan(value) or math.isinf(value):
             return None
-        text = repr(value) if abs(value) < 1e21 else f"{value:e}"
+        # String(n) as JavaScript writes it: whole numbers below 1e21 in full ("100000000000000000000"),
+        # larger ones in exponent form ("1e+21" parses to 1)
+        text = f"{value:.0f}" if value.is_integer() and abs(value) < 1e21 else repr(value)
     elif isinstance(value, int):
         text = str(value)
     elif isinstance(value, str):
