@@ -1,5 +1,5 @@
 {
- "source": "synthetic starter library authored for the service; the full 1,240-archetype library is client-derived and blocked by D3",
+ "source": "synthetic test library authored for the service's tests (no client content)",
  "generated": "hand-written for app/core/design_refs (no client deck was used)",
  "categoryCount": 12,
  "archetypeCount": 24,

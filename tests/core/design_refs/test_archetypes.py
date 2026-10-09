@@ -1,10 +1,10 @@
 """`design_refs.archetypes`: the layout-archetype library behind `find_layout_reference`.
 
-The service ships a synthetic starter library (`app/core/design_refs/data/archetypes.synthetic.json`); the
-full client-derived library is installed beside the deploy once decision D3 clears
-(`DESIGN_ARCHETYPES_PATH`). These tests run on the synthetic library, and on a temp library to prove the
-setting switches it. Ported from the archetype tests in Slide Studio `server/tests/test_design_tools.py`,
-re-baselined on the synthetic data (24 archetypes in 12 categories instead of 1,240 in 42).
+The library is the shared `app/data/archetypes.json` (one copy, also read by the storyline). Most tests
+run on a small synthetic library (`tests/fixtures/design_refs/archetypes.synthetic.json`, 24 archetypes in
+12 categories, named by `DESIGN_ARCHETYPES_PATH`) so their expectations do not move when the shared data
+does; the first two check the shared library itself. Ported from the archetype tests in Slide Studio
+`server/tests/test_design_tools.py`.
 """
 
 from __future__ import annotations
@@ -17,25 +17,29 @@ import pytest
 from app.config import ai as ai_config
 from app.core.design_refs import archetypes
 
+SYNTHETIC = Path(__file__).resolve().parents[2] / "fixtures" / "design_refs" / "archetypes.synthetic.json"
+
 
 @pytest.fixture(autouse=True)
 def _synthetic(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(ai_config.ai_settings, "design_archetypes_path", str(SYNTHETIC))
+
+
+def test_the_default_is_the_shared_library(monkeypatch: pytest.MonkeyPatch):
     monkeypatch.setattr(ai_config.ai_settings, "design_archetypes_path", "")
+    assert archetypes.data_path() == archetypes.DATA
+    assert archetypes.DATA.parent.name == "data" and archetypes.DATA.parent.parent.name == "app"
+    raw = json.loads(archetypes.DATA.read_text(encoding="utf-8"))
+    assert len(archetypes.library().archetypes) == raw["archetypeCount"] == 1240
+    assert len(archetypes.categories()) == raw["categoryCount"] == 42
 
 
-def test_the_default_is_the_synthetic_starter_library():
-    assert archetypes.data_path() == archetypes.SYNTHETIC_DATA
-    raw = json.loads(archetypes.SYNTHETIC_DATA.read_text(encoding="utf-8"))
-    assert raw["source"].startswith("synthetic starter library") and "D3" in raw["source"]
-    assert len(archetypes.library().archetypes) == raw["archetypeCount"] == 24
-    assert len(archetypes.categories()) == raw["categoryCount"] == 12
-
-
-def test_the_synthetic_library_carries_no_client_deck_references():
-    raw = archetypes.SYNTHETIC_DATA.read_text(encoding="utf-8")
-    for leak in ('"src"', '"deck"', '"page"', '"referencePage"', "reference-decks"):
+def test_the_shared_library_carries_no_client_deck_references(monkeypatch: pytest.MonkeyPatch):
+    monkeypatch.setattr(ai_config.ai_settings, "design_archetypes_path", "")
+    raw = archetypes.DATA.read_text(encoding="utf-8")
+    for leak in ('"deck"', '"page"', '"referencePage"', "reference-decks", "--p0"):
         assert leak not in raw, leak
-    assert all(not a.src for a in archetypes.library().archetypes)
+    assert all(len(a.src) == 16 for a in archetypes.library().archetypes if a.src), "src is a one-way digest"
 
 
 def test_every_synthetic_category_is_one_the_slide_types_draw_from():
@@ -106,5 +110,5 @@ def test_the_setting_switches_the_library(tmp_path: Path, monkeypatch: pytest.Mo
     monkeypatch.setattr(ai_config.ai_settings, "design_archetypes_path", str(path))
     assert archetypes.data_path() == path
     assert [a.name for a in archetypes.library().archetypes] == ["installed-only-recipe"]
-    monkeypatch.setattr(ai_config.ai_settings, "design_archetypes_path", "")
+    monkeypatch.setattr(ai_config.ai_settings, "design_archetypes_path", str(SYNTHETIC))
     assert len(archetypes.library().archetypes) == 24

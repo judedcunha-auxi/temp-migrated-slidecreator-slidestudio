@@ -83,8 +83,8 @@ class AISettings(BaseSettings):
     design_generate_fanout: int = 4
     # Browsers previews and the design review measure in (1-8; one Chromium each).
     design_preview_browsers: int = 2
-    # Optional reference data, installed beside the deploy (decision D3: none ships in the repo).
-    # Empty: the synthetic starter library for layout archetypes, and no exemplar pictures.
+    # Reference data. Archetypes: empty means the shared app/data/archetypes.json; a path names another
+    # library. Exemplar pictures (decision D3: none ship in the repo): empty means none installed.
     design_archetypes_path: str = ""
     design_exemplars_dir: str = ""
     # The $0 path: the pipeline saves a hand-authored slide instead of calling a model. For wiring

@@ -1,12 +1,10 @@
 """The layout-archetype library behind the design chat's `find_layout_reference` tool.
 
-The library is a JSON file of slide-layout archetypes grouped in categories. Slide Studio shipped 1,240 of
-them in 42 categories, mined from client decks (with deck names, page numbers and pictures stripped); that
-data is client-derived, so it does **not** ship with the service (decision D3). By default the library is
-the synthetic starter set in `data/archetypes.synthetic.json`, authored for the service; the full library
-is installed beside the deploy and named by `DESIGN_ARCHETYPES_PATH` once D3 clears. Each archetype is a
-structural recipe —
-what the layout argues (`purpose`), how it is laid out (`directive`), the repeating units it is built from
+The library is `app/data/archetypes.json`: 1,240 slide-layout archetypes in 42 categories (Darwin's
+`deckArchetypes.json`, de-identified: neutral `<category>-<nn>` ids, no deck names, page numbers or
+pictures). It is the one copy, shared with the storyline (`app/data/README.md`); this module owns only
+its loader. `DESIGN_ARCHETYPES_PATH` points at another library (tests use a small synthetic one).
+Each archetype is a structural recipe: what the layout argues (`purpose`), how it is laid out (`directive`), the repeating units it is built from
 with their typical and tolerable counts, the page furniture and the density.
 
 Retrieval is deterministic and dependency-free: BM25 over a weighted bag of words per archetype (its
@@ -29,15 +27,15 @@ from typing import Any
 
 from app.config import ai as ai_config
 
-#: The synthetic starter library that ships with the service (no client-derived content).
-SYNTHETIC_DATA = Path(__file__).parent / "data" / "archetypes.synthetic.json"
+#: The one copy of the archetype library, shared with app/core/storyline (app/data/README.md).
+DATA = Path(__file__).resolve().parents[2] / "data" / "archetypes.json"
 
 
 def data_path() -> Path:
-    """The library in use: `DESIGN_ARCHETYPES_PATH` when set, else the synthetic starter library.
+    """The library in use: `DESIGN_ARCHETYPES_PATH` when set, else the shared `app/data/archetypes.json`.
     Read on every call, so a test (or a changed setting) takes effect without a restart."""
     configured = ai_config.ai_settings.design_archetypes_path.strip()
-    return Path(configured) if configured else SYNTHETIC_DATA
+    return Path(configured) if configured else DATA
 
 DEFAULT_LIMIT = 3
 MAX_LIMIT = 5
