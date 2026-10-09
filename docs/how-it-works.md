@@ -16,7 +16,8 @@ place, written in Python and run on Azure:
   today (`/api/decks`, `/api/status`, and so on) keeps working exactly as it does now, just
   answered by this service instead of Netlify.
 
-None of that is here yet. This first phase builds the frame everything else hangs on.
+The frame (Phase 1) and the export engine (Phase 2) are here; the design features and Darwin's
+routes come next.
 
 ## 2. What is here today
 
@@ -66,6 +67,33 @@ never takes traffic.
 running" counters and the rate limits. It holds no lasting data: decks, brands and files will
 live in the **General service** (auxi's .NET service in front of SQL Server and blob storage).
 
+**The export engine** (`app/engine/`, Phase 2). It turns slide designs into real, editable
+PowerPoint on the customer's own template. No route calls it yet (Phase 3 wires it in), but it is
+complete and tested:
+
+1. **Read the template.** An uploaded `.pptx` master is read into a *manifest*: the slide size,
+   the colours and fonts, every layout and every placeholder box (where the title goes, where the
+   body goes). A picture of each empty layout comes from **PptxRender**, a separate rendering
+   service the engine calls over the network.
+2. **Measure the slide.** Each slide is a small web page. The engine opens it in a hidden
+   browser (Chromium), sized exactly like the slide, in the template's fonts, and writes down
+   where every piece of text, every line break, box, colour, image and drawing ended up.
+3. **Understand it.** Hand-drawn bar and doughnut charts that show their numbers become real
+   charts; a heading that sits where the template's title goes becomes the slide's title.
+4. **Rebuild it in PowerPoint.** On a copy of the template, each slide is rebuilt from native
+   shapes, text boxes, tables, pictures and charts with their own data, so the result can be
+   edited in PowerPoint like any deck. The template's own parts are left byte-for-byte as they
+   were.
+5. **Check it** (in testing): text that would overflow in PowerPoint, overlaps, what had to
+   become a picture, and, with a full PptxRender build, a pixel comparison against the browser.
+
+The same slides always give exactly the same file, byte for byte. Each export works in its own
+scratch folder, and a small pool of browsers lets several exports run at once.
+
+One thing to know: two of the engine's files are derived from third-party code whose
+licence is not yet granted ([licensing.md](licensing.md)); they must not ship to production until
+that is settled. [architecture.md](architecture.md) has the details.
+
 ## 3. What happens to a request
 
 ```
@@ -94,8 +122,8 @@ caller ─► request id (read or made) ─► CORS check ─► route ─► re
 
 ## 5. What comes next
 
-The migration plan's phases, in short: the slide engine (Phase 2), the AI design features
-(Phase 3), storage through the General service and background jobs (Phase 4), sign-in and
-per-route protection (Phase 5), then Darwin's routes and data moving over (Phase 7). Where it
-will be hosted is still open (decision D2), most likely as a container, because the engine
-needs a headless browser.
+The migration plan's phases, in short: the AI design features, wired to the engine (Phase 3),
+storage through the General service and background jobs (Phase 4), sign-in and per-route
+protection (Phase 5), then Darwin's routes and data moving over (Phase 7). It will run as a
+container on Azure App Service (decision D2), because the engine needs a headless browser and
+fonts.

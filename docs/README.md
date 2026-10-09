@@ -8,6 +8,8 @@ everything else readable. Then pick by what you are trying to do.
 | Doc | |
 |---|---|
 | [how-it-works.md](how-it-works.md) | **Start here.** What the service is for, what happens to a request, and what is still to come. |
+| [architecture.md](architecture.md) | The modules and the rules between them; the export engine in detail. |
+| [licensing.md](licensing.md) | Third-party code that is licence-gated (StageFlow, decision D3), and what is kept out on purpose. |
 | [route-controls.md](route-controls.md) | Every route, who may call it and what protects it. Generated from a table the tests hold to the code. |
 
 ## I want to change it
@@ -35,6 +37,5 @@ test, it is one:
 - `tests/config/test_env_example.py` checks that `.env.example` lists every variable the code reads.
 - `tests/test_ci_workflow.py` checks the CI workflow keeps the standard job and step names.
 
-Still to write, when there is something to say: `architecture.md` (once the engine and jobs
-arrive), `testing.md`, `security.md` and `observability-runbook.md` (once there is traffic to
-ask questions about).
+Still to write, when there is something to say: `testing.md`, `security.md` and
+`observability-runbook.md` (once there is traffic to ask questions about).
