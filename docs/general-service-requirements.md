@@ -113,6 +113,7 @@ Replaces: `org_brand_domains` and `my_org_brand_ids` (0011).
 | `orgs.list_domains` | `GET /v1/org-brand-domains` | | domains | Admin |
 | `orgs.map_domain` | `PUT /v1/org-brand-domains/{domain}` | brandId | mapping | Admin; the brand must be an org brand; the same brand again is a no-op; another brand is 409; domain lower-cased, `^[a-z0-9-]+(\.[a-z0-9-]+)+$` |
 | `orgs.unmap_domain` | `DELETE /v1/org-brand-domains/{domain}` | | | Admin; idempotent |
+| `orgs.count_accounts` | `GET /v1/org-brand-domains/{domain}/accounts` | | count | Admin. Profiles whose email ends in `@<domain>`, case-insensitive (Darwin's `ILIKE '%@<domain>'`): a sign-up snapshot for the admin page, not the membership rule |
 
 ### Brands, kits and brand assets
 
@@ -130,6 +131,7 @@ Replaces: `brands` (0005, 0011) and the Netlify Blobs store `brand-assets`.
 | `brands.get_asset` | `GET /v1/brands/{brandId}/assets/{name}` | | bytes + AssetInfo | Needs read |
 | `brands.list_assets` | `GET /v1/brands/{brandId}/assets` | | name → AssetInfo | Needs read |
 | `brands.delete_asset` | `DELETE /v1/brands/{brandId}/assets/{name}` | | | Needs edit; idempotent |
+| `brands.list_org` | `GET /v1/org-brands` | | Brand[] | Admin; every org brand (with kit and updatedAt), ordered by name |
 
 ### Masters and manifests
 
@@ -245,6 +247,8 @@ D27 may send these to PostHog or App Insights instead. If so, these three operat
 | `analytics.record_event` | `POST /v1/analytics/events` | sessionId, eventName, properties, pagePath | Event | |
 | `analytics.record_page_view` | `POST /v1/analytics/page-views` | sessionId, path, durationSeconds, scrollDepthPct, referrerPath | PageView | |
 | `analytics.admin_aggregates` | `GET /v1/analytics/aggregates?since=` | | users, decks, exports, eventsByName, spendUsd | Admin |
+| `analytics.admin_overview` | `GET /v1/admin/overview?since=&recentDecks=` | since, recentDecks (default 20) | profiles (newest first), decks since, ledger rows (createdAt, estCostUsd) since, newest decks | Admin. `/api/admin-metrics` answers 500 if this fails |
+| `analytics.admin_activity` | `GET /v1/admin/activity?since=&events=&intake=&slideEdits=` | since, limits (2000, 50, 100) | analytics events since (newest first), newest intake transcripts, most recently updated slide-edit transcripts (each with an id) | Admin. Best-effort: `/api/admin-metrics` shows empty lists if this fails |
 
 ### Health
 

@@ -571,3 +571,64 @@ def check_id(value: str, what: str = "id") -> str:
     if not is_valid_id(value):
         raise ValueError(f"{what} is not a valid id")
     return value
+
+
+# ----------------------------------------------------------------------- admin (Darwin admin routes)
+class AdminDeckRow(_Model):
+    """A deck as /api/admin-metrics reads it (the decks columns it selects)."""
+
+    id: str
+    owner_id: str
+    title: str = ""
+    status: str
+    creation_method: str | None = None
+    slide_count: int | None = None
+    refine_count: int = 0
+    export_count: int = 0
+    created_at: datetime
+
+
+class AdminUsageRow(_Model):
+    created_at: datetime
+    est_cost_usd: float = 0.0
+
+
+class AdminOverview(_Model):
+    """What /api/admin-metrics must have (a failure is its 500): every profile (newest first), the decks
+    and ledger rows since `since`, and the 20 newest decks overall."""
+
+    profiles: list[Profile]
+    decks_since: list[AdminDeckRow]
+    usage_since: list[AdminUsageRow]
+    recent_decks: list[AdminDeckRow]
+
+
+class AdminIntakeRow(_Model):
+    id: str
+    user_id: str
+    deck_id: str | None = None
+    turn_count: int = 0
+    total_chars: int = 0
+    messages: list[Any] = Field(default_factory=list)
+    brief: dict[str, Any] = Field(default_factory=dict)
+    created_at: datetime
+    completed_at: datetime | None = None
+
+
+class AdminSlideEditRow(_Model):
+    id: str
+    user_id: str
+    deck_id: str
+    slide_number: int
+    messages: list[Any] = Field(default_factory=list)
+    refine_count: int = 0
+    updated_at: datetime
+
+
+class AdminActivity(_Model):
+    """What /api/admin-metrics shows best-effort (a failure is empty lists, not a 500): analytics events
+    since `since` (newest first), the newest intake transcripts and slide-edit transcripts overall."""
+
+    events: list[AnalyticsEvent]
+    intake: list[AdminIntakeRow]
+    slide_edits: list[AdminSlideEditRow]

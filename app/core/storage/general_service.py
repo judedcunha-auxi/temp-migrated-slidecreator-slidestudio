@@ -71,6 +71,8 @@ REQUIRED_ENDPOINTS: tuple[Endpoint, ...] = (
     Endpoint("orgs.list_domains", "GET", "/v1/org-brand-domains", "admin"),
     Endpoint("orgs.map_domain", "PUT", "/v1/org-brand-domains/{domain}", "admin; body: brandId; 409 if mapped elsewhere"),
     Endpoint("orgs.unmap_domain", "DELETE", "/v1/org-brand-domains/{domain}", "admin; idempotent"),
+    Endpoint("orgs.count_accounts", "GET", "/v1/org-brand-domains/{domain}/accounts",
+             "admin; profiles whose email is at the domain (case-insensitive) -> {count}"),
     # brands
     Endpoint("brands.list_visible", "GET", "/v1/brands", "org brands readable by the caller, then own, newest first"),
     Endpoint("brands.get", "GET", "/v1/brands/{brandId}", "-> {brand, canEdit}"),
@@ -82,6 +84,7 @@ REQUIRED_ENDPOINTS: tuple[Endpoint, ...] = (
     Endpoint("brands.get_asset", "GET", "/v1/brands/{brandId}/assets/{name}"),
     Endpoint("brands.list_assets", "GET", "/v1/brands/{brandId}/assets"),
     Endpoint("brands.delete_asset", "DELETE", "/v1/brands/{brandId}/assets/{name}", "idempotent"),
+    Endpoint("brands.list_org", "GET", "/v1/org-brands", "admin; every org brand, by name"),
     # masters
     Endpoint("masters.create", "POST", "/v1/brands/{brandId}/masters", "Idempotency-Key"),
     Endpoint("masters.get", "GET", "/v1/masters/{masterId}"),
@@ -136,6 +139,10 @@ REQUIRED_ENDPOINTS: tuple[Endpoint, ...] = (
     Endpoint("analytics.record_event", "POST", "/v1/analytics/events"),
     Endpoint("analytics.record_page_view", "POST", "/v1/analytics/page-views"),
     Endpoint("analytics.admin_aggregates", "GET", "/v1/analytics/aggregates?since=", "admin"),
+    Endpoint("analytics.admin_overview", "GET", "/v1/admin/overview?since=&recentDecks=",
+             "admin; profiles, decks + ledger rows since, newest decks"),
+    Endpoint("analytics.admin_activity", "GET", "/v1/admin/activity?since=&events=&intake=&slideEdits=",
+             "admin; events since (newest first), newest intake and slide-edit transcripts"),
     # health
     Endpoint("health.ping", "GET", "/v1/health", "service credential only; answers within 2 s"),
 )
