@@ -31,7 +31,11 @@ plugins = ["pydantic.mypy"]
 
 [[tool.mypy.overrides]]
 # No type information shipped for these.
-module = ["fakeredis.*", "azure.monitor.opentelemetry.*", "opentelemetry.instrumentation.*"]
+module = [
+    "fakeredis.*", "azure.monitor.opentelemetry.*", "opentelemetry.instrumentation.*",
+    # The engine's (app/engine): no inline types and no stubs installed.
+    "fontTools.*", "svgelements.*", "tinycss2.*", "html5lib.*", "openpyxl.*", "defusedxml.*", "lxml.*",
+]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]
@@ -42,3 +46,9 @@ pythonpath = ["."]
 # async test carries @pytest.mark.asyncio.
 asyncio_mode = "strict"
 asyncio_default_fixture_loop_scope = "function"
+# The engine tests' external tools (tests/engine/conftest.py skips them when not configured).
+markers = [
+    "renderer: needs PptxRender's /render-layouts (SLIDE_ENGINE_RENDERER_URL); skipped when unset",
+    "renderer_full: needs a PptxRender build with /render and /verify (SLIDE_ENGINE_RENDERER_ENDPOINTS); skipped otherwise",
+    "validator: needs the OOXML validator (SLIDE_ENGINE_VALIDATE_PY); skipped when unset",
+]

@@ -26,3 +26,28 @@ azure-monitor-opentelemetry>=1.8.11,<2.0.0
 # Imported directly for request spans (telemetry.instrument_app). A 0.x beta line
 # that moves with the distro above, which bounds it to one minor; keep them in step.
 opentelemetry-instrumentation-fastapi>=0.66b0,<0.67b0
+
+# --- the export engine (app/engine) ------------------------------------------------
+# Writes the .pptx. ONE minor: the emitter reaches into python-pptx internals
+# (part rels, partname, oxml), so a minor release can break it. Tests: tests/engine.
+python-pptx>=1.0.2,<1.1
+# Chart workbooks python-pptx embeds; the emitter rewrites their timestamps for
+# byte-identical exports, so pin it like python-pptx.
+XlsxWriter>=3.2.9,<3.3
+lxml>=6.1.3,<7.0.0
+Pillow>=12.3.0,<13.0.0
+# The measuring browser. ONE minor: measurements are calibrated against this
+# Chromium build, and the container installs the matching browser with
+# `playwright install --with-deps chromium`. Bump deliberately and re-run tests/engine.
+playwright>=1.63.0,<1.64
+svgelements>=1.9.6,<2.0.0
+html5lib>=1.1,<2.0
+tinycss2>=1.5.1,<2.0.0
+fonttools>=4.66.1,<5.0.0
+# Reads chart workbooks back in the coverage check (app/engine/verify/coverage.py).
+openpyxl>=3.1.5,<4.0.0
+# Parses package XML from uploaded masters safely (no entity expansion).
+defusedxml>=0.7.1,<0.8
+# The PptxRender HTTP client (app/engine/renderer.py). Also Starlette's TestClient
+# transport in tests; starlette 1.7 deprecates plain httpx for it.
+httpx2>=2.13.1,<3.0.0
