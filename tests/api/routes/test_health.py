@@ -12,6 +12,7 @@ from fastapi.testclient import TestClient
 
 from app.api.routes import health
 from tests.conftest import build_settings
+from tests.fakes.general_service import FakeGeneralService
 
 
 class DownRedis:
@@ -61,14 +62,14 @@ def test_healthz_does_not_touch_dependencies(make_app: Callable[..., FastAPI]):
 
 def test_readyz_ok_when_redis_answers(client: TestClient):
     r = client.get("/readyz")
-    assert (r.status_code, r.json()) == (200, {"status": "ok", "redis": "ok", "config": "ok"})
+    assert (r.status_code, r.json()) == (200, {"status": "ok", "redis": "ok", "storage": "skipped", "config": "ok"})
 
 
 def test_readyz_503_when_redis_is_down_without_naming_the_host(make_app: Callable[..., FastAPI]):
     with TestClient(make_app(redis=DownRedis())) as c:
         r = c.get("/readyz")
     assert r.status_code == 503
-    assert r.json() == {"status": "unavailable", "redis": "unreachable", "config": "ok"}
+    assert r.json() == {"status": "unavailable", "redis": "unreachable", "storage": "skipped", "config": "ok"}
     assert "secret-host" not in r.text and "6380" not in r.text
 
 
@@ -76,7 +77,7 @@ def test_readyz_503_on_bad_production_config_without_naming_the_variable(make_ap
     with TestClient(make_app(build_settings(environment="production"))) as c:
         r = c.get("/readyz")
     assert r.status_code == 503
-    assert r.json() == {"status": "unavailable", "redis": "ok", "config": "invalid"}
+    assert r.json() == {"status": "unavailable", "redis": "ok", "storage": "skipped", "config": "invalid"}
     assert "APPLICATIONINSIGHTS" not in r.text and "REDIS_URL" not in r.text
 
 
@@ -89,3 +90,37 @@ def test_readyz_reports_but_tolerates_bad_config_outside_production(make_app: Ca
 def test_health_endpoints_need_no_credentials(client: TestClient):
     for path in ("/healthz", "/readyz"):
         assert client.get(path).status_code == 200
+
+
+# ------------------------------------------------------------------ storage (Phase 4)
+def test_readyz_storage_is_neutral_for_the_fake(make_app: Callable[..., FastAPI]):
+    with TestClient(make_app(storage=FakeGeneralService())) as c:
+        r = c.get("/readyz")
+    assert (r.status_code, r.json()["storage"]) == (200, "skipped")
+
+
+def test_readyz_storage_ok_for_the_local_adapter(make_app: Callable[..., FastAPI], tmp_path: Path):
+    settings = build_settings(storage_backend="local", scratch_root=str(tmp_path))
+    with TestClient(make_app(settings)) as c:
+        r = c.get("/readyz")
+    assert (r.status_code, r.json()["storage"]) == (200, "ok")
+    assert all(p.resolve().is_relative_to(tmp_path.resolve()) for p in tmp_path.rglob("*"))
+
+
+def test_readyz_503_when_storage_is_unreachable_without_naming_the_host(make_app: Callable[..., FastAPI]):
+    fake = FakeGeneralService()
+    fake.fail_health = True
+    with TestClient(make_app(storage=fake)) as c:
+        r = c.get("/readyz")
+    assert r.status_code == 503
+    assert r.json() == {"status": "unavailable", "redis": "ok", "storage": "unreachable", "config": "ok"}
+    assert "general-service.internal" not in r.text
+
+
+def test_readyz_503_while_the_general_adapter_is_a_stub(make_app: Callable[..., FastAPI]):
+    settings = build_settings(storage_backend="general", general_service_url="https://general.example")
+    with TestClient(make_app(settings)) as c:
+        r = c.get("/readyz")
+    assert r.status_code == 503
+    assert r.json()["storage"] == "unavailable"
+    assert "D5" not in r.text and "NotImplemented" not in r.text

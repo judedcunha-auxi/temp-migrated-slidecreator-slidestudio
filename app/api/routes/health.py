@@ -6,9 +6,10 @@ GET /healthz  Liveness. No dependency checks: a failure means the process is stu
               the commit that is running (sha, builtAt, dirty) from build_info.json,
               which scripts/package_deploy.py stamps into the deploy package, so
               "what is deployed?" is one request.
-GET /readyz   Readiness. Redis answers a PING, and in production check_config()
-              found no problems. 503 when not ready. Point the platform's health
-              check here. (The General service joins this check in Phase 4.)
+GET /readyz   Readiness. Redis answers a PING, the storage backend answers its
+              ping, and in production check_config() found no problems. 503 when
+              not ready. Point the platform's health check here. The in-memory
+              fake has nothing to reach: it reports "skipped", which is neutral.
 
 Both are open to unauthenticated callers, because probes send no credentials, and
 neither reveals internal details: which host, which variable, which exception all
@@ -28,6 +29,9 @@ from fastapi.responses import JSONResponse
 
 from app.config.settings import PROJECT_ROOT, is_production
 from app.core.redis_client import PING_TIMEOUT_S, RedisStore
+from app.core.request_id import get_request_id
+from app.core.storage.models import CallerContext
+from app.core.storage.ports import HealthPort
 
 _log = logging.getLogger(__name__)
 
@@ -66,8 +70,34 @@ def liveness_body(info: dict[str, Any]) -> dict[str, Any]:
     return body
 
 
-async def readiness(redis: RedisStore | None, config_problems: list[str], production: bool) -> tuple[bool, dict[str, str]]:
-    """(ready, public detail). The detail names only which check failed."""
+# The storage ping shares Redis's budget: both must answer well inside the probe timeout.
+STORAGE_PING_TIMEOUT_S = PING_TIMEOUT_S
+
+
+async def storage_readiness(storage: HealthPort | None, request_id: str) -> tuple[bool, str]:
+    """(ready, public word) for the storage backend: ok, skipped (the fake: nothing
+    to reach, neutral), or unreachable / unavailable (not built, e.g. the General
+    service stub)."""
+    if storage is None:
+        _log.warning("readiness: no storage backend (see the startup log)")
+        return False, "unavailable"
+    try:
+        report = await asyncio.wait_for(storage.ping(CallerContext.service(request_id)),
+                                        timeout=STORAGE_PING_TIMEOUT_S)
+    except Exception as exc:  # noqa: BLE001 - any failure is "not ready"
+        _log.warning("readiness: storage unreachable: %s", exc)
+        return False, "unreachable"
+    return True, report.status
+
+
+async def readiness(
+    redis: RedisStore | None,
+    config_problems: list[str],
+    production: bool,
+    storage: tuple[bool, str] | None = None,
+) -> tuple[bool, dict[str, str]]:
+    """(ready, public detail). The detail names only which check failed.
+    `storage` is storage_readiness()'s answer, when the caller checked it."""
     detail: dict[str, str] = {}
     ready = True
     try:
@@ -80,6 +110,10 @@ async def readiness(redis: RedisStore | None, config_problems: list[str], produc
         _log.warning("readiness: Redis unreachable: %s", exc)
         detail["redis"] = "unreachable"
         ready = False
+
+    if storage is not None:
+        storage_ok, detail["storage"] = storage
+        ready = ready and storage_ok
 
     if config_problems:
         detail["config"] = "invalid"
@@ -98,13 +132,15 @@ async def healthz() -> JSONResponse:
     return JSONResponse(liveness_body(_build_info()))
 
 
-@router.get("/readyz", summary="Readiness: Redis and configuration")
+@router.get("/readyz", summary="Readiness: Redis, storage and configuration")
 async def readyz(request: Request) -> JSONResponse:
     state = request.app.state
+    storage = getattr(state, "storage", None)
     ready, detail = await readiness(
         getattr(state, "redis", None),
         list(getattr(state, "config_problems", [])),
         is_production(state.settings),
+        await storage_readiness(storage.health if storage is not None else None, get_request_id(request)),
     )
     return JSONResponse({"status": "ok" if ready else "unavailable", **detail},
                         status_code=200 if ready else 503)
