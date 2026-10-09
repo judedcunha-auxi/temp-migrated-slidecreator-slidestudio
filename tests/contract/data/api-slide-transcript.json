@@ -1,0 +1,48 @@
+{
+  "route": "/api/slide-transcript",
+  "handler": "netlify/functions/slide-transcript.ts",
+  "netlifyRouting": "netlify.toml:12-15",
+  "methods": ["POST"],
+  "methodHandling": { "otherMethods": "Any method other than POST -> 405 {\"error\":\"Method not allowed\"}, checked BEFORE auth (so an unauthenticated GET gets 405, not 401). No Allow header.", "cite": "slide-transcript.ts:7" },
+  "auth": { "kind": "requireUser", "cite": "slide-transcript.ts:8; _shared/auth.ts:9-25", "notes": "After the method check, before body parse." },
+  "query": [],
+  "request": {
+    "contentType": "application/json",
+    "parse": "body = await req.json() (slide-transcript.ts:10-15). Malformed JSON -> 500 'Internal error'. JSON null -> body?.deckId falsy -> 400.",
+    "fields": [
+      { "name": "deckId", "type": "string", "required": true, "default": null, "bounds": "UUID in practice (non-UUID -> 500 via ownsDeck)", "validation": "falsy -> 400 'Missing deckId, slideNumber, or messages'", "cite": "slide-transcript.ts:17-19,21" },
+      { "name": "slideNumber", "type": "number", "required": true, "default": null, "bounds": "any number (no integer/positivity check; NaN impossible from JSON)", "validation": "typeof !== 'number' -> 400 'Missing deckId, slideNumber, or messages'", "cite": "slide-transcript.ts:17" },
+      { "name": "messages", "type": "array of {role, content}", "required": true, "default": null, "bounds": "no length cap", "validation": "!Array.isArray -> 400. Elements not validated; a null element -> TypeError reading .role -> 500. Content string kept; content array: text blocks kept verbatim, other blocks replaced by {type, data:'[attachment]', media_type: b.media_type ?? null}; any other content passed as-is.", "cite": "slide-transcript.ts:17,24-33" },
+      { "name": "refineCount", "type": "number", "required": false, "default": "count of messages with role 'user'", "bounds": "not validated (any JSON value except null/undefined is stored)", "validation": "body.refineCount ?? userCount", "cite": "slide-transcript.ts:40" }
+    ],
+    "unknownFields": "Ignored; unknown keys inside each message are dropped (only role/content kept)."
+  },
+  "checkOrder": ["1. method === POST (405)", "2. requireUser", "3. req.json()", "4. deckId/slideNumber/messages (400)", "5. ownsDeck (403)", "6. sanitize", "7. upsert slide_edit_transcripts (errors logged, swallowed)", "8. 200 {ok:true}"],
+  "responses": [
+    { "status": 200, "contentType": "application/json", "headers": {}, "when": "stored (or DB error swallowed)", "bodyShape": { "ok": true }, "example": { "ok": true }, "cite": "slide-transcript.ts:43" }
+  ],
+  "errors": [
+    { "status": 405, "body": { "error": "Method not allowed" }, "when": "method !== POST", "cite": "slide-transcript.ts:7" },
+    { "status": 401, "body": { "error": "Missing bearer token" }, "when": "no bearer", "cite": "_shared/http.ts:20-25" },
+    { "status": 401, "body": { "error": "Invalid or expired session" }, "when": "bad token", "cite": "_shared/auth.ts:22-23" },
+    { "status": 400, "body": { "error": "Missing deckId, slideNumber, or messages" }, "when": "validation", "cite": "slide-transcript.ts:17-19" },
+    { "status": 403, "body": { "error": "Not your deck" }, "when": "not owned / not found", "cite": "slide-transcript.ts:21" },
+    { "status": 500, "body": { "error": "Internal error" }, "when": "malformed JSON, null message element, non-UUID deckId, ownsDeck DB error", "cite": "_shared/http.ts:14-18" }
+  ],
+  "sideEffects": ["Upsert slide_edit_transcripts {user_id, deck_id, slide_number, messages (sanitized), refine_count, updated_at} on conflict (deck_id, slide_number) — awaited, but errors only logged (_shared/db.ts:417-436)"],
+  "externalCalls": ["Supabase only."],
+  "quirks": [
+    "Only route in this group with an explicit method check, and it precedes auth.",
+    "Upsert key is (deck_id, slide_number): the whole thread is replaced each call.",
+    "DB errors never surface: always {ok:true} once validation/ownership pass.",
+    "Base64 attachment payloads are stripped to '[attachment]' before storage."
+  ],
+  "beforeAnyState": "Creates the row on first call; no prior state needed beyond deck ownership.",
+  "tests": [ { "file": "none", "asserts": "No test file exists for slide-transcript (netlify/functions/_tests has none)." } ],
+  "callers": [
+    { "who": "frontend", "where": "src/lib/api.ts:27-37 (saveSlideTranscript); src/pages/Generation.tsx:137,180", "expects": "2xx {ok} (fire-and-forget usage)" },
+    { "who": "Auxi_Connector", "where": "none", "expects": "-" }
+  ],
+  "docs": { "openapi": "absent from public/openapi.yaml", "postman": "absent from docs/postman_collection.json", "apiMd": "absent from docs/api.md" },
+  "planSection65": "Row '{deckId, slideNumber, messages[], refineCount?} → {ok:true}' — accurate; add 405 'Method not allowed' before auth."
+}

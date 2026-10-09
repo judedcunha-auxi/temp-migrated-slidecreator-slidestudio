@@ -1,0 +1,56 @@
+{
+  "route": "/api/intake",
+  "handler": "netlify/functions/intake.ts",
+  "netlifyRouting": "netlify.toml:12-15",
+  "methods": ["POST"],
+  "methodHandling": { "otherMethods": "Not checked. A bodyless GET -> req.json() rejects -> caught -> null -> 400 'messages array required' (after auth). Other methods with a JSON body behave like POST.", "cite": "intake.ts:11-72" },
+  "auth": { "kind": "requireUser", "cite": "intake.ts:13; _shared/auth.ts:9-25", "notes": "Auth first." },
+  "query": [],
+  "request": {
+    "contentType": "application/json",
+    "parse": "await req.json().catch(() => null) (intake.ts:14) — malformed JSON is NOT a 500 here; it becomes 400 'messages array required'.",
+    "fields": [
+      { "name": "messages", "type": "ChatMessage[] = {role:'user'|'assistant', content: string | ContentBlock[]}", "required": true, "default": null, "bounds": ">= 1 message; total TEXT chars (string contents + text blocks' text) <= 30000 (MAX_TRANSCRIPT_CHARS); binary data not counted and not size-checked", "validation": "non-array or empty -> 400 'messages array required'. Every message: role user|assistant; content string, or array whose every block is {type:'text', text:string} | {type:'image', data:string, media_type in image/jpeg|png|gif|webp} | {type:'document', data:string}; else 400 'malformed message'. Text total > 30000 -> 400 'Conversation too long — draft with what you have'.", "cite": "intake.ts:15-37; _shared/intake.ts:30" },
+      { "name": "brief", "type": "Partial<IntakeBrief>", "required": false, "default": "{}", "bounds": "topic 1..300, audience 1..300, numSlides int >= 1 (no max), keyMessages 1..6 items each 1..300, context 1..4000, ready boolean", "validation": "sanitizeBrief: per-field zod safeParse, invalid fields silently dropped, unknown keys dropped; never errors", "cite": "intake.ts:39-41; _shared/intake.ts:36-55; _tests/intake.test.ts:55-58" },
+      { "name": "intakeSessionKey", "type": "string (not type-checked)", "required": false, "default": null, "bounds": null, "validation": "if truthy, the transcript is upserted (fire-and-forget)", "cite": "intake.ts:44-66" }
+    ],
+    "unknownFields": "Ignored (top-level and inside brief). Unknown keys on messages are not forwarded (toAnthropicContent maps only known fields, _shared/intake.ts:20-27)."
+  },
+  "checkOrder": ["1. requireUser", "2. parse (null on failure)", "3. messages non-empty array (400)", "4. well-formed (400)", "5. text length (400)", "6. runIntakeTurn(messages, sanitizeBrief(brief), ANTHROPIC_API_KEY)", "7. if intakeSessionKey: void upsertIntakeTranscript", "8. 200 turn"],
+  "responses": [
+    { "status": 200, "contentType": "application/json", "headers": {}, "when": "turn produced", "bodyShape": { "message": "string (assistant reply; never empty)", "brief": "Partial<IntakeBrief> — ONLY the fields changed this turn (sanitized), {} if none" }, "example": { "message": "Who is the audience?", "brief": { "topic": "GTM" } }, "cite": "intake.ts:68; _shared/intake.ts:83,85-138; _tests/intake.test.ts:30-37" },
+    { "status": 200, "contentType": "application/json", "headers": {}, "when": ">= 12 assistant messages in transcript (no model call)", "bodyShape": { "message": "fixed wrap-up string", "brief": {} }, "example": { "message": "We've covered a lot — let's draft with what we have. Hit “Draft storyline” whenever you're ready.", "brief": {} }, "cite": "_shared/intake.ts:29,31-32,93" },
+    { "status": 200, "contentType": "application/json", "headers": {}, "when": "no user message in transcript (no model call)", "bodyShape": { "message": "fixed string", "brief": {} }, "example": { "message": "Tell me about the deck you need — what's it for?", "brief": {} }, "cite": "_shared/intake.ts:98-99" },
+    { "status": 200, "contentType": "application/json", "headers": {}, "when": "model returned no text even after the follow-up call", "bodyShape": { "message": "'Noted — anything else before we draft?'", "brief": "fields from tool call" }, "example": { "message": "Noted — anything else before we draft?", "brief": { "ready": true } }, "cite": "_shared/intake.ts:124-138" }
+  ],
+  "errors": [
+    { "status": 401, "body": { "error": "Missing bearer token" }, "when": "no bearer", "cite": "_shared/http.ts:20-25" },
+    { "status": 401, "body": { "error": "Invalid or expired session" }, "when": "bad token", "cite": "_shared/auth.ts:22-23; _tests/intake.test.ts:51-54" },
+    { "status": 400, "body": { "error": "messages array required" }, "when": "malformed JSON, null body, messages missing/non-array/empty", "cite": "intake.ts:15-16; _tests/intake.test.ts:38-41" },
+    { "status": 400, "body": { "error": "malformed message" }, "when": "bad role, bad content or block", "cite": "intake.ts:30; _tests/intake.test.ts:41-43" },
+    { "status": 400, "body": { "error": "Conversation too long — draft with what you have" }, "when": "text chars > 30000", "cite": "intake.ts:37; _tests/intake.test.ts:45-50" },
+    { "status": 500, "body": { "error": "Internal error" }, "when": "Anthropic API error (first call), missing ANTHROPIC_API_KEY (requireEnv throws plain Error)", "cite": "_shared/http.ts:14-18; _shared/config.ts:27-31" }
+  ],
+  "sideEffects": ["If intakeSessionKey truthy: upsert intake_transcripts {user_id, session_key, messages (binary stripped to '[attachment]'), brief (sanitized, {} default), turn_count (user messages), total_chars, updated_at} on (user_id, session_key) — not awaited, errors logged (intake.ts:44-66; _shared/db.ts:368-389)"],
+  "externalCalls": ["Anthropic messages.create, model STORYLINE_MODEL (default claude-sonnet-4-6), max_tokens 1024, tool update_brief; plus a second text-only call (max_tokens 512) when the first returns no text — PAID (_shared/intake.ts:105-122)"],
+  "quirks": [
+    "The response is plain JSON, NOT SSE — but the frontend's primary path streamIntake (src/lib/api.ts:81-139) expects text/event-stream frames. It parses the JSON body as one frame with no `type`, never sees `done`, throws 'Stream ended unexpectedly', and IntakeChat falls back to postIntake (src/pages/IntakeChat.tsx:96-104). Net effect: every intake turn hits /api/intake TWICE (two paid Claude calls, two transcript upserts). openapi.yaml, postman and api.md all describe an SSE response that the handler does not produce.",
+    "Malformed JSON -> 400 (caught), unlike most routes (500).",
+    "No per-user daily cap (comment intake.ts:7-10; reserveIntakeTurn exists in db.ts:171-175 but is unused); the only bound is 30000 text chars and 12 assistant turns.",
+    "Returned brief contains only fields changed this turn; client merges.",
+    "Leading assistant messages are stripped before calling the model (_shared/intake.ts:95-103).",
+    "Attachment bytes are not size-checked server-side; 'document' blocks are always sent as application/pdf."
+  ],
+  "beforeAnyState": "Stateless; transcript upsert creates a row on first call.",
+  "tests": [ { "file": "netlify/functions/_tests/intake.test.ts", "asserts": "200 {message, brief} with sanitized inbound brief; 400 for {}, [], role 'system', content 42; 400 oversize without model call; 401 (lines 29-58)" } ],
+  "callers": [
+    { "who": "frontend", "where": "src/lib/api.ts:81-139 (streamIntake, expects SSE) then fallback src/lib/api.ts:63-69 (postIntake, expects JSON {message, brief}); src/pages/IntakeChat.tsx:77-104", "expects": "postIntake: 2xx {message, brief}; errors via body.error" },
+    { "who": "Auxi_Connector", "where": "none", "expects": "-" }
+  ],
+  "docs": {
+    "openapi": "public/openapi.yaml:1606-1707 — WRONG response: documents 200 text/event-stream with delta/brief/done/error events; handler returns application/json {message, brief}. intakeSessionKey undocumented. 400 errors undocumented.",
+    "postman": "'3.1 Send intake message' description says 'Response is Server-Sent Events (SSE)' — wrong; bodies otherwise valid.",
+    "apiMd": "docs/api.md:156 — also says streaming SSE (wrong)"
+  },
+  "planSection65": "Row '{messages[], brief?, intakeSessionKey?} → turn JSON' — accurate (turn JSON = {message, brief}). The frontend's SSE-first double call should be flagged: if the new service implements SSE the frontend would start using it; if it keeps JSON the double call persists."
+}

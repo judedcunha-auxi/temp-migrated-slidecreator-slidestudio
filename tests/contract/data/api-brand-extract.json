@@ -1,0 +1,59 @@
+{
+  "route": "/api/brand-extract",
+  "handler": "netlify/functions/brand-extract.ts",
+  "netlifyRouting": "netlify.toml:12-15 rewrites /api/* -> /.netlify/functions/:splat (status 200)",
+  "methods": ["POST"],
+  "methodHandling": { "otherMethods": "405 {\"error\":\"POST only\"} AFTER requireUser", "cite": "netlify/functions/brand-extract.ts:18-19" },
+  "auth": { "kind": "requireUser", "cite": "netlify/functions/brand-extract.ts:18", "notes": "If brandId supplied: needs canEdit, else 404 (not 403)." },
+  "query": [],
+  "request": {
+    "contentType": "application/json",
+    "parse": "`req.json().catch(() => ({}))` - malformed body behaves as {} -> 400 'b64 PDF data required'. JSON null body -> destructuring null throws TypeError -> 500.",
+    "fields": [
+      { "name": "b64", "type": "string (base64 PDF)", "required": true, "default": null, "bounds": "decoded 1..4194304 bytes; starts with '%PDF'", "validation": "non-string/empty -> 400 'b64 PDF data required'; decoded 0 or > 4 MiB -> 400 'Guidelines must be a PDF up to 4MB'; first 4 bytes != '%PDF' -> 400 'Guidelines must be a PDF'", "cite": "netlify/functions/brand-extract.ts:10-11,21-24" },
+      { "name": "brandId", "type": "string", "required": false, "default": "absent", "bounds": "UUID", "validation": "If the key is present with ANY value other than undefined (including null, \"\", numbers): resolved only when typeof string; caller must have canEdit, else 404 'Brand not found'. Checked AFTER the PDF checks.", "cite": "netlify/functions/brand-extract.ts:25-26" }
+    ],
+    "unknownFields": "ignored"
+  },
+  "checkOrder": ["1. requireUser", "2. method", "3. b64 present", "4. size", "5. magic", "6. brandId access", "7. write PDF blob + pending job + trigger"],
+  "responses": [
+    { "status": 202, "contentType": "application/json", "headers": {}, "when": "accepted", "bodyShape": { "jobId": "uuid" }, "example": { "jobId": "3fa85f64-5717-4562-b3fc-2c963f66afa6" }, "cite": "netlify/functions/brand-extract.ts:28,37; _tests/brand-extract.test.ts:57-66" }
+  ],
+  "errors": [
+    { "status": 401, "body": { "error": "Missing bearer token" }, "when": "no bearer", "cite": "netlify/functions/_shared/http.ts:20-25" },
+    { "status": 401, "body": { "error": "Invalid or expired session" }, "when": "bad token", "cite": "netlify/functions/_shared/auth.ts:22-23" },
+    { "status": 405, "body": { "error": "POST only" }, "when": "non-POST", "cite": "netlify/functions/brand-extract.ts:19" },
+    { "status": 400, "body": { "error": "b64 PDF data required" }, "when": "b64 missing/empty, or body unparsable", "cite": "netlify/functions/brand-extract.ts:21" },
+    { "status": 400, "body": { "error": "Guidelines must be a PDF up to 4MB" }, "when": "decoded empty or > 4 MiB", "cite": "netlify/functions/brand-extract.ts:23; _tests/brand-extract.test.ts:47-48" },
+    { "status": 400, "body": { "error": "Guidelines must be a PDF" }, "when": "not %PDF", "cite": "netlify/functions/brand-extract.ts:24; _tests/brand-extract.test.ts:46" },
+    { "status": 404, "body": { "error": "Brand not found" }, "when": "brandId present but not editable (incl. null/empty/non-UUID, read-only org member)", "cite": "netlify/functions/brand-extract.ts:26; _tests/brand-extract.test.ts:51-55" },
+    { "status": 500, "body": { "error": "Internal error" }, "when": "blob/DB failure; JSON null body", "cite": "netlify/functions/_shared/http.ts:14-18" }
+  ],
+  "sideEffects": [
+    "With brandId: PDF stored at brand/<ownerId>/<brandId>/guidelines.pdf (kept); without: extract/<jobId>.pdf in store 'brand-assets', deleted by the background after extraction (brand-extract.ts:32-33; blobs.ts:80-82,123-125)",
+    "Job {status:'pending', userId} in store 'brand-extract-jobs' key extract/<jobId>.json (brand-extract.ts:34; blobs.ts:168-170)",
+    "Triggers brand-extract-background with {jobId, userId, pdfKey, ephemeral: !brand}; trigger failures swallowed (trigger.ts:3-25,43-49)",
+    "Background calls Anthropic (paid) with the whole PDF as a document block, model STORYLINE_MODEL (default claude-sonnet-4-6), max_tokens 2048, forced tool emit_brand_fields (brandExtract.ts:62-85; config.ts:33)"
+  ],
+  "externalCalls": ["Anthropic Messages API from the background function (ANTHROPIC_API_KEY) - paid"],
+  "quirks": [
+    "NO daily cap is enforced. loadCaps().brandExtractsPerUserPerDay (config.ts:23, default 10) and db.reserveBrandExtract / RPC reserve_brand_extract (db.ts:334-338; supabase/migrations/0005_brands.sql:28-62) exist, but nothing calls them (grep: only definitions). The plan's 'cap 10 per user per day' is not current behaviour.",
+    "brandId: null in JSON -> 404 (null !== undefined). The frontend omits it via JSON.stringify of undefined.",
+    "Malformed JSON -> 400 b64 message (catch -> {}), but literal `null` body -> 500.",
+    "PDF validation happens before the brand access check, so an invalid PDF to someone else's brand returns 400, not 404.",
+    "Trigger failure leaves job pending forever while 202 is returned."
+  ],
+  "beforeAnyState": "Works without a brand (create-mode editor): PDF parked per job.",
+  "tests": [
+    { "file": "netlify/functions/_tests/brand-extract.test.ts", "asserts": "400 non-PDF and oversized; 404 unowned brandId; with brandId stores at guidelines key and triggers non-ephemeral job, 202; without brandId temp key + ephemeral; plus status + background tests" }
+  ],
+  "callers": [
+    { "who": "frontend", "where": "src/lib/api.ts:309-311 (postBrandExtract); src/pages/BrandEditorPage.tsx:191", "expects": "{jobId}" }
+  ],
+  "docs": {
+    "openapi": "public/openapi.yaml:1407-1436. Only 202 documented; errors undocumented; no mention of per-user cap (consistent with code) .",
+    "postman": "docs/postman_collection.json:599-624 (5.3) - matches shape",
+    "apiMd": "docs/api.md:1008-1043"
+  },
+  "planSection65": "Row: 'POST {b64, brandId} -> 202 {jobId} | Redis job; cap 10 per user per day'. INACCURATE: today there is no cap (reserve_brand_extract is never called). If the new service adds the cap it is a behaviour change (new 429 path) and must be decided explicitly. brandId is optional."
+}

@@ -63,3 +63,15 @@ google-genai>=2.29.0,<2.30
 # Text of PDF attachments, so a brief's figures can be grounded in them
 # (app/core/design/briefs.py: attachment_text).
 pypdf>=6.20.0,<7.0.0
+
+# --- Darwin's /api (app/api/routes, app/core/darwin, app/core/auth) ------------------
+# Image generation for Darwin's image mode (app/core/darwin/image_gen.py, gpt-image behind a
+# port, D28). ONE minor, as for anthropic: the adapter reads the images response shape.
+openai>=3.27.0,<3.28
+# Verifies the bearer JWT against the issuer's JWKS (app/core/auth.py). The crypto extra
+# brings RSA/EC key support; cryptography is pinned in step with it.
+PyJWT[crypto]>=2.15.1,<3.0.0
+cryptography>=50.0.2,<51.0.0
+# Multipart form parsing for Starlette's request.form() (/api/image-to-slide's "file" upload).
+# A 0.0.x line: bounded to one minor.
+python-multipart>=0.0.32,<0.1

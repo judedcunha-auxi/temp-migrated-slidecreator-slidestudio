@@ -1,0 +1,52 @@
+{
+  "route": "/api/analytics-event",
+  "handler": "netlify/functions/analytics-event.ts",
+  "netlifyRouting": "netlify.toml:12-15 rewrites /api/* -> /.netlify/functions/:splat (status 200)",
+  "methods": ["POST"],
+  "methodHandling": { "otherMethods": "Not checked. A GET (no body) makes req.json() reject, the .catch turns it into null, and the route answers 200 {\"ok\":true} (after auth).", "cite": "netlify/functions/analytics-event.ts:12-18" },
+  "auth": { "kind": "requireUser", "cite": "netlify/functions/analytics-event.ts:14", "notes": "Auth runs first and is NOT silent: an unauthenticated call gets 401, only the malformed-body path is silent." },
+  "query": [],
+  "request": {
+    "contentType": "application/json (header not checked)",
+    "parse": "`await req.json().catch(() => null)`. Malformed JSON, empty body, or a body whose `events` is missing or not an array -> 200 {\"ok\":true} with no writes (no touchLastSeen either).",
+    "fields": [
+      { "name": "events", "type": "array of EventPayload", "required": true, "default": null, "bounds": "only the first 50 are processed; the rest are silently dropped", "validation": "Array.isArray(body.events), else silent {ok:true}", "cite": "netlify/functions/analytics-event.ts:16-20" },
+      { "name": "events[].event_name", "type": "string", "required": true, "default": null, "bounds": null, "validation": "falsy -> the event is skipped silently, but still counted in `stored`", "cite": "netlify/functions/analytics-event.ts:28" },
+      { "name": "events[].properties", "type": "object", "required": false, "default": "{}", "bounds": null, "validation": "none; stored as-is (properties ?? {})", "cite": "netlify/functions/analytics-event.ts:47" },
+      { "name": "events[].page_path", "type": "string", "required": false, "default": "null", "bounds": null, "validation": "none", "cite": "netlify/functions/analytics-event.ts:48" },
+      { "name": "events[].session_id", "type": "string", "required": false, "default": "properties.session_id, else null", "bounds": null, "validation": "none", "cite": "netlify/functions/analytics-event.ts:45" },
+      { "name": "page_exited properties: path, duration_seconds, scroll_depth_pct, referrer_path, session_id", "type": "mixed", "required": false, "default": "path: properties.path ?? page_path ?? ''; session: session_id ?? properties.session_id ?? ''; duration/scroll: the value only if typeof number, else null; referrer: ?? null", "bounds": null, "validation": "typeof checks only for the two numbers", "cite": "netlify/functions/analytics-event.ts:31-41" }
+    ],
+    "unknownFields": "Ignored at the top level and per event (only the fields above are read). Unknown keys inside `properties` are stored verbatim in analytics_events.properties jsonb."
+  },
+  "checkOrder": ["1. requireUser (:14)", "2. parse body with .catch(null) (:15)", "3. events array? else 200 {ok:true} (:16-18)", "4. slice(0,50) (:20)", "5. `at` timestamp taken BEFORE the writes (:21)", "6. touchLastSeen + one insert per event, in parallel (:23-51)", "7. 200 {ok, stored, at} (:53)"],
+  "responses": [
+    { "status": 200, "contentType": "application/json", "headers": {}, "when": "body malformed / no events array", "bodyShape": { "ok": true }, "example": { "ok": true }, "cite": "netlify/functions/analytics-event.ts:16-18" },
+    { "status": 200, "contentType": "application/json", "headers": {}, "when": "events array processed (including an empty array)", "bodyShape": { "ok": true, "stored": "integer = min(events.length, 50), counts skipped events too", "at": "ISO-8601 string, new Date().toISOString() taken before the writes" }, "example": { "ok": true, "stored": 2, "at": "2026-10-08T11:52:03.417Z" }, "cite": "netlify/functions/analytics-event.ts:20-21, 53" }
+  ],
+  "errors": [
+    { "status": 401, "body": { "error": "Missing bearer token" }, "when": "no bearer", "cite": "netlify/functions/_shared/http.ts:23" },
+    { "status": 401, "body": { "error": "Invalid or expired session" }, "when": "token rejected", "cite": "netlify/functions/_shared/auth.ts:23" },
+    { "status": 500, "body": { "error": "Internal error" }, "when": "only if something throws outside the swallowed DB errors (e.g. Supabase env missing). Insert errors do not produce 500.", "cite": "netlify/functions/_shared/http.ts:14-18" }
+  ],
+  "sideEffects": [
+    "profiles.last_seen_at = now for the caller on every valid batch; its error is ignored (db.ts:364-366).",
+    "event_name === 'page_exited' -> insert into page_view_sessions {user_id, session_id, path, exited_at: now, duration_seconds, scroll_depth_pct, referrer_path} (analytics-event.ts:31-41, db.ts:438-456).",
+    "Other events -> insert into analytics_events {user_id, session_id, event_name, properties, page_path} (analytics-event.ts:43-49, db.ts:400-415).",
+    "Insert errors are logged with console.error and swallowed (db.ts:414, 455)."
+  ],
+  "externalCalls": [],
+  "quirks": [
+    "Silent 200 {\"ok\":true} on a malformed body (no `stored`, no `at`), while a well-formed body gets {ok, stored, at}. The two success shapes differ.",
+    "`stored` is the sliced batch length, not the number actually written: events without event_name and failed inserts are still counted.",
+    "Batches over 50 are truncated silently; there is no error.",
+    "DB insert failures never surface; the route still answers ok.",
+    "page_exited events go to a different table (page_view_sessions), not analytics_events.",
+    "An empty events array still touches last_seen_at and returns stored: 0."
+  ],
+  "beforeAnyState": "No prior state needed; works for any authenticated user.",
+  "tests": [ { "file": "none", "asserts": "No test covers this route." } ],
+  "callers": [ { "who": "frontend", "where": "src/lib/analytics.ts:110-121 (_flushToSupabase, fetch keepalive POST {events}); events built at src/lib/analytics.ts:69-92 (page_exited with session_id in properties; others with properties.session_id)", "expects": "Nothing: fire-and-forget, response and errors ignored (.catch(() => {}))." } ],
+  "docs": { "openapi": "absent from public/openapi.yaml", "postman": "absent from docs/postman_collection.json" },
+  "planSection65": "Row '{events[] <=50} -> {ok, stored, at} (silent {ok:true} on a malformed body)' is accurate. Add: >50 are truncated not rejected; `stored` counts skipped events; 401 still applies."
+}

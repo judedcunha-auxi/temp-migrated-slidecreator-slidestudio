@@ -10,11 +10,16 @@ The code is `app/core/llm/` and the settings are `app/config/ai.py`; every varia
 |---|---|---|
 | Anthropic (Claude) | The primary provider: the design chat, the critic. | Always on. `ANTHROPIC_API_KEY` is required in production. |
 | Google (Gemini) | An alternative design model, and the optional brand role annotation. | Off unless `LLM_GEMINI_ENABLED=true`; then `GEMINI_API_KEY` is required in production. |
+| OpenAI (gpt-image) | Darwin's image mode: slide images, brand previews (`app/core/darwin/image_gen.py`, D28). Priced by Darwin's estimates ($0.08 an image, $0.16 an edit on a master), recorded in the cost ledger. | `OPENAI_API_KEY`, required in production; `OPENAI_IMAGE_MODEL` (gpt-image-2), `OPENAI_IMAGE_QUALITY` (medium); `GLOBAL_IMAGES_PER_DAY` caps the images per UTC day (`app/config/darwin.py`). |
 
 Every call goes through one port (`app/core/llm/ports.py`), so the design loop, the critic and
 brand extraction work the same on either provider. The tests run on a scripted fake provider
-(`tests/fakes/llm.py`), and a test fixture refuses to build a real SDK client, so **no test makes a
-paid call**.
+(`tests/fakes/llm.py`, `tests/fakes/image_gen.py`), and a test fixture refuses to build a real
+Anthropic, Gemini or OpenAI client, so **no test makes a paid call**.
+
+Every paid call that finishes lands in the cost ledger through the storage port
+(`app/core/darwin/usage.py`): the model in `model`, the cost in `est_cost_usd` (Darwin put them one
+column early, C10, so its ledger reads $0).
 
 ## Models
 

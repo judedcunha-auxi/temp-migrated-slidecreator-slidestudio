@@ -1,0 +1,94 @@
+{
+  "route": "/api/brand-asset",
+  "handler": "netlify/functions/brand-asset.ts",
+  "netlifyRouting": "netlify.toml:12-15 rewrites /api/* -> /.netlify/functions/:splat (status 200)",
+  "methods": ["POST", "GET"],
+  "methodHandling": {
+    "otherMethods": "No 405. Only POST is special-cased; EVERY other method (GET, PUT, PATCH, DELETE, HEAD, ...) runs the GET branch and reads the query string.",
+    "cite": "netlify/functions/brand-asset.ts:41,71"
+  },
+  "auth": {
+    "kind": "requireUser",
+    "cite": "netlify/functions/brand-asset.ts:39; netlify/functions/_shared/auth.ts:9-25",
+    "notes": "Required for every request including GET ?kind=style-default (which needs no brand). Per-brand access: reads need read access (owner, admin, or domain member of an org brand); writes need canEdit (owner of personal brand, or admin for org brand). _tests/brand-asset.test.ts:98-103 pins 401 on both methods."
+  },
+  "query": [
+    { "name": "kind", "type": "string", "required": true, "appliesTo": "GET (non-POST)", "parse": "searchParams.get('kind'); exact match", "default": null, "bounds": "style-default | layout-preview | logo | master | titleMaster | dividerMaster", "invalidBehaviour": "missing/other -> 400 'kind must be one of logo, master, titleMaster, dividerMaster' (the message does not list style-default or layout-preview)", "cite": "netlify/functions/brand-asset.ts:12-18,72-91" },
+    { "name": "brandId", "type": "string", "required": "yes except kind=style-default", "parse": "searchParams.get('brandId')", "default": null, "bounds": "UUID", "invalidBehaviour": "missing/empty -> 400 'brandId required'; non-UUID/unreachable -> 404 'Brand not found'. Ignored for style-default.", "cite": "netlify/functions/brand-asset.ts:29-35,80,92" },
+    { "name": "index", "type": "integer", "required": "kind=layout-preview only (in practice optional, see invalidBehaviour)", "parse": "Number(searchParams.get('index'))", "default": "0 when missing (Number(null) === 0) or empty (Number('') === 0)", "bounds": ">= 0 integer", "invalidBehaviour": "non-integer/negative/NaN -> 400 'index must be a non-negative integer'. A MISSING index is NOT an error: it resolves to 0.", "cite": "netlify/functions/brand-asset.ts:81-82" }
+  ],
+  "request": {
+    "contentType": "application/json (POST); none (GET)",
+    "parse": "POST: `await req.json()` with NO catch -> malformed/empty body throws SyntaxError -> 500 {\"error\":\"Internal error\"}. A JSON `null` body throws TypeError on destructuring -> 500.",
+    "fields": [
+      { "name": "kind", "type": "string", "required": true, "default": null, "bounds": "logo | master | titleMaster | dividerMaster", "validation": "checked FIRST (before brandId) -> 400 'kind must be one of logo, master, titleMaster, dividerMaster'", "cite": "netlify/functions/brand-asset.ts:45" },
+      { "name": "brandId", "type": "string", "required": true, "default": null, "bounds": "UUID", "validation": "non-string/empty -> 400 'brandId required'; unreachable -> 404 'Brand not found'; reachable but !canEdit -> 403 'Organization brands can only be edited by an admin'", "cite": "netlify/functions/brand-asset.ts:29-35,46" },
+      { "name": "fromLayoutIndex", "type": "integer", "required": false, "default": null, "bounds": ">= 0", "validation": "When !== undefined (null counts as present): kind must be master|titleMaster|dividerMaster else 400 'fromLayoutIndex only valid for master, titleMaster, dividerMaster'; then Number.isInteger && >=0 else 400 'fromLayoutIndex must be a non-negative integer'; then copies blob brand/<ownerId>/<brandId>/layout-preview-<i>.png -> master key; missing -> 404 'No rendered layout at that index'; first 4 bytes not PNG magic -> 422 'Rendered layout is not a PNG'. Takes precedence over b64 (b64 ignored).", "cite": "netlify/functions/brand-asset.ts:50-60" },
+      { "name": "b64", "type": "string (base64)", "required": "yes unless fromLayoutIndex given", "default": null, "bounds": "decoded 1..4194304 bytes (4 MiB)", "validation": "non-string/empty -> 400 'b64 image data required'; Buffer.from(b64,'base64') (lenient: invalid chars silently dropped, data: URI prefix not stripped); decoded length 0 or > 4MiB -> 400 'Image must be a PNG up to 4MB'; first 4 bytes != 89 50 4E 47 -> 400 'Image must be a PNG' (only 4-byte check, not full 8-byte PNG signature, no decode)", "cite": "netlify/functions/brand-asset.ts:9-10,62-65" }
+    ],
+    "unknownFields": "ignored"
+  },
+  "checkOrder": [
+    "1. requireUser",
+    "POST: 2. JSON parse (500 on failure) 3. kind 4. brandId/access (400/404/403) 5. fromLayoutIndex branch OR b64 checks 6. write",
+    "GET: 2. kind==='style-default' -> template 3. kind==='layout-preview' -> brand read access, index, read 4. requireKind 5. brand read access 6. scoped read, legacy fallback 7. 404"
+  ],
+  "responses": [
+    { "status": 200, "method": "POST", "contentType": "application/json", "headers": {}, "when": "upload or layout copy stored", "bodyShape": { "key": "string brand/<ownerId>/<brandId>/<kind>.png" }, "example": { "key": "brand/u1/b1/master.png" }, "notes": "200, not 201. Key is under the brand OWNER id (for org brands the creating admin), not the caller.", "cite": "netlify/functions/brand-asset.ts:57-59,66-68; netlify/functions/_shared/blobs.ts:68-70; _tests/brand-asset.test.ts:32-36,92-96" },
+    { "status": 200, "method": "GET kind=style-default", "contentType": "application/json", "headers": {}, "when": "always (auth only, no brandId)", "bodyShape": { "template": "string (DEFAULT_STYLE_TEMPLATE, 7 lines joined by \\n, contains {primaryColor} {accentColor} {headingFont} {bodyFont} tokens)" }, "example": { "template": "Make the slide executive-ready, text-rich, ...\nBrand & art direction (apply identically to EVERY slide in this deck):\n- Palette: use {primaryColor} as the primary structural color ..." }, "cite": "netlify/functions/brand-asset.ts:75; netlify/functions/_shared/brandKit.ts:201-209; _tests/brand-asset.test.ts:54-58" },
+    { "status": 200, "method": "GET kind=layout-preview", "contentType": "image/png", "headers": { "cache-control": "private, max-age=300" }, "when": "blob brand/<ownerId>/<brandId>/layout-preview-<index>.png exists", "bodyShape": "raw PNG bytes (no content-length set explicitly)", "example": "<binary>", "cite": "netlify/functions/brand-asset.ts:79-89; netlify/functions/_shared/blobs.ts:88-90" },
+    { "status": 200, "method": "GET kind=logo|master|titleMaster|dividerMaster", "contentType": "image/png", "headers": { "cache-control": "private, max-age=60" }, "when": "scoped blob brand/<ownerId>/<brandId>/<kind>.png exists, else (personal brands, kind logo|master only) legacy brand/<callerUserId>/<kind>.png", "bodyShape": "raw PNG bytes", "example": "<binary>", "notes": "Served bytes are whatever was stored; content-type is always image/png.", "cite": "netlify/functions/brand-asset.ts:91-107; netlify/functions/_shared/blobs.ts:76-78; _tests/brand-asset.test.ts:59-71,78-84" }
+  ],
+  "errors": [
+    { "status": 401, "body": { "error": "Missing bearer token" }, "when": "no bearer", "cite": "netlify/functions/_shared/http.ts:20-25" },
+    { "status": 401, "body": { "error": "Invalid or expired session" }, "when": "bad token", "cite": "netlify/functions/_shared/auth.ts:22-23" },
+    { "status": 500, "body": { "error": "Internal error" }, "when": "POST body not valid JSON / null / empty; any blob or DB failure", "cite": "netlify/functions/brand-asset.ts:42; netlify/functions/_shared/http.ts:14-18" },
+    { "status": 400, "body": { "error": "kind must be one of logo, master, titleMaster, dividerMaster" }, "when": "POST bad kind; GET kind missing or not one of the 6 accepted values", "cite": "netlify/functions/brand-asset.ts:13-18; _tests/brand-asset.test.ts:51" },
+    { "status": 400, "body": { "error": "brandId required" }, "when": "brandId missing/empty/non-string", "cite": "netlify/functions/brand-asset.ts:30; _tests/brand-asset.test.ts:44-47" },
+    { "status": 404, "body": { "error": "Brand not found" }, "when": "brand unreachable for caller (incl. non-UUID)", "cite": "netlify/functions/brand-asset.ts:31-32; _tests/brand-asset.test.ts:38-42,72-76" },
+    { "status": 403, "body": { "error": "Organization brands can only be edited by an admin" }, "when": "POST by read-only domain member", "cite": "netlify/functions/brand-asset.ts:33; _tests/brand-asset.test.ts:86-90" },
+    { "status": 400, "body": { "error": "fromLayoutIndex only valid for master, titleMaster, dividerMaster" }, "when": "fromLayoutIndex with kind=logo", "cite": "netlify/functions/brand-asset.ts:51" },
+    { "status": 400, "body": { "error": "fromLayoutIndex must be a non-negative integer" }, "when": "bad fromLayoutIndex (incl. null)", "cite": "netlify/functions/brand-asset.ts:52" },
+    { "status": 404, "body": { "error": "No rendered layout at that index" }, "when": "no layout preview blob", "cite": "netlify/functions/brand-asset.ts:54" },
+    { "status": 422, "body": { "error": "Rendered layout is not a PNG" }, "when": "stored preview lacks PNG magic", "cite": "netlify/functions/brand-asset.ts:56" },
+    { "status": 400, "body": { "error": "b64 image data required" }, "when": "no b64 and no fromLayoutIndex", "cite": "netlify/functions/brand-asset.ts:62" },
+    { "status": 400, "body": { "error": "Image must be a PNG up to 4MB" }, "when": "decoded empty or > 4 MiB", "cite": "netlify/functions/brand-asset.ts:64" },
+    { "status": 400, "body": { "error": "Image must be a PNG" }, "when": "wrong magic bytes", "cite": "netlify/functions/brand-asset.ts:65; _tests/brand-asset.test.ts:50" },
+    { "status": 400, "body": { "error": "index must be a non-negative integer" }, "when": "GET layout-preview with bad index", "cite": "netlify/functions/brand-asset.ts:82" },
+    { "status": 404, "body": { "error": "No layout preview at that index" }, "when": "GET layout-preview blob missing", "cite": "netlify/functions/brand-asset.ts:84" },
+    { "status": 404, "body": { "error": "No asset uploaded" }, "when": "GET asset missing (scoped and legacy)", "cite": "netlify/functions/brand-asset.ts:103" }
+  ],
+  "sideEffects": [
+    "POST writes Netlify Blob store 'brand-assets' key brand/<ownerId>/<brandId>/<kind>.png (blobs.ts:62,127-129). Does NOT update the brand kit: the asset is inert until PATCH /api/brands sets the matching kit key (truthy)."
+  ],
+  "externalCalls": ["Supabase (brand access), Netlify Blobs; no paid APIs"],
+  "quirks": [
+    "Any non-POST method is treated as GET; there is no 405.",
+    "POST malformed JSON -> 500 'Internal error' (uncaught req.json()), unlike /api/brands which returns 400.",
+    "GET layout-preview without ?index= serves index 0 (Number(null) === 0) instead of 400; docs/api.md:892 claims 400 when missing.",
+    "GET 200 does not prove the asset was uploaded to THIS brand: the legacy per-user fallback fires for any personal brand of the caller whose scoped logo/master is missing (brand-asset.ts:93-97 comment). Consumers must use the kit key.",
+    "Legacy fallback never applies to org brands, nor to titleMaster/dividerMaster.",
+    "Response cache headers differ: layout-preview max-age=300, assets max-age=60, style-default none.",
+    "POST success is 200 {key}, not 201.",
+    "4 MiB limit is on decoded bytes; Netlify's ~6MB sync request body limit is enforced by the platform before the handler.",
+    "Error message for bad GET kind lists only the 4 asset kinds even though style-default and layout-preview are also accepted."
+  ],
+  "beforeAnyState": "GET before upload -> 404 'No asset uploaded' (or the legacy per-user asset if one exists). GET layout-preview before PPTX import -> 404 'No layout preview at that index'. POST fromLayoutIndex before import -> 404 'No rendered layout at that index'. style-default works with no state.",
+  "tests": [
+    { "file": "netlify/functions/_tests/brand-asset.test.ts", "asserts": "POST stores under brand/u1/b1/master.png and returns {key}; 404 unowned brand (no storage touched); 400 missing brandId; 400 non-PNG and bad kind; style-default template contains '{primaryColor}'; GET scoped then legacy fallback, 404 on miss; GET 404 unowned; org brand served from owner namespace with no legacy fallback; POST 403 domain member; admin POST writes under owner; 401 on both methods. fromLayoutIndex and layout-preview are NOT covered by tests." }
+  ],
+  "callers": [
+    { "who": "frontend", "where": "src/lib/api.ts:172-174 (uploadBrandAsset), src/lib/api.ts:178-184 (assignMasterFromLayout)", "expects": "{key}; error text from body.error. Note: neither helper has a call site in src/ (grep), so POST appears unused by the current UI" },
+    { "who": "frontend", "where": "src/lib/api.ts:206-208 (getDefaultStyleTemplate, used by src/pages/BrandEditorPage.tsx:277)", "expects": "{template}" },
+    { "who": "frontend", "where": "src/components/ArchetypeLayoutPicker.tsx:28", "expects": "GET kind=layout-preview&brandId&index -> image blob; non-ok silently ignored" },
+    { "who": "frontend", "where": "src/components/TitlePlaceholderPicker.tsx:50", "expects": "GET kind=<master|titleMaster|dividerMaster>&brandId -> image blob; non-ok ignored" },
+    { "who": "frontend", "where": "src/components/WorkzoneEditor.tsx:47", "expects": "GET kind=master&brandId -> image blob" },
+    { "who": "Auxi_Connector", "where": "C:/Github/Auxi_Connector/app/core/forge_brands.py:289-309 (upload_asset)", "expects": "POST {brandId, kind: master|titleMaster|dividerMaster, b64}; success = status <400 AND truthy resp.json()['key']" }
+  ],
+  "docs": {
+    "openapi": "public/openapi.yaml:1157-1233. Discrepancies: (1) POST omits fromLayoutIndex and lists b64 as required; (2) GET kind enum omits layout-preview and the index parameter; (3) no error responses documented (400/403/404/422); (4) no cache-control headers documented; (5) says stored at brand/<userId>/... but it is the brand OWNER id; (6) brandId description 'Must be a brand you own' - org brands editable by admins, readable by members.",
+    "postman": "docs/postman_collection.json:555-596 (5.1, 5.1b upload; 5.2 download logo) and :720-728 (7.2 style-default). Matches shapes; omits layout-preview/fromLayoutIndex; says 'Stored at brand/<userId>/<brandId>/<kind>.png' (owner id in fact).",
+    "apiMd": "docs/api.md:825-914. api.md:892 says 400 if index is missing - code serves index 0."
+  },
+  "planSection65": "Row: 'POST {kind, b64, brandId, fromLayoutIndex?} -> {key}; GET ?kind=&brandId=&index= -> PNG or {template}'. Accurate. Add: GET kinds style-default (JSON, no brandId) and layout-preview (PNG, max-age=300) vs asset kinds (PNG, max-age=60); non-POST methods all behave as GET; POST bad JSON is 500."
+}

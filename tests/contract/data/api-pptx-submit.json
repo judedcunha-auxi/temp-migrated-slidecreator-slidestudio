@@ -1,0 +1,108 @@
+{
+  "route": "/api/pptx-submit",
+  "handler": "netlify/functions/pptx-submit.ts",
+  "netlifyRouting": "netlify.toml:12-15 rewrites /api/* -> /.netlify/functions/:splat (status 200)",
+  "methods": ["POST"],
+  "methodHandling": {
+    "otherMethods": "Any non-POST -> 405 {\"error\":\"Method not allowed\"}, checked BEFORE auth (an unauthenticated GET gets 405, not 401).",
+    "cite": "netlify/functions/pptx-submit.ts:17"
+  },
+  "auth": { "kind": "requireUser", "cite": "netlify/functions/pptx-submit.ts:18; netlify/functions/_shared/auth.ts:9-25", "notes": "After the method check, before body parse." },
+  "query": [],
+  "request": {
+    "contentType": "application/json (content-type header not checked; body parsed with req.json() regardless)",
+    "parse": "await req.json() uncaught: malformed/empty JSON -> SyntaxError -> 500 {\"error\":\"Internal error\"}. JSON null -> destructuring TypeError -> 500 'Internal error'. JSON array/number/string -> fields undefined -> 400 'Missing params'.",
+    "fields": [
+      { "name": "deckId", "type": "string", "required": true, "default": null, "bounds": "truthy; no UUID check (non-UUID -> ownsDeck Postgres error -> 500)", "validation": "!deckId -> 400 'Missing params'", "cite": "netlify/functions/pptx-submit.ts:21-24,33" },
+      { "name": "slide", "type": "string (typed) - a JSON number also works", "required": true, "default": null, "bounds": "parseInt(slide,10) must be integer > 0; '1abc' -> 1 accepted; numeric 0 or '' -> falsy -> 'Missing params'; '0'/'-1'/'abc' -> 'Invalid slide'", "validation": "!slide -> 400 'Missing params'; parseInt invalid or <=0 -> 400 'Invalid slide'", "cite": "netlify/functions/pptx-submit.ts:24,28-29" },
+      { "name": "version", "type": "string (number also works)", "required": false, "default": "1 (original)", "bounds": "parseInt(version,10); refined iff integer >= 2; invalid/0/1 -> original image, no error", "validation": "none", "cite": "netlify/functions/pptx-submit.ts:30-31,49-51" },
+      { "name": "applyBrandLayout", "type": "boolean", "required": false, "default": true, "bounds": "only literal false disables; any other value (missing, 'false' string, 0, null) = ON", "validation": "none", "cite": "netlify/functions/pptx-submit.ts:25-27" },
+      { "name": "variant", "type": "string", "required": false, "default": null, "bounds": null, "validation": "declared in the TS type but never read (legacy; frontend still sends 'A')", "cite": "netlify/functions/pptx-submit.ts:22; src/lib/pptxDownload.ts:56" }
+    ],
+    "unknownFields": "Ignored (e.g. Auxi_Connector sends 'heading', forge.py:803-806, which is silently dropped; the heading actually sent upstream is always the DB slide title)."
+  },
+  "checkOrder": [
+    "1. method POST (405)",
+    "2. requireUser (401/500)",
+    "3. req.json() (500 on malformed)",
+    "4. deckId && slide truthy (400 'Missing params')",
+    "5. slide parse (400 'Invalid slide')",
+    "6. ownsDeck (403 'Not your deck') - before any brand asset read",
+    "7. getDeckWithSlides / resolveBrandSource / getSlideTypes - each error swallowed (.catch) and degraded to defaults",
+    "8. read slide PNG (refined key or original, each with legacy variant_A fallback) (404 'Image not found')",
+    "9. requireEnv PPTX_API_URL, PPTX_API_TOKEN (500 'Internal error' if missing)",
+    "10. build multipart form, load master PNG / furniture (readBrandAsset errors NOT caught -> 500; furniture read errors caught -> null)",
+    "11. POST {PPTX_API_URL}/jobs (upstream mapping 422/413/502)",
+    "12. fire-and-forget incrementExportCounts; 200 {jobId}"
+  ],
+  "responses": [
+    {
+      "status": 200,
+      "contentType": "application/json",
+      "headers": { "content-type": "application/json" },
+      "when": "upstream /jobs returned 2xx",
+      "bodyShape": { "jobId": "string = upstream job_id" },
+      "example": { "jobId": "j_46d7c2769bb1" },
+      "cite": "netlify/functions/pptx-submit.ts:207-209; netlify/functions/_shared/http.ts:7-12"
+    },
+    {
+      "status": 200,
+      "contentType": "application/json",
+      "headers": { "content-type": "application/json" },
+      "when": "upstream 2xx JSON without job_id",
+      "bodyShape": "{} (jobId undefined is dropped by JSON.stringify)",
+      "example": {},
+      "cite": "netlify/functions/pptx-submit.ts:207-209"
+    }
+  ],
+  "errors": [
+    { "status": 405, "body": { "error": "Method not allowed" }, "when": "method != POST", "cite": "netlify/functions/pptx-submit.ts:17" },
+    { "status": 401, "body": { "error": "Missing bearer token" }, "when": "no bearer", "cite": "netlify/functions/_shared/http.ts:20-24" },
+    { "status": 401, "body": { "error": "Invalid or expired session" }, "when": "bad token", "cite": "netlify/functions/_shared/auth.ts:22-23" },
+    { "status": 500, "body": { "error": "DEV_SECRET_KEY set but DEV_USER_ID missing" }, "when": "dev bypass misconfigured", "cite": "netlify/functions/_shared/auth.ts:16-18" },
+    { "status": 400, "body": { "error": "Missing params" }, "when": "deckId or slide falsy", "cite": "netlify/functions/pptx-submit.ts:24" },
+    { "status": 400, "body": { "error": "Invalid slide" }, "when": "parseInt(slide) NaN or <= 0", "cite": "netlify/functions/pptx-submit.ts:29" },
+    { "status": 403, "body": { "error": "Not your deck" }, "when": "deck missing or not owned", "cite": "netlify/functions/pptx-submit.ts:33" },
+    { "status": 404, "body": { "error": "Image not found" }, "when": "no PNG for that slide/version (new or legacy key)", "cite": "netlify/functions/pptx-submit.ts:49-52" },
+    { "status": 422, "body": { "error": "Brand layout rejected by the PPTX service (invalid archetype or furniture)." }, "when": "upstream /jobs returned 422", "cite": "netlify/functions/pptx-submit.ts:202" },
+    { "status": 413, "body": { "error": "Brand layout assets are too large for the PPTX service." }, "when": "upstream /jobs returned 413", "cite": "netlify/functions/pptx-submit.ts:203" },
+    { "status": 502, "body": { "error": "PPTX service error" }, "when": "upstream /jobs any other non-2xx", "cite": "netlify/functions/pptx-submit.ts:204" },
+    { "status": 500, "body": { "error": "Internal error" }, "when": "malformed JSON body; JSON null body; non-UUID deckId; missing PPTX_API_URL/PPTX_API_TOKEN ('Missing required env var' Error is not an HttpError); fetch network failure; upstream 2xx with non-JSON body; brand master blob read failure", "cite": "netlify/functions/_shared/http.ts:14-18; netlify/functions/_shared/config.ts:27-31; netlify/functions/pptx-submit.ts:20,54-55,191-195,207" }
+  ],
+  "sideEffects": [
+    "POST {PPTX_API_URL}/jobs creates a SlideForge conversion job (paid OCR/LLM upstream).",
+    "void incrementExportCounts(userId, deckId) only on success (rpc increment_export_counts)."
+  ],
+  "externalCalls": [
+    "POST ${PPTX_API_URL}/jobs, header Authorization: Bearer ${PPTX_API_TOKEN}, multipart/form-data (pptx-submit.ts:191-195). Fields: file (slide PNG, filename slide.png, image/png) always; slide_context (buildSlideContext string) when the slide row exists; primary_color, accent_color, heading_font, body_font (normalizeKit, with company from deck inputs) always; slide_framework when slide row has framework; chart_data JSON {chart_kind, categories, series} when storyline slide has chartData and framework meta is a chart with subType; language='ar' only for Arabic decks (pptx-submit.ts:92-104).",
+    "Brand layout fields only when the brand has a master PNG or furniture for the slide archetype: layout_archetype (cover|divider|content via archetypeForType: title->cover, divider->divider, else content), apply_brand_layout 'true'|'false', furniture_json (raw text of brand/{owner}/{brandId}/furniture.json) when kit.furnitureArchetypes includes the archetype, layout_template (master PNG, layout.png) + apply_template_bg 'true'|'false' when a master exists, heading (slide row title) when furniture present, date ('Month YYYY', en-US) for cover with furniture (pptx-submit.ts:141-179; _shared/brandKit.ts:118-122).",
+    "Master selection: cover->titleMaster if kit.titleMasterKey, divider->dividerMaster if kit.dividerMasterKey, else 'master' if kit.masterKey; keys always re-derived from brand owner id + deck brandId, never from kit strings; legacy per-user brand/{userId}/master.png fallback when no brandId, or when brand is personal (legacyOk) and the scoped master is missing (pptx-submit.ts:112-148).",
+    "Workzone tiles: tile_is_content_only='true' and workzone_bounds JSON when kit.workzone && shouldTileSlide (content archetype, non-degenerate workzone, furniture for content) (pptx-submit.ts:186-189; _shared/workzone.ts:116-120)."
+  ],
+  "quirks": [
+    "Success status is 200, not 202 (pptx-submit.ts:209), unlike image-to-slide (202).",
+    "Method check precedes auth.",
+    "applyBrandLayout defaults ON; only boolean false turns it off.",
+    "Unbranded decks: request to upstream is byte-for-byte the legacy one (no brand-layout fields) regardless of applyBrandLayout (tests).",
+    "deck data / brand / slide-type lookups failing are swallowed and degrade to defaults (pptx-submit.ts:35,37-38,46) - an export never fails because of them.",
+    "Upstream job id is not validated; missing job_id gives 200 {}.",
+    "Only 413/422 are passed through with mapped messages; upstream 400/401/404/429/5xx all become 502 'PPTX service error'.",
+    "The jobId returned is the SlideForge id; there is no ownership record, so /api/pptx-status and /api/pptx-result accept it from any authenticated user.",
+    "A request field 'heading' (sent by Auxi_Connector) is ignored; heading always comes from the slide row title.",
+    "Cover date uses the server clock/timezone at submit time (pptx-submit.ts:176)."
+  ],
+  "beforeAnyState": "Deck owned but slide image not rendered -> 404 'Image not found'. Deck missing -> 403. If getDeckWithSlides fails or returns no row for the slide, no slide_context/framework/heading is sent but the job still submits.",
+  "tests": [
+    { "file": "netlify/functions/_tests/pptx-submit.test.ts", "asserts": "All 11 pass (2026-10-08): unbranded deck sends no layout fields (200); applyBrandLayout:false sends furniture+template with apply_brand_layout/apply_template_bg 'false' and heading 'T'; false + no assets sends nothing extra; furniture_json inline + layout_archetype content + apply_brand_layout true; master -> layout_template + apply_template_bg true read from brand/u1/b-1/master.png; title slide -> cover + titleMaster; keys re-derived (never forged kit keys); language=ar forwarded / omitted for English; upstream 422 -> 422; non-owner -> 403 before any brand asset read. Tests use upstream status 202 with {job_id} and expect handler 200." }
+  ],
+  "callers": [
+    { "who": "frontend", "where": "src/lib/api.ts:233-235 (submitPptx) via src/lib/pptxDownload.ts:47-58,89-100", "expects": "Sends {deckId, slide: String(n), variant:'A', version: String(v) only when v>1, applyBrandLayout}. Reads jobId. Non-2xx -> Error(body.error || 'HTTP <status>')." },
+    { "who": "Auxi_Connector", "where": "C:/Github/Auxi_Connector/app/api/routes/forge.py:790-825 (_submit_conversion)", "expects": "Sends {deckId, slide: str, applyBrandLayout: bool (default False), version?: str, heading?: str}. Status 413 and 422 mapped to specific user messages (forge.py:784-787); any other >=400 -> 'PPTX submit failed (<status>)'; 2xx must be JSON object with non-empty 'jobId'." }
+  ],
+  "docs": {
+    "openapi": "public/openapi.yaml:966-1035 - matches fields and 200/413/422/502. Missing: 400 ('Missing params', 'Invalid slide'), 401, 403, 404, 405, 500 responses; deckId 'format: uuid' is not enforced.",
+    "postman": "docs/postman_collection.json:295-320 (2.6) - matches.",
+    "apiMd": "docs/api.md:1245-1273 - matches."
+  },
+  "planSection65": "Row '/api/pptx-submit (POST) | {deckId, slide, version, applyBrandLayout} -> {jobId}' - accurate; specify status 200 (not 202), 405 before auth, 413/422 passthrough with fixed messages, 502 otherwise, and that 'variant'/'heading' are ignored."
+}

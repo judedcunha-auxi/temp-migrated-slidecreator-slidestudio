@@ -1,0 +1,76 @@
+{
+  "route": "/api/image-to-slide",
+  "handler": "netlify/functions/image-to-slide.ts",
+  "netlifyRouting": "netlify.toml:12-15 rewrites /api/* -> /.netlify/functions/:splat (status 200)",
+  "methods": ["POST"],
+  "methodHandling": { "otherMethods": "Non-POST -> 405 {\"error\":\"POST only\"}, checked AFTER auth (an unauthenticated GET gets 401). Message differs from pptx-submit's 'Method not allowed'.", "cite": "netlify/functions/image-to-slide.ts:10-11" },
+  "auth": { "kind": "requireUser", "cite": "netlify/functions/image-to-slide.ts:10", "notes": "First check of all; userId unused - no per-user record of the job." },
+  "query": [],
+  "request": {
+    "contentType": "multipart/form-data (REQUIRED; JSON is rejected)",
+    "parse": "content-type header must contain the substring 'multipart/form-data' (case-sensitive includes) else 400. req.formData() failure is caught -> null -> 400 'Missing \"file\" field'.",
+    "fields": [
+      { "name": "file", "type": "File part", "required": true, "default": null, "bounds": "part MIME (file.type, from the part's Content-Type) in {image/png, image/jpeg, image/webp, image/gif}; size > 0; size <= 4194304 bytes (4*1024*1024)", "validation": "not a File (absent or a plain text field) -> 400 'Missing \"file\" field'; MIME not allowed -> 400 'file must be image/png, image/jpeg, image/webp, or image/gif'; size 0 -> 400 'Empty image'; size > 4 MiB -> 400 'Image must be 4 MB or smaller'. Bytes are NOT sniffed; MIME is trusted from the part header.", "cite": "netlify/functions/image-to-slide.ts:5-6,18-26" }
+    ],
+    "unknownFields": "Other multipart fields are ignored and not forwarded (only 'file' is sent upstream)."
+  },
+  "checkOrder": [
+    "1. requireUser (401/500)",
+    "2. method POST (405 'POST only')",
+    "3. content-type includes multipart/form-data (400)",
+    "4. formData parse + file is File (400 'Missing \"file\" field')",
+    "5. MIME allow-list (400)",
+    "6. size == 0 (400 'Empty image')",
+    "7. size > 4 MiB (400)",
+    "8. requireEnv PPTX_API_URL, PPTX_API_TOKEN (500)",
+    "9. POST {PPTX_API_URL}/jobs multipart with single 'file' part (502 on non-2xx)",
+    "10. 202 {jobId}"
+  ],
+  "responses": [
+    {
+      "status": 202,
+      "contentType": "application/json",
+      "headers": { "content-type": "application/json" },
+      "when": "upstream /jobs 2xx",
+      "bodyShape": { "jobId": "string = upstream job_id (SlideForge style j_xxxxxxxxxxxx); key omitted if upstream had none" },
+      "example": { "jobId": "j_46d7c2769bb1" },
+      "cite": "netlify/functions/image-to-slide.ts:48-49"
+    }
+  ],
+  "errors": [
+    { "status": 401, "body": { "error": "Missing bearer token" }, "when": "no bearer", "cite": "netlify/functions/_shared/http.ts:20-24" },
+    { "status": 401, "body": { "error": "Invalid or expired session" }, "when": "bad token", "cite": "netlify/functions/_shared/auth.ts:22-23" },
+    { "status": 500, "body": { "error": "DEV_SECRET_KEY set but DEV_USER_ID missing" }, "when": "dev bypass misconfigured", "cite": "netlify/functions/_shared/auth.ts:16-18" },
+    { "status": 405, "body": { "error": "POST only" }, "when": "method != POST (after auth)", "cite": "netlify/functions/image-to-slide.ts:11" },
+    { "status": 400, "body": { "error": "Send the image as multipart/form-data with a \"file\" field" }, "when": "content-type lacks multipart/form-data (e.g. application/json)", "cite": "netlify/functions/image-to-slide.ts:13-16" },
+    { "status": 400, "body": { "error": "Missing \"file\" field" }, "when": "multipart parse failed, or no file part named 'file', or 'file' is a text field", "cite": "netlify/functions/image-to-slide.ts:18-20" },
+    { "status": 400, "body": { "error": "file must be image/png, image/jpeg, image/webp, or image/gif" }, "when": "part MIME not in allow-list (incl. empty type)", "cite": "netlify/functions/image-to-slide.ts:22-24" },
+    { "status": 400, "body": { "error": "Empty image" }, "when": "file.size === 0", "cite": "netlify/functions/image-to-slide.ts:25" },
+    { "status": 400, "body": { "error": "Image must be 4 MB or smaller" }, "when": "file.size > 4194304 (note: 400, not 413)", "cite": "netlify/functions/image-to-slide.ts:5,26" },
+    { "status": 502, "body": { "error": "PPTX service error" }, "when": "upstream /jobs non-2xx (413/422 NOT passed through, unlike pptx-submit)", "cite": "netlify/functions/image-to-slide.ts:42-46" },
+    { "status": 500, "body": { "error": "Internal error" }, "when": "missing env, network failure, upstream non-JSON 2xx", "cite": "netlify/functions/_shared/http.ts:14-18; netlify/functions/image-to-slide.ts:28-29,36-40,48" }
+  ],
+  "sideEffects": ["Creates an upstream SlideForge conversion job (paid OCR upstream). No DB writes, no export counter increment, no ownership record."],
+  "externalCalls": ["POST ${PPTX_API_URL}/jobs, Authorization: Bearer ${PPTX_API_TOKEN}, multipart with one part 'file' = the original File (bytes and MIME unchanged), filename file.name || 'slide.png'. No slide_context, colours, fonts, or brand fields (image-to-slide.ts:31-40)."],
+  "quirks": [
+    "Accepts multipart ONLY. The plan's §6.5 'or JSON' is wrong: a JSON body gets 400 'Send the image as multipart/form-data with a \"file\" field'.",
+    "Auth precedes the method check (opposite of pptx-submit / pptx-deck-submit), and the 405 text is 'POST only'.",
+    "Over-size is 400 not 413. Netlify's platform request-body limit (~6 MB, not in code) applies before the handler.",
+    "MIME is trusted from the part header; bytes are not sniffed (Auxi_Connector sniffs on its side before calling).",
+    "Success is 202 (pptx-submit is 200).",
+    "The returned jobId is polled through /api/pptx-status and downloaded via /api/pptx-result (no dedicated status route).",
+    "No export counter increment (image-to-slide.ts has no incrementExportCounts)."
+  ],
+  "beforeAnyState": "Stateless: no deck/brand needed.",
+  "tests": [ { "file": "none", "asserts": "No unit test covers image-to-slide.ts." } ],
+  "callers": [
+    { "who": "Auxi_Connector", "where": "C:/Github/Auxi_Connector/app/api/routes/image_slide.py:278-311 (_forge_image_slide_submit); polling image_slide.py:325-339 via forge.py _check_conversion; download image_slide.py:381-420 via forge.py _download_result", "expects": "Sends multipart files={'file': ('image.<ext>', bytes, sniffed media type)} after enforcing <= 4 MiB (image_slide.py:48,260-264) and <= 40 MP; any status >= 400 -> its own 502 with _refusal_message (413 / 400,415,422 / other) (image_slide.py:140-147, 293-300); 2xx JSON must carry 'jobId' matching [A-Za-z0-9_-]{1,128} (image_slide.py:154-166, 302-310). Does not check for 202 specifically." },
+    { "who": "frontend", "where": "none (no src/ reference)", "expects": "n/a" }
+  ],
+  "docs": {
+    "openapi": "public/openapi.yaml:920-962 - matches (multipart file, 202 {jobId}, 400 Error, 502). Missing 401/405/500; 502 has no content schema though body is {error}.",
+    "postman": "docs/postman_collection.json:103-161 (1b.1-1b.3) - matches.",
+    "apiMd": "docs/api.md:1202-1241 - matches."
+  },
+  "planSection65": "Row '/api/image-to-slide (POST, multipart file <=4 MB, or JSON) | 202 {jobId}' - INACCURATE: JSON is not accepted (400). Otherwise accurate; add exact 400 strings, 405 'POST only' after auth, 502 'PPTX service error' with no 413/422 passthrough."
+}

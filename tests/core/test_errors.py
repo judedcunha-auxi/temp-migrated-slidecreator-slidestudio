@@ -16,6 +16,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from app.core.errors import (
     GENERIC_5XX_DETAIL,
     LEGACY_ERRORS_TAG,
+    LEGACY_INTERNAL_ERROR,
     LEGACY_VALIDATION_MESSAGE,
     PROBLEM_JSON,
     ApiError,
@@ -108,9 +109,10 @@ def test_legacy_route_validation_failure_is_a_400_error_body(api: TestClient):
 
 
 def test_legacy_route_crash_is_generic(api: TestClient):
+    """Darwin's errorResponse: anything that is not an HttpError is 500 "Internal error"."""
     r = api.get("/api/crash")
     assert r.status_code == 500
-    assert r.json() == {"error": GENERIC_5XX_DETAIL}
+    assert r.json() == {"error": LEGACY_INTERNAL_ERROR}
     assert "hunter2" not in r.text and "redis" not in r.text
 
 
@@ -204,3 +206,20 @@ def test_problem_types_and_titles():
     assert problem_type(599) == "/errors/internal-error"
     assert problem_title(404) == "Not Found"
     assert problem_title(799) == "Error"
+
+
+def test_a_deliberate_legacy_5xx_keeps_darwins_fixed_text(make_app):
+    """The Connector reads Darwin's 502 "PPTX service error" as "still running": it must pass through."""
+    from fastapi.testclient import TestClient
+
+    app = make_app()
+    legacy = legacy_router(prefix="/api", tags=["darwin-test"])
+
+    @legacy.get("/pptx-like")
+    async def pptx_like() -> None:
+        raise ApiError(502, "PPTX service error")
+
+    app.include_router(legacy)
+    with TestClient(app, raise_server_exceptions=False) as c:
+        r = c.get("/api/pptx-like")
+    assert (r.status_code, r.json()) == (502, {"error": "PPTX service error"})

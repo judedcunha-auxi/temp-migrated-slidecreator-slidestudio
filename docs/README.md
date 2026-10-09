@@ -12,6 +12,7 @@ everything else readable. Then pick by what you are trying to do.
 | [models-and-cost.md](models-and-cost.md) | The AI models the service calls, what each call costs, per-turn cost accounting, `max_tokens` continuation, and the settings for all of it. |
 | [licensing.md](licensing.md) | Third-party code that is licence-gated (StageFlow, decision D3), and what is kept out on purpose. |
 | [route-controls.md](route-controls.md) | Every route, who may call it and what protects it. Generated from a table the tests hold to the code. |
+| [darwin-api.md](darwin-api.md) | Darwin's `/api` routes: the legacy contract layer, its quirks, auth, and how to port a route and add its contract cases. |
 | [general-service-requirements.md](general-service-requirements.md) | What this service needs from the General service: every operation, the access rules, idempotency and request ids. The hand-over spec for the .NET team. |
 
 ## I want to change it
@@ -20,6 +21,7 @@ everything else readable. Then pick by what you are trying to do.
 |---|---|
 | [development.md](development.md) | Running it locally, **which interpreter to use**, the tests, and how to add a route or a setting. |
 | [route-controls.md](route-controls.md) | Read before adding a route: the row you add there is part of the change. |
+| [darwin-api.md](darwin-api.md) | Porting a Darwin `/api` route: the helpers, the quirks, the contract harness. |
 
 ## I want to ship or run it
 
@@ -36,6 +38,7 @@ test, it is one:
 
 - `tests/test_docs_links.py` checks every link and anchor, and that the required documents exist.
 - `tests/test_route_controls.py` regenerates and checks the table in `route-controls.md`.
+- `tests/contract/` runs Darwin's recorded `/api` contract (`tests/contract/data/`) against the routes.
 - `tests/config/test_env_example.py` checks that `.env.example` lists every variable the code reads.
 - `tests/test_ci_workflow.py` checks the CI workflow keeps the standard job and step names.
 - `tests/core/storage/test_fake_and_stub.py` checks that `general-service-requirements.md` covers

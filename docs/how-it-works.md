@@ -16,8 +16,9 @@ place, written in Python and run on Azure:
   today (`/api/decks`, `/api/status`, and so on) keeps working exactly as it does now, just
   answered by this service instead of Netlify.
 
-The frame (Phase 1), the export engine (Phase 2) and the AI design core (Phase 3) are here;
-Darwin's routes come next.
+The frame (Phase 1), the export engine (Phase 2) and the AI design core (Phase 3) are here, and
+the first of Darwin's routes have moved in (Phase 7a): the storyline, the intake chat, and the
+PowerPoint exports.
 
 ## 2. What is here today
 
@@ -158,22 +159,41 @@ version of this step; this is the two merged into one.
 
 Arabic decks get the same plan written in Arabic, with Western digits, and words like "left rail"
 mirrored in anything the AI reads about layout. The draft runs as a background job; its result is
-exactly what Darwin's web app reads today. No AI provider is wired in yet: the storyline asks for
-"a model that answers in structured data", and the tests use a scripted stand-in, so they cost
-nothing. [architecture.md](architecture.md#the-storyline-phase-3) has the design.
+exactly what Darwin's web app reads today. The storyline asks for "a model that answers in
+structured data"; in the service that is Claude, through the same model layer the design loop uses,
+and in the tests a scripted stand-in, so they cost nothing. [architecture.md](architecture.md#the-storyline-phase-3) has the design.
+
+**Darwin's first routes.** Darwin's web app and the auxi Connector call addresses like
+`/api/storyline` and `/api/pptx-submit`. The first ten of them are answered here now, exactly as
+Netlify answers them today, down to the odd corners (an unknown job id says "pending" forever; a
+broken request body gets "Internal error", not "Bad request"), because the callers depend on them.
+The plan's recorded contract for each route is the test: every documented answer is reproduced, or
+the test says why it can no longer happen. Behind the routes, the old background functions are
+jobs on the queue, and "send it to Slide Studio" is a call to the design pipeline inside this
+service. [darwin-api.md](darwin-api.md) explains the layer and how to move the remaining routes.
+
+**Who is calling.** Darwin's routes need a signed-in user. The caller sends a token from the
+identity provider; the service checks its signature against the provider's published keys, that
+it has not expired, and that it was issued for this service, then finds (or creates) the user's
+profile through the storage door. Which identity provider is still to be decided, so the service
+names it by configuration; the tests use a pretend provider with its own keys. There is no
+back-door developer key.
 
 ## 3. What happens to a request
 
 ```
 caller ─► request id (read or made) ─► CORS check ─► route ─► response (+ request id)
-                                                      │
+                                                      │  └─ token check, then the work
+                                                      │     (or a job on the queue)
                                                       └─ error? ─► {"error"} or Problem Details
 ```
 
 1. The request-id step reads the gateway's id or makes one, and binds it for logging.
 2. CORS lets Darwin's web page, and only that page, call the service from a browser. (Once the
    gateway exists, browsers will go through it.)
-3. The matching route runs.
+3. The matching route runs. A Darwin route checks the caller's token first (or, on a few routes,
+   the method first, because that is the order Darwin used), then does the work or queues a job
+   and answers with its id.
 4. If it fails, the error handler picks the route's error shape and answers safely.
 5. The response leaves with the request id, and one access line plus one timing metric is
    recorded.
@@ -192,6 +212,7 @@ caller ─► request id (read or made) ─► CORS check ─► route ─► re
 
 The migration plan's phases, in short: the AI design features (Phase 3, here; paid runs on staging
 still to be approved), storage through the General service and background jobs (Phase 4), sign-in and per-route
-protection (Phase 5), then Darwin's routes and data moving over (Phase 7). It will run as a
+protection (Phase 5: rate limits, in-flight caps, licensing; the route table marks what each
+route still lacks as TODO-P5), then the rest of Darwin's routes and its data moving over (Phase 7). It will run as a
 container on Azure App Service (decision D2), because the engine needs a headless browser and
 fonts.

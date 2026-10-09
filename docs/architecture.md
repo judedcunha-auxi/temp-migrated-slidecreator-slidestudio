@@ -9,13 +9,15 @@ Add a section rather than editing another area's. The plain-English tour is
 ```
 app/
   main.py          the FastAPI app: middleware, error handlers, the ROUTERS registry
-  api/routes/      one router per area of the API (health today)
-  config/          settings.py (service settings, check_config), engine.py (engine settings),
-                   ai.py (models, keys, cost, fan-out)
-  core/            logging, telemetry, errors, request ids, Redis, storage/ (the General
-                   service port), jobs/ (the Redis queue), the browser pool; the AI features:
-                   llm/ (models, cost), design/ (the design loop), design_refs/, brand/,
-                   slides/ (design_and_export), masters, exports, preview
+  api/             deps.py (who is calling; shared services), legacy.py (Darwin's contract helpers)
+  api/routes/      one router per area of the API: health, and Darwin's storyline and exports
+  config/          settings.py (service settings, auth, check_config), engine.py (engine settings),
+                   ai.py (models, keys, cost, fan-out), storyline.py, darwin.py (image model, caps)
+  core/            logging, telemetry, errors, request ids, Redis, auth (the bearer JWT),
+                   storage/ (the General service port), jobs/ (the Redis queue), the browser pool;
+                   the AI features: llm/ (models, cost), design/ (the design loop), design_refs/,
+                   brand/, slides/ (design_and_export), masters, exports, preview, storyline/;
+                   darwin/ (Darwin's backend logic: ledger, image port, caps, job helpers, runtime)
   engine/          the export engine: slide HTML -> an editable .pptx
 ```
 
@@ -479,9 +481,9 @@ itself.
 - **The real General service adapter.** It is blocked on D5.
 - **A sweeper for stale `queued` records.** If the process dies between writing the durable
   record and adding the job to Redis, that record waits forever.
-- **Wiring workers into the app process.** Starting worker loops in the lifespan, or as a
-  separate entry point in the same image, comes when the first route enqueues a job (Phase 5
-  and 7).
+- **A separate worker entry point.** Worker loops can run inside the API process
+  (`WORKER_CONCURRENCY`, see [Darwin's `/api`](#darwins-api-phase-7a)); a worker-only process in
+  the same image, for scaling workers apart from the API, is still to come.
 - **Two replicas on staging.** This Phase 4 exit item needs hosting (D2).
 - **The local adapter is single-process.** It has one lock per process and lists by scanning
   directories. It is for development only.
@@ -494,7 +496,8 @@ draft, its validation and repair. Ported from Darwin `netlify/functions/_shared/
 `dividers.ts`, `deckArchetypes.ts`, `rtlText.ts`) with `storyline.ts`, `storyline-background.ts`,
 `storyline-status.ts` and `intake.ts`, and from Slide Studio `server/storyline/*` and
 `server/routers/{storyline,intake}.py`. The `/api/storyline`, `/api/storyline-status` and
-`/api/intake` routes are not built yet (Phase 7a); the core produces exactly their bodies.
+`/api/intake` routes are served by `app/api/routes/storyline.py` (Phase 7a; see
+[Darwin's `/api`](#darwins-api-phase-7a)); the core produces exactly their bodies.
 
 ```
 app/core/storyline/
@@ -542,23 +545,18 @@ constraints, which `validation.py` enforces after the call). Errors: `ModelUnava
 asks for `output_config.format` (a JSON schema) instead, and the intake turn's `update_brief` tool
 became a `{message, brief}` answer.
 
-**The adapter onto `app/core/llm`** (built on another branch) is one class with one method, mapping
-the request straight onto a streamed Messages call:
+**The adapter onto `app/core/llm`** is `app/core/storyline/llm_adapter.py: LlmStorylineModel`, one
+class with one method. It maps the request onto one provider round with `output_schema`
+(structured output, `output_config.format`), streamed in a worker thread (64k `max_tokens` needs
+streaming; providers are synchronous), and never touches a vendor SDK itself:
 
-```python
-class LlmStorylineModel:   # app/core/storyline/llm_adapter.py, once app/core/llm lands
-    async def structured(self, request: StructuredRequest) -> StructuredReply:
-        # stream(model=request.model, max_tokens=request.max_tokens, system=request.system,
-        #        messages=request.messages,
-        #        output_config={"format": {"type": "json_schema", "schema": request.schema},
-        #                       "effort": request.effort})
-        # data = json.loads(the text block) unless stop_reason is "refusal" or "max_tokens";
-        # usage and cost from app/core/llm's pricing; SDK errors -> ModelUnavailable / ModelRejected.
-        ...
-```
+- `data` is the JSON text block, or None for a refusal, a reply cut off at `max_tokens`, or text that
+  is not a JSON object;
+- usage is priced with the model that actually answered (`app/core/llm/pricing.py`);
+- no provider for the model is `ModelRejected`; a failed call is `ModelUnavailable` (retryable).
 
-Stream it (64k `max_tokens` needs streaming). Thinking stays adaptive (the default on Sonnet 5.5;
-`effort` is the control). Enable the provider layer's server-side refusal fallback.
+Thinking stays adaptive (the default on Sonnet 5.5; `effort` is the control), and the provider
+layer's server-side refusal fallback applies.
 `tests/fakes/storyline_model.py` (`ScriptedStorylineModel`) is the test double.
 
 ### Validation and repair
@@ -660,3 +658,119 @@ started here.
 - A missing `audience` or `style` becomes "Executive committee" or "Executive strategy" in the
   prompt (Darwin printed `undefined`); a missing `numSlides` becomes 12.
 - Job errors are user-safe messages; Darwin stored raw exception text (SDK errors, missing env).
+
+## Darwin's `/api` (Phase 7a)
+
+Darwin's backend moves into this service (decision D24): every `/api/*` route keeps its path,
+method, request and response, quirks included (plan §2.1, D32). The guide for porting a route is
+[darwin-api.md](darwin-api.md); this section is the design.
+
+```
+app/api/
+  deps.py            require_user / require_admin (Darwin's 401/403 bodies), get_storage, get_runtime
+  legacy.py          darwin_route (every method), read_json / read_json_or_none, destructure,
+                     check_method, effective_method, required_query, postgres_uuid, js_truthy,
+                     js_parse_int, json_response, error_response, compact, LegacyModel
+  routes/storyline.py  /api/storyline, /api/storyline-status, /api/intake
+  routes/exports.py    /api/pptx-{submit,status,result}, /api/pptx-deck-{submit,status,result},
+                       /api/image-to-slide
+app/core/
+  auth.py            TokenVerifier: a JWKS-verified JWT (issuer, audience, keys by configuration)
+  darwin/            usage.py (the ledger, C10), image_gen.py (gpt-image port, D28), caps.py,
+                     jobs.py (status shapes), exports.py (export job inputs, the deck job),
+                     runtime.py (registry, queue, models, workers)
+  brand/kit.py       normalize_kit (a partial port of brandKit.ts)
+tests/contract/      the contract harness: data/ (the oracle), cases/ (how to provoke each entry)
+```
+
+### The legacy layer
+
+Darwin's handlers are written against the raw request: `async def handler(request: Request) ->
+Response`, registered with `darwin_route` on a `legacy_router`. There are no FastAPI body models,
+because FastAPI's own 422s and 405s are not Darwin's. So:
+
+- **every route is registered for every method.** The documented methods appear in the OpenAPI
+  document, one operation each; the rest are hidden but reach the same handler, which ignores the
+  method, answers 405 (`check_method`), or acts as GET (`effective_method`), as Darwin did;
+- **errors** are `ApiError(status, "<Darwin's text>")`, rendered `{"error": ...}` with content-type
+  `application/json`. Anything else, and the quirk exceptions (`MalformedJsonBody`, `NonUuidId`,
+  `NullBody`), is 500 `{"error": "Internal error"}`, Darwin's `errorResponse`. On a legacy route an
+  ApiError's message is shown at any status, because Darwin's fixed 5xx texts are part of the
+  contract (502 "PPTX service error"); problem routes keep their generic 5xx detail;
+- **the order of checks is the code's order**: auth, method and body checks are plain calls, so the
+  handler's statements follow the contract's `checkOrder` (405 before auth on some routes, after on
+  others).
+
+### Auth
+
+`TokenVerifier` (`app/core/auth.py`) checks the bearer JWT's signature against the issuer's JWKS
+(cached `AUTH_JWKS_CACHE_S`; an unknown `kid` re-reads the set at most every 30 s, for rotation),
+`exp` (required) with `AUTH_LEEWAY_S`, `iss` == `AUTH_ISSUER`, `aud` == `AUTH_AUDIENCE`, and a `sub`.
+Only asymmetric algorithms (`AUTH_ALGORITHMS`; `check_config` refuses HS* and none). The issuer is
+not decided (D7/D8), so it is configuration: tests mint tokens with a local key
+(`tests/fakes/identity.py`), and swapping in the real issuer is a settings change. `check_config`
+requires the three in production. There is no `DEV_SECRET_KEY` bypass.
+
+`require_user` maps the token's `sub` to a profile through the storage port's `users.get_or_create`
+(email and `email_verified` refreshed from the token each call, as 0011 read `auth.users`), and
+caches the result on the request. Bodies: 401 "Missing bearer token", 401 "Invalid or expired
+session", 403 "Admin access required"; an unreachable issuer is 500 "Internal error".
+
+### Jobs behind the routes
+
+`app/core/darwin/runtime.py: build_runtime` wires one `JobRegistry` and `JobQueue` for the routes
+(`app.state.darwin`, built in the lifespan): the `storyline` job, the pipeline's jobs
+(`slides.design_and_export`, `exports.stitch_deck`, ...) and `darwin.pptx_deck` (resolves the
+caller's finished slide jobs, then stitches). Every type is registered NOT expensive: Darwin had no
+per-user in-flight limit, so the queue's limit of 3 would be a new 429 (TODO-P5 in-flight).
+
+`WORKER_CONCURRENCY` (default 0) worker loops run inside the API process, started and stopped by
+the lifespan; with 0, jobs wait in Redis for a worker process. Tests run jobs inline
+(`runtime.run_pending()`).
+
+Status routes come in two families (`app/core/darwin/jobs.py`): the JSON ones (`{status: "pending"}`
+for an unknown id, 403 "Not your job" for someone else's) and the pptx ones (502 for an unknown or
+unfinished id, no ownership check, `# TODO-P5 ownership`).
+
+### The cost ledger (C10)
+
+`app/core/darwin/usage.py: record_usage` takes keywords only, so the model lands in `model` and the
+cost in `est_cost_usd` (Darwin's five-for-six argument slip put the cost in `model` and $0 in the
+cost column). Successful storyline and design jobs are ledgered by a wrapper in the runtime
+(`ledgered`, keyed by job id so a replay is not counted twice); intake turns by the route; images
+(Darwin's `EST_COST_PER_IMAGE` / `EST_COST_MASTER`) by the generation routes when they are ported.
+
+### Caps (D12)
+
+`app/core/darwin/caps.py`: the global image cap is a Redis counter per UTC day
+(`GLOBAL_IMAGES_PER_DAY`, enforced, as Darwin's `reserveImageSlot`); the per-user intake and
+guidelines-extraction caps go through the port's `reserve_daily` and are OFF by default
+(`INTAKE_CAP_ENABLED`, `BRAND_EXTRACT_CAP_ENABLED`), because Darwin defines them and never calls
+them. Turning one on adds a 429, a behaviour change for the release notes.
+
+### Image generation (D28)
+
+`ImageGenerator` is a protocol (`generate`, `edit`); `OpenAIImageGenerator` is the one
+implementation, over the official `openai` SDK (gpt-image-2, quality medium, 2560x1440, the SDK's
+retries on 429/5xx/network). The client is built lazily, so a missing `OPENAI_API_KEY` is a job
+error, never a boot failure; `check_config` requires the key in production. No test can build a
+real OpenAI client (`no_paid_model_calls` in tests/conftest.py); `tests/fakes/image_gen.py` is the
+double.
+
+### The contract harness
+
+`tests/contract/test_contract.py` reads every `data/api-*.json` and runs each documented outcome
+(`R<i>` responses, `E<status> <text>` errors) through the probes in `tests/contract/cases/`, on the
+service with fakes (`tests/fakes/darwin.py`). The JSON is the oracle: status, exact error body,
+content-type, documented headers and body shape come from it, not from the cases. An entry needs a
+probe or a stated reason it cannot happen; a route not served yet is xfail "not yet ported"; the
+`-background` paths must 404. `tests/api/routes/test_darwin_negative.py` holds the per-route
+negative tests (the over-the-limit one is TODO-P5).
+
+### Not done yet
+
+- The 27 other Darwin routes (two parallel porting efforts; see darwin-api.md).
+- The per-slide image `prompt` in the storyline result (`SlidePrompter`, with `prompt.ts`).
+- Phase 5: Redis rate limits, in-flight caps, licensing, the pptx ownership decision (D33), and the
+  over-the-limit tests. The route-controls rows mark each as TODO-P5.
+- A worker-only entry point.

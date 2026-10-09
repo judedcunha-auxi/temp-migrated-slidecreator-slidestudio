@@ -14,7 +14,16 @@ THE ROBOTS (the tests) fail the build when:
   * a `public` row's route takes credentials or declares any dependency;
   * a row's error format disagrees with the route (legacy routes must use
     `LegacyErrorRoute`, everything else must not);
+  * a row's TODO-P5 markers are unknown, or an "ownership" marker has no
+    `TODO-P5 ownership` comment in the handler's module (where the check will go);
+  * an expensive row neither enforces nor marks (TODO-P5) its rate limit and
+    in-flight cap;
   * the generated documentation is out of date.
+
+TODO-P5 markers. Phase 5 adds Redis rate limits, in-flight caps, licensing and
+ownership checks behind decisions. Until then a row says what it still lacks in
+`todo_p5`, and the generated table shows it: a promise that is visibly open, never
+one that silently looks kept.
 
 To add a route: write its handler, add or extend a row in RULES, then run
     python tests/test_route_controls.py --write
@@ -48,6 +57,8 @@ BEGIN = "<!-- BEGIN GENERATED: route controls (python tests/test_route_controls.
 END = "<!-- END GENERATED: route controls -->"
 
 GUARDS = ("public", "dependency", "route")
+# What a row may say Phase 5 still owes it (docs/route-controls.md, "TODO-P5").
+TODO_P5 = ("rate-limit", "in-flight", "licence", "ownership", "over-the-limit-test")
 RATE_CLASSES = ("none", "standard", "expensive")
 ERROR_FORMATS = ("problem", "legacy")
 
@@ -65,6 +76,19 @@ class Rule:
     must_depend: tuple[str, ...] = ()  # guard == "dependency": names of required dependencies
     must_call: tuple[str, ...] = ()    # guard == "route": names the handler must (transitively) call
     notes: str = ""
+    todo_p5: tuple[str, ...] = ()      # what Phase 5 still owes this row (TODO_P5)
+
+
+def _darwin(path: str) -> tuple[str, ...]:
+    """Every method of a Darwin route: each is registered for all of them, because Darwin's
+    handlers answer an unexpected method themselves (app/api/legacy.py, darwin_route)."""
+    from app.api.legacy import ALL_METHODS
+
+    return tuple(f"{method} /api/{path}" for method in sorted(ALL_METHODS))
+
+
+_DARWIN_USER = "any signed-in user (bearer JWT, verified in-service: app/core/auth.py)"
+_DARWIN_TODO = ("rate-limit", "in-flight", "licence", "over-the-limit-test")
 
 
 RULES: tuple[Rule, ...] = (
@@ -89,6 +113,73 @@ RULES: tuple[Rule, ...] = (
         errors="problem",
         routes=("GET /openapi.json", "HEAD /openapi.json"),
         notes="Interactive /docs and /redoc pages are disabled.",
+    ),
+    Rule(
+        name="Darwin storyline + intake",
+        who=_DARWIN_USER,
+        guard="route",
+        rate_class="expensive",
+        budget="paid model calls: storyline (one structured call per job), intake (one call per turn); "
+               "intake text <= 30000 chars, 12-reply wrap-up; per-user intake cap wired, OFF (D12)",
+        licence="not checked yet (D10)",
+        errors="legacy",
+        routes=_darwin("storyline") + _darwin("intake"),
+        must_call=("require_user",),
+        todo_p5=_DARWIN_TODO,
+        notes="Method not checked (any method acts as POST). Malformed JSON: 500 on storyline, 400 on intake.",
+    ),
+    Rule(
+        name="Darwin storyline status",
+        who=_DARWIN_USER + "; the job's owner (403 'Not your job'); an unknown id is 200 pending",
+        guard="route",
+        rate_class="standard",
+        budget="a read of one job record",
+        licence="no",
+        errors="legacy",
+        routes=_darwin("storyline-status"),
+        must_call=("require_user", "read_owned_job"),
+        todo_p5=("rate-limit", "over-the-limit-test"),
+    ),
+    Rule(
+        name="Darwin PPTX submit",
+        who=_DARWIN_USER + "; the deck's owner (403 'Not your deck')",
+        guard="route",
+        rate_class="expensive",
+        budget="one design_and_export / stitch job per call (paid design turn + export)",
+        licence="not checked yet (D10)",
+        errors="legacy",
+        routes=_darwin("pptx-submit") + _darwin("pptx-deck-submit"),
+        must_call=("check_method", "require_user", "owned_deck"),
+        todo_p5=_DARWIN_TODO,
+        notes="405 is checked BEFORE auth (Darwin's order). Success is 200, not 202.",
+    ),
+    Rule(
+        name="Darwin PPTX status + result",
+        who=_DARWIN_USER + "; NO ownership check today (any job id), kept for the Connector",
+        guard="route",
+        rate_class="standard",
+        budget="a read of one job record (and one .pptx)",
+        licence="no",
+        errors="legacy",
+        routes=_darwin("pptx-status") + _darwin("pptx-result") + _darwin("pptx-deck-status")
+        + _darwin("pptx-deck-result"),
+        must_call=("require_user", "read_any_job"),
+        todo_p5=("rate-limit", "ownership", "over-the-limit-test"),
+        notes="Unknown or unfinished id: 502 (the Connector reads it as still running). Adding the ownership "
+              "check is a D33 behaviour change; someone else's job must then answer the same 502.",
+    ),
+    Rule(
+        name="Darwin image-to-slide",
+        who=_DARWIN_USER + " (the Auxi Connector)",
+        guard="route",
+        rate_class="expensive",
+        budget="multipart image <= 4 MiB; one design_and_export job (paid design turn) per call",
+        licence="not checked yet (D10)",
+        errors="legacy",
+        routes=_darwin("image-to-slide"),
+        must_call=("require_user", "check_method"),
+        todo_p5=_DARWIN_TODO,
+        notes="405 'POST only' AFTER auth. JSON bodies are a 400.",
     ),
 )
 
@@ -201,6 +292,12 @@ def violations(table: dict[str, BaseRoute], rules: tuple[Rule, ...]) -> list[str
             problems.append(f"{rule.name}: unknown error format {rule.errors!r}")
         if not any(key in table for key in rule.routes):
             problems.append(f"{rule.name}: covers no served route")
+        unknown_todo = set(rule.todo_p5) - set(TODO_P5)
+        if unknown_todo:
+            problems.append(f"{rule.name}: unknown TODO-P5 markers {sorted(unknown_todo)}")
+        if rule.rate_class == "expensive" and not {"rate-limit", "in-flight"} <= set(rule.todo_p5):
+            problems.append(f"{rule.name}: expensive, but its rate limit and in-flight cap are not marked TODO-P5 "
+                            "(remove the markers only when Phase 5 enforces them, with must_depend/must_call)")
         for key in rule.routes:
             if key not in table:
                 problems.append(f"{rule.name}: lists {key}, which is not served")
@@ -227,6 +324,9 @@ def violations(table: dict[str, BaseRoute], rules: tuple[Rule, ...]) -> list[str
             missing = set(rule.must_call) - closure_calls(route.endpoint)
             if not rule.must_call or missing:
                 problems.append(f"{key}: handler does not call {sorted(missing) or 'anything promised'}")
+        if "ownership" in rule.todo_p5:
+            if "TODO-P5 ownership" not in inspect.getsource(route.endpoint):
+                problems.append(f"{key}: TODO-P5 ownership, but no 'TODO-P5 ownership' marker in its handler")
     return problems
 
 
@@ -292,6 +392,15 @@ def test_the_robots_catch_what_they_should():
         Rule("f", "w", "public", "none", "b", "l", "problem", ("GET /gone",)),
     )
     found = "\n".join(violations(table, good))
+    todo = (
+        Rule("g", "w", "public", "none", "b", "l", "problem", ("GET /dep-ok",), todo_p5=("someday",)),
+        Rule("h", "w", "public", "expensive", "b", "l", "problem", ("GET /route-ok",)),
+        Rule("i", "w", "public", "none", "b", "l", "legacy", ("GET /legacy",), todo_p5=("ownership",)),
+    )
+    found_todo = "\n".join(violations(table, todo))
+    assert "g: unknown TODO-P5 markers ['someday']" in found_todo
+    assert "h: expensive, but its rate limit and in-flight cap are not marked TODO-P5" in found_todo
+    assert "GET /legacy: TODO-P5 ownership, but no 'TODO-P5 ownership' marker" in found_todo
     assert "GET /dep-ok" not in found
     assert "GET /route-ok" not in found
     assert "GET /dep-missing: missing dependencies ['require_user']" in found
@@ -314,14 +423,18 @@ def render(table: dict[str, BaseRoute] | None = None) -> str:
     lines = [
         "### The checklist",
         "",
-        "| Entry | Who may call it | Enforced in | Rate class | Abuse budget | Licence | Errors | Notes |",
-        "|---|---|---|---|---|---|---|---|",
+        "| Entry | Who may call it | Enforced in | Rate class | Abuse budget | Licence | Errors | TODO-P5 | Notes |",
+        "|---|---|---|---|---|---|---|---|---|",
     ]
     for rule in RULES:
-        entry = "<br>".join(f"`{r}`" for r in rule.routes)
+        paths = list(dict.fromkeys(r.split(" ", 1)[1] for r in rule.routes))
+        if len(rule.routes) > 2 and all(sum(1 for r in rule.routes if r.endswith(" " + p)) > 2 for p in paths):
+            entry = "<br>".join(f"`{p}` (every method)" for p in paths)
+        else:
+            entry = "<br>".join(f"`{r}`" for r in rule.routes)
         lines.append("| " + " | ".join(_cell(c) for c in (
             f"**{rule.name}**<br>{entry}", rule.who, rule.guard, rule.rate_class, rule.budget,
-            rule.licence, rule.errors, rule.notes)) + " |")
+            rule.licence, rule.errors, ", ".join(rule.todo_p5) or "-", rule.notes)) + " |")
     lines += ["", "### Every served route, and the row that covers it", "", "| Route | Row |", "|---|---|"]
     for key in sorted(table, key=lambda k: (k.split(" ", 1)[1], k)):
         rows = _matching(key, RULES)

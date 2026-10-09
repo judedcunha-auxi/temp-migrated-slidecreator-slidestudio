@@ -1,0 +1,53 @@
+{
+  "route": "/api/admin-metrics",
+  "handler": "netlify/functions/admin-metrics.ts",
+  "netlifyRouting": "netlify.toml:12-15 rewrites /api/* -> /.netlify/functions/:splat (status 200)",
+  "methods": ["GET"],
+  "methodHandling": { "otherMethods": "Not checked; any method returns the same metrics.", "cite": "netlify/functions/admin-metrics.ts:5-215" },
+  "auth": { "kind": "requireAdmin", "cite": "netlify/functions/admin-metrics.ts:7", "notes": "401 (no/invalid token) or 403 {error:'Admin access required'} before any query." },
+  "query": [
+    { "name": "days", "type": "integer", "required": false, "parse": "parseInt(days ?? '30', 10) || 30, then clamped to [1, 365]", "default": 30, "bounds": "1..365", "invalidBehaviour": "Non-numeric -> 30. '0' -> 30 (0 is falsy). Negative -> 1. >365 -> 365. '7.9' -> 7. '12abc' -> 12.", "cite": "netlify/functions/admin-metrics.ts:10-11" }
+  ],
+  "request": { "contentType": "none", "parse": "Body not read.", "fields": [], "unknownFields": "Extra query params ignored." },
+  "checkOrder": ["1. requireAdmin (:7)", "2. days (:10-11)", "3. cutoff = now - days (server-local date arithmetic) (:12-14)", "4. 7 parallel queries (:16-50)", "5. profiles/decks/usage/recentDecks errors throw -> 500; events/transcripts/slideTranscripts errors are ignored (:52-56)", "6. aggregate and return (:58-212)"],
+  "responses": [
+    {
+      "status": 200, "contentType": "application/json", "headers": {}, "when": "admin",
+      "bodyShape": {
+        "summary": { "totalUsers": "int, all profiles", "totalDecks30d": "int, decks created since cutoff (name says 30d whatever `days` is)", "decksToday": "int, decks in range whose created_at UTC date == today", "totalCostUsd": "number, sum usage_events.est_cost_usd since cutoff", "usersWithDecks": "int, profiles with lifetime_decks >= 1", "powerUsers": "int, lifetime_decks >= 3", "chatDecks": "int, creation_method 'intake_chat' in range", "wizardDecks": "int, creation_method 'wizard' in range", "totalRefines30d": "int, sum refine_count in range", "totalExports30d": "int, sum export_count in range" },
+        "dailyActivity": "[{date:'YYYY-MM-DD', decks:int, costUsd:number}] exactly `days` entries, oldest first, ending today",
+        "users": "[{id, email ('—' if null), createdAt, lifetimeDecks, decksToday, isAdmin, totalSlidesGenerated, totalRefinements, totalExports, lastSeenAt|null}] all profiles, created_at desc",
+        "recentDecks": "[{id, title ('Untitled' if empty), ownerEmail ('—' if unknown), status, createdAt, creationMethod|null, slideCount|null, refineCount, exportCount}] last 20 decks overall (NOT limited by days)",
+        "events": "[{userId, userEmail, eventName, properties, pagePath, createdAt}] analytics_events since cutoff, newest first, max 2000",
+        "transcripts": "[{id, userEmail, deckId, turnCount, totalChars, messages ([] default), brief ({} default), createdAt, completedAt}] last 50 intake transcripts overall (NOT limited by days)",
+        "topClicks": "[{text, path, count}] element_clicked events grouped by path|text, top 50 by count",
+        "perUserClicks": "[{email, total, topText, topCount}] per user with element_clicked events, total desc",
+        "slideTranscripts": "[{id, userEmail, deckId, slideNumber, messages ([] default), refineCount, updatedAt}] last 100 slide_edit_transcripts by updated_at (NOT limited by days)"
+      },
+      "example": { "summary": { "totalUsers": 2, "totalDecks30d": 1, "decksToday": 0, "totalCostUsd": 0.32, "usersWithDecks": 1, "powerUsers": 0, "chatDecks": 1, "wizardDecks": 0, "totalRefines30d": 2, "totalExports30d": 1 }, "dailyActivity": [ { "date": "2026-10-07", "decks": 1, "costUsd": 0.32 }, { "date": "2026-10-08", "decks": 0, "costUsd": 0 } ], "users": [ { "id": "u1", "email": "a@acme.com", "createdAt": "2026-09-01T10:00:00Z", "lifetimeDecks": 1, "decksToday": 0, "isAdmin": true, "totalSlidesGenerated": 8, "totalRefinements": 2, "totalExports": 1, "lastSeenAt": "2026-10-08T09:00:00Z" } ], "recentDecks": [], "events": [], "transcripts": [], "topClicks": [], "perUserClicks": [], "slideTranscripts": [] },
+      "cite": "netlify/functions/admin-metrics.ts:58-212"
+    }
+  ],
+  "errors": [
+    { "status": 401, "body": { "error": "Missing bearer token" }, "when": "no bearer", "cite": "netlify/functions/_shared/http.ts:23" },
+    { "status": 401, "body": { "error": "Invalid or expired session" }, "when": "token rejected", "cite": "netlify/functions/_shared/auth.ts:23" },
+    { "status": 403, "body": { "error": "Admin access required" }, "when": "profiles.is_admin falsy", "cite": "netlify/functions/_shared/auth.ts:31" },
+    { "status": 500, "body": { "error": "Internal error" }, "when": "profiles, decks (range), usage_events or recent-decks query errors", "cite": "netlify/functions/admin-metrics.ts:52-55, netlify/functions/_shared/http.ts:14-18" }
+  ],
+  "sideEffects": [],
+  "externalCalls": [],
+  "quirks": [
+    "summary keys are named *30d but follow `days` (admin-metrics.ts:70, 196-197).",
+    "days=0 yields 30, not 1 (`|| 30` runs before the clamp).",
+    "recentDecks, transcripts and slideTranscripts ignore `days`; events, decks-in-range and usage use it.",
+    "events is capped at 2000 rows, so topClicks/perUserClicks are computed from at most 2000 events.",
+    "Failures of the analytics_events, intake_transcripts and slide_edit_transcripts queries are ignored (empty arrays), so the route still returns 200 when those tables are missing (admin-metrics.ts:56).",
+    "Date buckets mix server-local date arithmetic (setDate) with UTC slicing (toISOString().slice(0,10)); on a UTC host they agree.",
+    "No pagination over profiles: `users` lists every profile."
+  ],
+  "beforeAnyState": "With empty tables: all counts 0, `days` zeroed dailyActivity buckets, empty arrays.",
+  "tests": [ { "file": "none", "asserts": "No test covers this route." } ],
+  "callers": [ { "who": "frontend", "where": "src/pages/admin/AdminDashboard.tsx:76-85 (fetchAdminMetrics, days in '7'|'30'|'90'); type DashboardData at src/pages/admin/AdminDashboard.tsx:5-73", "expects": "200 JSON in the DashboardData shape; on non-OK reads body.error." } ],
+  "docs": { "openapi": "absent from public/openapi.yaml", "postman": "absent from docs/postman_collection.json" },
+  "planSection65": "Row lists the 9 top-level keys correctly. Add: days clamp 1..365 with 0/invalid -> 30; summary key names fixed at *30d."
+}

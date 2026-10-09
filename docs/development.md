@@ -101,6 +101,9 @@ Before pushing, run the whole gate: `.venv/Scripts/python.exe scripts/gate.py` (
    `python tests/test_route_controls.py --write`.
 5. Write its tests, including the negative cases, next to the others in `tests/api/routes/`.
 
+Porting one of Darwin's `/api/*` routes has more to it (the legacy helpers, the quirks, the
+contract cases the harness runs): follow [darwin-api.md](darwin-api.md).
+
 ## Adding a setting
 
 Engine settings live in `EngineSettings` in `app/config/engine.py` (environment prefix

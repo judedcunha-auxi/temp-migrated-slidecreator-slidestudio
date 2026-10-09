@@ -6,7 +6,7 @@ from typing import Any
 
 from app.config.settings import Settings, is_production, secret_values
 from app.config.settings import check_config as _check_config
-from tests.conftest import build_ai_settings, build_engine_settings, build_settings
+from tests.conftest import build_ai_settings, build_darwin_settings, build_engine_settings, build_settings
 
 GOOD_PROD = {
     "environment": "production",
@@ -15,6 +15,9 @@ GOOD_PROD = {
     "cors_allowed_origins": "https://app.example.com",
     "storage_backend": "general",
     "general_service_url": "https://general.example",
+    "auth_issuer": "https://issuer.example/",
+    "auth_audience": "slideforge",
+    "auth_jwks_url": "https://issuer.example/.well-known/jwks.json",
 }
 GENERAL_SERVICE_PLACEHOLDER = "STORAGE_BACKEND=general: the General service adapter is not written yet (D5)."
 
@@ -24,11 +27,14 @@ GOOD_ENGINE_PROD = {"renderer_url": "https://render.example"}
 
 #: A production AI configuration: the provider key is required there (a placeholder, not a key).
 GOOD_AI_PROD = {"anthropic_api_key": "placeholder-anthropic-key"}
+#: Darwin's production configuration: the image key is required there (a placeholder).
+GOOD_DARWIN_PROD = {"openai_api_key": "placeholder-openai-key"}
 
 
 def check_config(s: Settings, **engine: Any) -> list[str]:
     """check_config with explicit engine settings, so the process environment cannot leak in."""
-    return _check_config(s, build_engine_settings(**engine), build_ai_settings(**GOOD_AI_PROD))
+    return _check_config(s, build_engine_settings(**engine), build_ai_settings(**GOOD_AI_PROD),
+                         build_darwin_settings(**GOOD_DARWIN_PROD))
 
 
 def test_a_default_local_config_has_no_problems():
@@ -103,3 +109,31 @@ def test_secret_values_include_the_redis_password_and_instrumentation_key():
         applicationinsights_connection_string="InstrumentationKey=ikey-value-123;IngestionEndpoint=https://x",
     )
     assert set(secret_values(s)) == {"redis-password-123", "ikey-value-123"}
+
+
+def test_production_requires_the_token_issuer_audience_and_jwks():
+    problems = " ".join(check_config(build_settings(environment="production")))
+    for name in ("AUTH_ISSUER", "AUTH_AUDIENCE", "AUTH_JWKS_URL"):
+        assert name in problems
+
+
+def test_auth_algorithms_must_be_asymmetric():
+    for bad in ("HS256", "none", "RS256,HS512", ""):
+        assert any("AUTH_ALGORITHMS" in p for p in check_config(build_settings(auth_algorithms=bad))), bad
+    assert check_config(build_settings(auth_algorithms="RS256, ES256")) == []
+
+
+def test_auth_jwks_url_must_be_https_in_production():
+    s = build_settings(**{**GOOD_PROD, "auth_jwks_url": "http://issuer.example/jwks"})
+    assert any("AUTH_JWKS_URL must use https" in p for p in check_config(s, **GOOD_ENGINE_PROD))
+
+
+def test_production_requires_the_openai_key():
+    problems = _check_config(build_settings(**GOOD_PROD), build_engine_settings(**GOOD_ENGINE_PROD),
+                             build_ai_settings(**GOOD_AI_PROD), build_darwin_settings())
+    assert any("OPENAI_API_KEY" in p for p in problems)
+
+
+def test_the_openai_key_is_a_secret_for_the_scrubber():
+    values = secret_values(build_settings(), build_ai_settings(), build_darwin_settings(openai_api_key="placeholder-openai-key"))
+    assert "placeholder-openai-key" in values

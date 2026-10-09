@@ -1,0 +1,92 @@
+{
+  "route": "/api/generate",
+  "handler": "netlify/functions/generate.ts",
+  "netlifyRouting": "netlify.toml:12-15 rewrites /api/* -> /.netlify/functions/:splat. Background worker netlify/functions/generate-background.ts (type 'background', generate-background.ts:132) via POST {origin}/.netlify/functions/generate-background (_shared/trigger.ts:27-33).",
+  "methods": ["POST"],
+  "methodHandling": {
+    "otherMethods": "Not checked. GET/HEAD (no body) -> req.json() throws -> 500 {\"error\":\"Internal error\"} after auth; other methods with a JSON body behave like POST.",
+    "cite": "generate.ts:15-78"
+  },
+  "auth": {
+    "kind": "requireUser",
+    "cite": "generate.ts:17; _shared/auth.ts:9-25",
+    "notes": "Auth first. 401 'Missing bearer token' / 401 'Invalid or expired session'."
+  },
+  "query": [],
+  "request": {
+    "contentType": "application/json",
+    "parse": "payload = await req.json() (generate.ts:18). Malformed JSON -> 500 'Internal error'. JSON null -> TypeError reading payload.presentationTitle -> 500 'Internal error'.",
+    "fields": [
+      { "name": "presentationTitle", "type": "string", "required": true, "default": null, "bounds": "min length 1", "validation": "zod storylineSchema.parse — failure throws ZodError -> 500 {\"error\":\"Internal error\"} (NOT 400)", "cite": "generate.ts:23-25; _shared/storylineSchema.ts:48-51,58-60" },
+      { "name": "slides", "type": "array", "required": true, "default": null, "bounds": "min 1 item; no max", "validation": "zod; each slide per slideSchema below. Failure -> 500 'Internal error'", "cite": "_shared/storylineSchema.ts:48-51" },
+      { "name": "slides[].number", "type": "integer", "required": true, "default": null, "bounds": "positive int; duplicates not rejected by zod but violate DB unique(deck_id, number) -> 500 after the deck row is inserted", "validation": "z.number().int().positive()", "cite": "_shared/storylineSchema.ts:23; supabase/migrations/0001_init.sql:43; _shared/db.ts:42-59" },
+      { "name": "slides[].title", "type": "string", "required": true, "default": null, "bounds": "min 1", "validation": "zod", "cite": "_shared/storylineSchema.ts:24" },
+      { "name": "slides[].type", "type": "enum SLIDE_TYPES (title, agenda, framework, data, process, quote, closing, comparison, timeline, kpi, market, org, divider, table, case-study, charter, synthesis, navigator, benchmark, scorecard, deep-dive, map)", "required": false, "default": "framework", "bounds": null, "validation": "z.enum(...).default('framework'); unknown value -> 500", "cite": "_shared/storylineSchema.ts:25; _shared/slideTypes.ts:7-12" },
+      { "name": "slides[].section", "type": "string", "required": false, "default": null, "bounds": null, "validation": "zod optional", "cite": "_shared/storylineSchema.ts:28" },
+      { "name": "slides[].framework", "type": "string", "required": true, "default": null, "bounds": "min 1", "validation": "zod; then repairStoryline coerces non-furniture frameworks to a library framework (warning, never rejection)", "cite": "_shared/storylineSchema.ts:29; _shared/frameworkGuard.ts:160-180" },
+      { "name": "slides[].description", "type": "string", "required": true, "default": null, "bounds": "min 1", "validation": "zod", "cite": "_shared/storylineSchema.ts:30" },
+      { "name": "slides[].bullets", "type": "string[]", "required": true, "default": null, "bounds": "each min length 1; max 4 items; at least 3 items unless type is divider/title/closing/agenda/navigator", "validation": "zod + superRefine 'Content slides need 3-4 bullets'", "cite": "_shared/storylineSchema.ts:19,31,35-46" },
+      { "name": "slides[].chartData", "type": "{categories: string[] (min1), series: [{name, values: number[], dataLabels?: string[]}] (min1)}", "required": false, "default": null, "bounds": null, "validation": "zod; dropped with a warning if the (repaired) framework is not a chart", "cite": "_shared/storylineSchema.ts:4-13,32; _shared/frameworkGuard.ts:169-172" },
+      { "name": "slides[].archetypeId", "type": "string", "required": false, "default": null, "bounds": null, "validation": "unknown id -> cleared with warning", "cite": "_shared/storylineSchema.ts:33; _shared/frameworkGuard.ts:173-176" },
+      { "name": "slides[].prompt", "type": "string", "required": false, "default": null, "bounds": null, "validation": "IGNORED — stripped by zod (unknown key) and re-assembled server-side", "cite": "generate.ts:33-52" },
+      { "name": "inputs", "type": "object (WizardInputs)", "required": false, "default": null, "bounds": null, "validation": "Not validated. Persisted verbatim to decks.inputs (includes creationMethod and any unknown keys). Read: inputs.brandId (string only), inputs.styleInstructions (string only), inputs.language ('ar' only, else English), inputs.creationMethod (string only), and normalizeKit(kit, inputs) uses legacy primaryColor/accentColor/fontStyle/company", "cite": "generate.ts:26-30,54; _shared/anthropic.ts:12-32" },
+      { "name": "intakeSessionKey", "type": "string", "required": false, "default": null, "bounds": null, "validation": "used only if typeof string; links intake transcript to the deck (fire-and-forget)", "cite": "generate.ts:31,65" }
+    ],
+    "unknownFields": "Top-level unknown fields ignored (e.g. `warnings` from storyline-status result). Unknown slide keys stripped by zod (default strip). Unknown keys inside `inputs` persisted verbatim."
+  },
+  "checkOrder": [
+    "1. requireUser",
+    "2. req.json()",
+    "3. parseStoryline (ZodError -> 500) then repairStoryline (warnings)",
+    "4. resolveBrandKitRaw(userId, brandId) + normalizeKit",
+    "5. assemble prompts per slide (content-only tile vs layout hint)",
+    "6. persistDeck (decks row status 'generating' + slides rows) -> deckId",
+    "7. fire-and-forget: incrementDeckCounters, decks update {slide_count, brand_id, creation_method, generation_started_at}, linkTranscriptToDeck",
+    "8. setSlidePrompt per slide (sequential)",
+    "9. writeJobState(initJobState(deckId, slides)) — all slides 'idle', no brandId",
+    "10. triggerBackground({deckId, userId, brandId, language, slides:[{number,type,framework,archetypeId,prompt}]}) — failures swallowed",
+    "11. 202 {deckId, warnings}"
+  ],
+  "responses": [
+    { "status": 202, "contentType": "application/json", "headers": {}, "when": "deck created and background triggered", "bodyShape": { "deckId": "uuid string", "warnings": "string[] (always present; [] when nothing coerced)" }, "example": { "deckId": "3fa85f64-5717-4562-b3fc-2c963f66afa6", "warnings": ["Slide 2: \"spider chart\" isn't buildable from native PowerPoint shapes — using \"weighted scoring matrix\" instead"] }, "cite": "generate.ts:74; _tests/generate.test.ts:35-66" }
+  ],
+  "errors": [
+    { "status": 401, "body": { "error": "Missing bearer token" }, "when": "no bearer", "cite": "_shared/http.ts:20-25" },
+    { "status": 401, "body": { "error": "Invalid or expired session" }, "when": "bad token", "cite": "_shared/auth.ts:22-23" },
+    { "status": 500, "body": { "error": "Internal error" }, "when": "malformed JSON; null body; ANY storyline validation failure (ZodError is not an HttpError); unknown slide type; DB errors (persistDeck, setSlidePrompt, duplicate slide number); Blobs write failure", "cite": "_shared/http.ts:14-18; generate.ts:75-77" }
+  ],
+  "sideEffects": [
+    "decks insert {owner, title: payload.presentationTitle, inputs: payload.inputs, storyline (repaired), status:'generating'} and slides rows {deck_id, number, title, framework, description, bullets, prompt:''} (_shared/db.ts:35-61)",
+    "decks update slide_count/brand_id/creation_method/generation_started_at; rpc increment_deck_counters; intake_transcripts link — all fire-and-forget, errors not awaited (generate.ts:57-66)",
+    "slides.prompt set per slide (generate.ts:68)",
+    "Blob 'deck-jobs' job/{deckId}.json = {deckId, slides:{n:{status:'idle'}}} (generate.ts:69; _shared/jobState.ts:75-79; _shared/blobs.ts:51-53)",
+    "Background trigger (_shared/trigger.ts:27-33)"
+  ],
+  "externalCalls": [
+    "Supabase (service role). Background: OpenAI gpt-image per slide — PAID (generate-background.ts, _shared/generateCore.ts)"
+  ],
+  "quirks": [
+    "Validation failures return 500 'Internal error', not 400 — the Connector documents this: 'api/generate 500s (undocumented) unless EVERY slide has a non-empty title, framework, description, type, and 3-4 bullets' (Auxi_Connector app/api/routes/forge.py:328-330).",
+    "No daily deck cap is enforced here (reserve_deck/incrementProfileDeckCount is not called; only analytics counters).",
+    "Client-supplied slide `prompt` is always discarded (generate.ts:33-36 comment, lines 37-52).",
+    "Framework coercions are warnings, never rejections; warnings returned in the 202 body.",
+    "Partial failure leaves an orphan deck: persistDeck commits the decks row before the slides insert, and later steps can 500 after the deck exists.",
+    "Trigger failures swallowed: 202 returned, job state stays all 'idle' and /api/status never reaches done.",
+    "Initial job state is written without brandId/masterUsed; /api/status before the background writes returns masterApplied:false, no masterSkipReason.",
+    "Slide numbers are kept as submitted; dividers are NOT inserted here (insertDividers runs only in storyline-background.ts:20)."
+  ],
+  "beforeAnyState": "Creates new state. Brand: an unknown/unreachable brandId silently falls back to profiles.brand_kit then defaults (_shared/db.ts:322-328).",
+  "tests": [
+    { "file": "netlify/functions/_tests/generate.test.ts", "asserts": "202 {deckId}; server-assembled prompts contain 'Non-negotiable rules:'; framework coercion to 'weighted scoring matrix' with warnings; brandId threaded to resolveBrandKitRaw and trigger; language 'ar' threaded; style override (lines 34-110). No error-path tests." }
+  ],
+  "callers": [
+    { "who": "frontend", "where": "src/lib/api.ts:141-153 (postGenerate: spreads storyline-status result, adds inputs.creationMethod and intakeSessionKey)", "expects": "2xx {deckId}" },
+    { "who": "Auxi_Connector", "where": "app/api/routes/forge.py:417-446 (/forge/generate)", "expects": "status < 400 and JSON deckId (non-empty) else 502; forwards only slide fields number,title,framework,description,type,bullets (forge.py:99,343) and inputs {topic,company,numSlides,audience,style,brandId?,styleInstructions?,primaryColor?,accentColor?} (forge.py:386-415)" }
+  ],
+  "docs": {
+    "openapi": "public/openapi.yaml:637-692. Discrepancies: example payload is INVALID against the handler (each slide has 2 bullets on non-furniture types kpi/data/market -> zod fails -> 500); StorylineSlide schema (openapi.yaml:158-190) marks `prompt` required (it is ignored) and omits chartData/archetypeId and the 3-4 bullet rule; DeckJobResponse is fine; no 500-on-validation documented; intakeSessionKey and inputs.creationMethod undocumented.",
+    "postman": "'2.3 Submit for generation' body is the same invalid example (2 bullets on kpi/data/market) -> real server returns 500 'Internal error'.",
+    "apiMd": "docs/api.md:328"
+  },
+  "planSection65": "Row 'storyline payload → 202 {deckId, warnings}' — accurate. Add: invalid storyline -> 500 'Internal error' (Connector relies on this being an error status, not on the code)."
+}

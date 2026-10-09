@@ -1,0 +1,57 @@
+{
+  "route": "/api/brand-preview-status",
+  "handler": "netlify/functions/brand-preview-status.ts",
+  "netlifyRouting": "netlify.toml:12-15 rewrites /api/* -> /.netlify/functions/:splat (status 200)",
+  "methods": ["GET"],
+  "methodHandling": { "otherMethods": "No method check: any method behaves like GET.", "cite": "netlify/functions/brand-preview-status.ts:5-22" },
+  "auth": { "kind": "requireUser", "cite": "netlify/functions/brand-preview-status.ts:7", "notes": "job.userId must match caller." },
+  "query": [
+    { "name": "jobId", "type": "string", "required": true, "parse": "searchParams.get('jobId')", "default": null, "bounds": null, "invalidBehaviour": "missing -> 400 'jobId is required'; unknown -> 200 {status:'pending'}", "cite": "netlify/functions/brand-preview-status.ts:8-11" }
+  ],
+  "request": { "contentType": "none", "parse": "body ignored", "fields": [], "unknownFields": "ignored" },
+  "checkOrder": ["1. requireUser", "2. jobId", "3. read job", "4. missing -> pending", "5. owner", "6. done+key -> read image", "7. else {status, error}"],
+  "responses": [
+    { "status": 200, "contentType": "application/json", "headers": {}, "when": "no job record", "bodyShape": { "status": "pending" }, "example": { "status": "pending" }, "cite": "netlify/functions/brand-preview-status.ts:11" },
+    { "status": 200, "contentType": "application/json", "headers": {}, "when": "done and preview blob readable", "bodyShape": { "status": "done", "image": "base64 PNG string (no data: prefix)" }, "example": { "status": "done", "image": "iVBORw0KGgoAAAANSUhEUgAA..." }, "cite": "netlify/functions/brand-preview-status.ts:13-16" },
+    { "status": 200, "contentType": "application/json", "headers": {}, "when": "done but preview blob missing", "bodyShape": { "status": "error", "error": "Preview image is no longer available" }, "example": { "status": "error", "error": "Preview image is no longer available" }, "cite": "netlify/functions/brand-preview-status.ts:15" },
+    { "status": 200, "contentType": "application/json", "headers": {}, "when": "pending or error (or done without key)", "bodyShape": { "status": "pending|error|done", "error": "string, only when present" }, "example": { "status": "error", "error": "Daily image limit reached — try again tomorrow." }, "cite": "netlify/functions/brand-preview-status.ts:18" }
+  ],
+  "fieldsProducer": {
+    "producer": "netlify/functions/brand-preview-background.ts:19 writes {status:'done', userId, key}; :20-21 writes {status:'error', userId, error}",
+    "errorStrings": [
+      "Brand master could not be loaded — re-upload it, then preview again. (brandPreview.ts:87, HttpError 503 message stored as text)",
+      "Daily image limit reached — try again tomorrow. (brandPreview.ts:110, HttpError 429 message)",
+      "Missing required env var: OPENAI_API_KEY (config.ts:27-31)",
+      "OpenAI client error messages verbatim",
+      "Preview failed (non-Error throw, brand-preview-background.ts:24)"
+    ]
+  },
+  "errors": [
+    { "status": 401, "body": { "error": "Missing bearer token" }, "when": "no bearer", "cite": "netlify/functions/_shared/http.ts:20-25" },
+    { "status": 401, "body": { "error": "Invalid or expired session" }, "when": "bad token", "cite": "netlify/functions/_shared/auth.ts:22-23" },
+    { "status": 400, "body": { "error": "jobId is required" }, "when": "no jobId", "cite": "netlify/functions/brand-preview-status.ts:9" },
+    { "status": 403, "body": { "error": "Not your job" }, "when": "other user's job", "cite": "netlify/functions/brand-preview-status.ts:12" },
+    { "status": 500, "body": { "error": "Internal error" }, "when": "blob failure", "cite": "netlify/functions/_shared/http.ts:14-18" }
+  ],
+  "sideEffects": ["none"],
+  "externalCalls": ["Netlify Blobs; no paid APIs"],
+  "quirks": [
+    "Image is returned inline as base64 JSON (not a binary endpoint).",
+    "The 503/429 HttpErrors raised inside the background never surface as HTTP statuses; they become status:'error' text here with HTTP 200.",
+    "A done job with no key returns {status:'done'} without image (frontend treats as failure).",
+    "Unknown jobId -> pending forever; no method check."
+  ],
+  "beforeAnyState": "200 {\"status\":\"pending\"}",
+  "tests": [
+    { "file": "netlify/functions/_tests/brand-preview.test.ts", "asserts": "Intended: done -> base64 image; 403 other user's job; done job whose image is gone -> status 'error' with string error. STATUS 2026-10-08: file fails to compile (unescaped apostrophe at line 69:35 in the title 'forbids reading another user's job'), so NONE of these run. Broken, not stale; the handler is the oracle." }
+  ],
+  "callers": [
+    { "who": "frontend", "where": "src/lib/api.ts:226-230 (getBrandPreviewStatus), src/lib/api.ts:360-371 (pollBrandPreview 60x2s); src/components/BrandPreviewPanel.tsx:23", "expects": "done -> image required else throws 'Preview failed — the server returned a completed job with no image.'; error -> s.error || 'Preview failed'" }
+  ],
+  "docs": {
+    "openapi": "public/openapi.yaml:1490-1516 - matches shape; 400/403 undocumented.",
+    "postman": "docs/postman_collection.json:665-678 (5.6) - matches",
+    "apiMd": "docs/api.md:1171+"
+  },
+  "planSection65": "Row: 'GET ?jobId= -> {status, image?: base64, error?}'. Accurate."
+}

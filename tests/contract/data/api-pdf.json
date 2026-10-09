@@ -1,0 +1,70 @@
+{
+  "route": "/api/pdf",
+  "handler": "netlify/functions/pdf.ts",
+  "netlifyRouting": "netlify.toml:12-15 rewrites /api/* -> /.netlify/functions/:splat (status 200)",
+  "methods": ["GET"],
+  "methodHandling": {
+    "otherMethods": "Not checked. Any method is served exactly like GET; body never read.",
+    "cite": "netlify/functions/pdf.ts:12-46 (no req.method check)"
+  },
+  "auth": {
+    "kind": "requireUser",
+    "cite": "netlify/functions/pdf.ts:14; netlify/functions/_shared/auth.ts:9-25",
+    "notes": "Auth first, then query validation."
+  },
+  "query": [
+    { "name": "deckId", "type": "string", "required": true, "parse": "searchParams.get('deckId'); empty treated as missing", "default": null, "bounds": "no format check; non-UUID -> ownsDeck Postgres error -> 500", "invalidBehaviour": "missing/empty -> 400 'Bad params'", "cite": "netlify/functions/pdf.ts:16,18; netlify/functions/_shared/db.ts:124-128" },
+    { "name": "slide", "type": "integer (string in query)", "required": true, "parse": "Number(p.get('slide')); Number.isInteger && > 0", "default": null, "bounds": ">= 1", "invalidBehaviour": "400 'Bad params'", "cite": "netlify/functions/pdf.ts:17-18" },
+    { "name": "v", "type": "integer (string in query)", "required": false, "parse": "Number(p.get('v')); version = Number.isInteger(v) && v >= 1 ? v : 1; then readSlideImage treats version >= 2 as refined", "default": 1, "bounds": "none", "invalidBehaviour": "invalid/0/absent -> version 1 (original), never an error", "cite": "netlify/functions/pdf.ts:21-23; netlify/functions/_shared/blobs.ts:40-45" }
+  ],
+  "request": { "contentType": "none", "parse": "Body never read.", "fields": [], "unknownFields": "n/a (unknown query params ignored)" },
+  "checkOrder": [
+    "1. requireUser",
+    "2. deckId present, slide positive integer (400 'Bad params')",
+    "3. ownsDeck (403 'Not your deck')",
+    "4. readSlideImage(deckId, slide, version): new key then legacy variant_A key (404 'Image not found')",
+    "5. pdf-lib: create doc, embedPng, one page sized [png.width, png.height], image drawn full-bleed at 0,0",
+    "6. fire-and-forget incrementExportCounts",
+    "7. 200 application/pdf"
+  ],
+  "responses": [
+    {
+      "status": 200,
+      "contentType": "application/pdf",
+      "headers": { "content-type": "application/pdf", "content-disposition": "attachment; filename=\"slide_<slide>.pdf\"" },
+      "when": "slide PNG exists",
+      "bodyShape": "single-page PDF (pdf-lib), page size in PDF points equal to the PNG pixel dimensions, PNG drawn full-bleed. <slide> in filename is the parsed Number, e.g. slide=01 -> slide_1.pdf. NO cache-control header (deliberate, so every download hits the function and is counted).",
+      "example": "<binary, starts with %PDF>",
+      "cite": "netlify/functions/pdf.ts:26-30,32-42"
+    }
+  ],
+  "errors": [
+    { "status": 401, "body": { "error": "Missing bearer token" }, "when": "no/invalid Authorization header", "cite": "netlify/functions/_shared/http.ts:20-24" },
+    { "status": 401, "body": { "error": "Invalid or expired session" }, "when": "Supabase rejects token", "cite": "netlify/functions/_shared/auth.ts:22-23" },
+    { "status": 500, "body": { "error": "DEV_SECRET_KEY set but DEV_USER_ID missing" }, "when": "dev bypass misconfigured", "cite": "netlify/functions/_shared/auth.ts:16-18" },
+    { "status": 400, "body": { "error": "Bad params" }, "when": "deckId missing or slide not a positive integer", "cite": "netlify/functions/pdf.ts:18" },
+    { "status": 403, "body": { "error": "Not your deck" }, "when": "deck missing or not owned", "cite": "netlify/functions/pdf.ts:19" },
+    { "status": 404, "body": { "error": "Image not found" }, "when": "no PNG at new or legacy key for that version", "cite": "netlify/functions/pdf.ts:23-24" },
+    { "status": 500, "body": { "error": "Internal error" }, "when": "non-UUID deckId (Postgres cast error), blob/DB failure, or pdf-lib embedPng throws because the stored bytes are not a PNG", "cite": "netlify/functions/_shared/http.ts:14-18; netlify/functions/pdf.ts:27" }
+  ],
+  "sideEffects": ["void incrementExportCounts(userId, deckId) -> Supabase rpc 'increment_export_counts' (errors logged, not surfaced)"],
+  "externalCalls": ["Supabase", "Netlify Blobs 'deck-images'. No paid API."],
+  "quirks": [
+    "No cache-control header on purpose (pdf.ts:32-34 comment) - docs/api.md claims 'cache-control: private, max-age=3600', which is wrong.",
+    "Unlike /api/image, the PDF is built from the RAW stored PNG; tile slides are NOT composited with the brand master here (pdf.ts uses readSlideImage, not image.ts compositeIfTile). The frontend works around this by building tile PDFs client-side (src/lib/pdfDownload.ts:178-184).",
+    "v validation differs from /api/image: v>=1 accepted, else 1; both end up treating v>=2 as refined (pdf.ts:22; blobs.ts:41).",
+    "Counts as an export (increment_export_counts) on every successful call.",
+    "No method check."
+  ],
+  "beforeAnyState": "Deck owned but slide not yet rendered -> 404 'Image not found'. Deck row missing -> 403.",
+  "tests": [ { "file": "none", "asserts": "No unit test covers pdf.ts (grep of netlify/functions/_tests for '../pdf' finds nothing)." } ],
+  "callers": [
+    { "who": "frontend", "where": "src/lib/api.ts:291-297 (downloadSlidePdf) called from src/lib/pdfDownload.ts:186-188 (exportSlideToPdf)", "expects": "res.ok -> blob; any non-2xx -> throws 'PDF download failed' and the caller silently falls back to client-side jsPDF assembly from /api/image. Not called for tile slides." }
+  ],
+  "docs": {
+    "openapi": "absent - /api/pdf is not in public/openapi.yaml.",
+    "postman": "docs/postman_collection.json:390-406 (2.11, deckId+slide+v=1) - matches.",
+    "apiMd": "docs/api.md:1388-1414 - says cache-control: private, max-age=3600 is returned; code sends no cache-control (pdf.ts:36-42). Otherwise matches."
+  },
+  "planSection65": "Row '/api/pdf (GET ?deckId=&slide=&v=) ... application/pdf' - accurate. Add content-disposition 'attachment; filename=\"slide_<n>.pdf\"', no cache-control, error strings, and that PDF content is the raw (non-composited) PNG."
+}

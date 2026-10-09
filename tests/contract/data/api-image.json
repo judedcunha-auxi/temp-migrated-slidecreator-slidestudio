@@ -1,0 +1,87 @@
+{
+  "route": "/api/image",
+  "handler": "netlify/functions/image.ts",
+  "netlifyRouting": "netlify.toml:12-15 rewrites /api/* -> /.netlify/functions/:splat (status 200); no config.path export in image.ts",
+  "methods": ["GET"],
+  "methodHandling": {
+    "otherMethods": "Not checked. Any method (POST, PUT, DELETE, ...) is handled exactly like GET; the body is never read.",
+    "cite": "netlify/functions/image.ts:65-94 (no req.method check)"
+  },
+  "auth": {
+    "kind": "requireUser",
+    "cite": "netlify/functions/image.ts:67; netlify/functions/_shared/auth.ts:9-25",
+    "notes": "Auth runs first, before query validation. Bearer header regex /^Bearer\\s+(.+)$/i (_shared/http.ts:20-25). DEV_SECRET_KEY bypass when token === env DEV_SECRET_KEY (_shared/auth.ts:14-20). Otherwise Supabase adminClient().auth.getUser(token) (_shared/auth.ts:22-24)."
+  },
+  "query": [
+    { "name": "deckId", "type": "string", "required": true, "parse": "searchParams.get('deckId'); empty string treated as missing", "default": null, "bounds": "no format check; a non-UUID string reaches ownsDeck -> Postgres uuid cast error -> 500", "invalidBehaviour": "missing/empty -> 400 {\"error\":\"Bad params\"}; non-UUID -> 500 {\"error\":\"Internal error\"}", "cite": "netlify/functions/image.ts:69,71; netlify/functions/_shared/db.ts:124-128" },
+    { "name": "slide", "type": "integer (string in query)", "required": true, "parse": "Number(p.get('slide')); must satisfy Number.isInteger && > 0. Number(null)=0 and Number('')=0 are rejected; '1.0' and ' 2' are accepted (Number coercion)", "default": null, "bounds": ">= 1, no upper bound", "invalidBehaviour": "400 {\"error\":\"Bad params\"}", "cite": "netlify/functions/image.ts:70-71" },
+    { "name": "v", "type": "integer (string in query)", "required": false, "parse": "Number(p.get('v')); refined iff Number.isInteger(v) && v >= 2", "default": "absent/0/1/non-numeric/fractional -> original render (v1 key)", "bounds": "none; v>=2 selects refine key slide_N_vV.png", "invalidBehaviour": "never an error; invalid values silently fall back to the original image", "cite": "netlify/functions/image.ts:74-79" },
+    { "name": "<any other, e.g. variant>", "type": "any", "required": false, "parse": "ignored (frontend tests and old URLs pass variant=A)", "default": null, "bounds": null, "invalidBehaviour": "ignored", "cite": "netlify/functions/image.ts:68-74; netlify/functions/_tests/image.test.ts:26" }
+  ],
+  "request": {
+    "contentType": "none",
+    "parse": "Body never read.",
+    "fields": [],
+    "unknownFields": "n/a"
+  },
+  "checkOrder": [
+    "1. requireUser (401/500)",
+    "2. deckId present and slide positive integer (400 'Bad params')",
+    "3. ownsDeck(userId, deckId) (403 'Not your deck'; DB error incl. non-UUID deckId -> 500)",
+    "4. v -> key: refined (v>=2) 'deck/{deckId}/slide_{n}_v{v}.png' else 'deck/{deckId}/slide_{n}.png'; fallback legacy 'deck/{deckId}/slide_{n}_variant_A[_v{v}].png'",
+    "5. no bytes in either key -> 404 'Image not found'",
+    "6. compositeIfTile (best effort, never errors)",
+    "7. 200 image/png"
+  ],
+  "responses": [
+    {
+      "status": 200,
+      "contentType": "image/png",
+      "headers": { "content-type": "image/png", "cache-control": "private, max-age=3600" },
+      "when": "image blob exists under the new or legacy key",
+      "bodyShape": "raw PNG bytes. For non-tile slides: the stored blob verbatim (whatever size gpt-image produced). For workzone tile slides with a resolvable brand master: a 2560x1440 PNG = brand 'master' PNG resized (fit:fill) to 2560x1440, with the tile resized (fit:fill) to the workzone rect (round(left*2560), round(top*1440), round(width*2560) x round(height*1440)) and its white background knocked out, composited on top.",
+      "example": "<binary PNG, starts with 89 50 4E 47>",
+      "cite": "netlify/functions/image.ts:12-13,18-63,85-90"
+    }
+  ],
+  "errors": [
+    { "status": 401, "body": { "error": "Missing bearer token" }, "when": "no Authorization header or not 'Bearer <x>'", "cite": "netlify/functions/_shared/http.ts:20-24" },
+    { "status": 401, "body": { "error": "Invalid or expired session" }, "when": "Supabase getUser fails or returns no user", "cite": "netlify/functions/_shared/auth.ts:22-23" },
+    { "status": 500, "body": { "error": "DEV_SECRET_KEY set but DEV_USER_ID missing" }, "when": "token equals DEV_SECRET_KEY but DEV_USER_ID unset", "cite": "netlify/functions/_shared/auth.ts:16-18" },
+    { "status": 400, "body": { "error": "Bad params" }, "when": "deckId missing/empty, or slide not a positive integer", "cite": "netlify/functions/image.ts:71" },
+    { "status": 403, "body": { "error": "Not your deck" }, "when": "deck does not exist or is owned by someone else (indistinguishable)", "cite": "netlify/functions/image.ts:72; netlify/functions/_shared/db.ts:124-128" },
+    { "status": 404, "body": { "error": "Image not found" }, "when": "no blob at the versioned key nor the legacy key (incl. slide still generating, version never rendered, slide number out of range)", "cite": "netlify/functions/image.ts:80-81" },
+    { "status": 500, "body": { "error": "Internal error" }, "when": "any non-HttpError: Supabase error (e.g. non-UUID deckId -> Postgres 22P02), blob store failure, missing SUPABASE_URL/SUPABASE_SERVICE_ROLE_KEY", "cite": "netlify/functions/_shared/http.ts:14-18; netlify/functions/_shared/db.ts:124-127; netlify/functions/_shared/config.ts:27-31" }
+  ],
+  "sideEffects": ["none (read only). Blob store 'deck-images' read; job store 'deck-jobs' read for tile compositing; brand-assets store read for master PNG."],
+  "externalCalls": ["Supabase (auth.getUser, decks select, brands/profiles via resolveBrandSource)", "Netlify Blobs", "sharp (local image processing). No paid API."],
+  "quirks": [
+    "No method check: POST/DELETE/etc. return the image like GET (image.ts:65-94).",
+    "Compositing is best-effort: any error (job state missing, brand unreadable, kit has no workzone or degenerate workzone, kit.masterKey falsy, src.brandId unset, master blob missing, sharp failure) returns the raw tile bytes with status 200 and the same headers (image.ts:24-62).",
+    "Compositing only triggers when job state slides[slide].isTile is true AND job state has brandId (image.ts:28-29). Always uses the 'master' (content/Layout) asset kind, keyed by the brand owner's id (src.assetOwnerId), never titleMaster/dividerMaster (image.ts:35-37).",
+    "Compositing requires kit.masterKey truthy but re-derives the blob key from owner+brandId; the kit's stored key string is not used (image.ts:35-36).",
+    "A composited response is always 2560x1440; a non-composited response has the stored PNG's native size.",
+    "Legacy key fallback: pre-variant-removal decks stored slide_N_variant_A.png / slide_N_variant_A_v{v}.png (image.ts:77-80; _shared/blobs.ts:19-25).",
+    "v=1 or omitted or invalid always reads the original key even if the slide's current version is >1; the caller must pass the current version (from /api/status imageUrl) to see refined renders.",
+    "Ownership 403 is checked before blob lookup, so an unknown deck yields 403 not 404.",
+    "Non-UUID deckId yields 500 'Internal error' (no UUID guard in ownsDeck), unlike brand routes which guard UUIDs (_shared/db.ts:189,228).",
+    "image.ts returns result.buffer (the underlying ArrayBuffer of the sharp Buffer) for composites (image.ts:58); for large PNGs this is a dedicated ArrayBuffer so bytes are correct.",
+    "Blob reads are eventually consistent; the frontend retries 404s (SlideImage.tsx/VariantCell.tsx comments) so a reimplementation must keep 404 (not 5xx) for not-yet-visible images."
+  ],
+  "beforeAnyState": "Deck row exists but no image yet (generating) -> 404 'Image not found'. Deck row absent -> 403 'Not your deck'. Job state absent -> raw bytes (no compositing).",
+  "tests": [
+    { "file": "netlify/functions/_tests/image.test.ts", "asserts": "200 + content-type image/png for owned deck; 404 when blob missing; 403 for non-owner. STALE TEST (verified 2026-10-08 with npx vitest run netlify/functions/_tests/image.test.ts): 'streams png bytes for an owned deck' (expected 200, got 500) and '404s when the blob is missing' (expected 404, got 500) FAIL. Root cause is the test harness, not the handler: the vi.mock of ../_shared/blobs (image.test.ts:12) returns only readImage and imageKey, so image.ts:79 calling legacyImageKey throws '[vitest] No \"legacyImageKey\" export is defined on the \"../_shared/blobs\" mock', caught by errorResponse -> 500. The mocked imageKey also has a stale 3-arg variant signature. The assertions themselves (200 image/png; 404 on missing blob) still match the handler and are valid oracle facts; only the mock is stale (it also lacks refineImageKey, legacyRefineImageKey, readJobState, readBrandAsset, brandAssetKey). '403s for a non-owner' passes (fails before key derivation)." }
+  ],
+  "callers": [
+    { "who": "frontend", "where": "src/components/SlideImage.tsx:10,68 (URL /api/image?deckId=&slide=&v=); src/components/VariantCell.tsx:14; src/lib/useAuthedImage (fetch with bearer, retries 404)", "expects": "200 PNG body; non-2xx treated as retryable then 'reload' affordance" },
+    { "who": "frontend", "where": "src/lib/pdfDownload.ts:21-40 (fetchSlideImage, 3 attempts), :176, :220 (client-side PDF fallback)", "expects": "200 PNG blob; reads natural width/height" },
+    { "who": "frontend", "where": "src/components/TilePreview.tsx (via tests TilePreview.test.tsx:30-96)", "expects": "PNG" },
+    { "who": "Auxi_Connector", "where": "C:/Github/Auxi_Connector/app/api/routes/forge.py:642-680 (_forge_image)", "expects": "Proxies GET with params deckId, slide, and v only when provided; any status >= 400 -> its own 502 'Image failed (<status>)'; on success re-serves resp.content with upstream content-type (default image/png) and its own cache-control 'private, max-age=3600'. Relies on content-type passthrough and 2xx/>=400 split only." }
+  ],
+  "docs": {
+    "openapi": "public/openapi.yaml:754-788 - matches (GET, deckId uuid required, slide integer>=1 required, v integer>=1 optional, 200 image/png with cache-control). Discrepancies: declares deckId format uuid but handler does not validate (non-UUID -> 500); documents no error responses (400/403/404/401/500 missing); does not mention that v=1/invalid silently serves the original.",
+    "postman": "docs/postman_collection.json:280-293 (2.5, deckId+slide) and :532-546 (4.5, v=2) - matches.",
+    "apiMd": "docs/api.md:440-470 - matches including tile compositing description."
+  },
+  "planSection65": "Row '/api/image (GET ?deckId=&slide=&v=) | image/png (master/tile composite), cache-control: private, max-age=3600' - accurate. Add: error bodies 400 'Bad params', 403 'Not your deck', 404 'Image not found'; no method check; composite is best-effort and 2560x1440."
+}

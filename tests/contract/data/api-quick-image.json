@@ -1,0 +1,43 @@
+{
+  "route": "/api/quick-image",
+  "handler": "netlify/functions/quick-image.ts",
+  "netlifyRouting": "netlify.toml:12-15 rewrites /api/* -> /.netlify/functions/:splat (status 200)",
+  "methods": ["GET"],
+  "methodHandling": { "otherMethods": "Not checked; any method behaves like GET.", "cite": "netlify/functions/quick-image.ts:5-27" },
+  "auth": { "kind": "requireUser", "cite": "netlify/functions/quick-image.ts:7", "notes": "Bearer header required, so a plain <img src> cannot load it; callers must fetch with the header." },
+  "query": [
+    { "name": "jobId", "type": "string", "required": true, "parse": "searchParams.get; any non-empty string", "default": null, "bounds": null, "invalidBehaviour": "missing/empty -> 400 'Bad params'", "cite": "netlify/functions/quick-image.ts:9, 11" },
+    { "name": "slide", "type": "integer", "required": true, "parse": "Number(p.get('slide')); must be Number.isInteger and > 0. Number(null) is 0 so missing -> 400. '1.0', '1e0', ' 1' all parse to 1 and are accepted; '1.5', 'abc', '0', '-1' -> 400.", "default": null, "bounds": ">= 1, no upper bound", "invalidBehaviour": "400 'Bad params'", "cite": "netlify/functions/quick-image.ts:10-11" }
+  ],
+  "request": { "contentType": "none", "parse": "Body not read.", "fields": [], "unknownFields": "Extra query params ignored." },
+  "checkOrder": ["1. requireUser (:7)", "2. params (:8-11)", "3. job exists -> 404 (:13-14)", "4. owner -> 403 (:15)", "5. status done -> else 404 (:16)", "6. blob exists -> else 404 (:18-19)", "7. 200 PNG (:21-24)"],
+  "responses": [
+    { "status": 200, "contentType": "image/png", "headers": { "content-type": "image/png", "cache-control": "private, max-age=3600" }, "when": "job done, owned, blob present", "bodyShape": "raw PNG bytes from deck-images store key quick/<jobId>/slide_<n>_variant_A.png", "example": "<binary PNG>", "cite": "netlify/functions/quick-image.ts:18-24, netlify/functions/_shared/blobs.ts:187-189" }
+  ],
+  "errors": [
+    { "status": 401, "body": { "error": "Missing bearer token" }, "when": "no bearer", "cite": "netlify/functions/_shared/http.ts:23" },
+    { "status": 401, "body": { "error": "Invalid or expired session" }, "when": "token rejected", "cite": "netlify/functions/_shared/auth.ts:23" },
+    { "status": 400, "body": { "error": "Bad params" }, "when": "jobId missing or slide not a positive integer", "cite": "netlify/functions/quick-image.ts:11" },
+    { "status": 404, "body": { "error": "Job not found" }, "when": "no job blob", "cite": "netlify/functions/quick-image.ts:14" },
+    { "status": 403, "body": { "error": "Not your job" }, "when": "job.userId !== caller", "cite": "netlify/functions/quick-image.ts:15" },
+    { "status": 404, "body": { "error": "Images not ready" }, "when": "job.status !== 'done' (pending or error)", "cite": "netlify/functions/quick-image.ts:16" },
+    { "status": 404, "body": { "error": "Image not found" }, "when": "slide blob missing (e.g. slide number beyond the deck)", "cite": "netlify/functions/quick-image.ts:19" },
+    { "status": 500, "body": { "error": "Internal error" }, "when": "Blobs failure", "cite": "netlify/functions/_shared/http.ts:14-18" }
+  ],
+  "sideEffects": [],
+  "externalCalls": [],
+  "quirks": [
+    "Blob key keeps the legacy '_variant_A' suffix (blobs.ts:187-189) even though variants are gone; a reimplementation reading migrated data must use this key shape.",
+    "The slide number is not checked against job.slides; existence is decided by the blob read alone.",
+    "Unlike /api/quick-status, an unknown jobId is 404 here.",
+    "The 'error' job status also yields 404 'Images not ready', even though partial images may exist in the store."
+  ],
+  "beforeAnyState": "404 {\"error\":\"Job not found\"}.",
+  "tests": [ { "file": "netlify/functions/_tests/quick-image.test.ts", "asserts": "200 + content-type image/png; 404 no job; 403 other owner; 404 pending; 404 missing blob; 400 no jobId. cache-control and error strings not asserted." } ],
+  "callers": [ { "who": "none in Slide-Creator src/ or Auxi_Connector", "where": "grep for '/api/quick-' finds no caller", "expects": "External API users; URLs come from /api/quick-status." } ],
+  "docs": {
+    "openapi": "public/openapi.yaml:519-546. 200 image/png with cache-control documented in description. Discrepancies: 400/403/404 responses undocumented; jobId documented as uuid but not validated.",
+    "postman": "docs/postman_collection.json '1.3 Fetch slide image (PNG)': matches."
+  },
+  "planSection65": "Row says `image/png`. Accurate; add cache-control 'private, max-age=3600'."
+}

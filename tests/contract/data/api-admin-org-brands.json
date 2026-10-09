@@ -1,0 +1,74 @@
+{
+  "route": "/api/admin-org-brands",
+  "handler": "netlify/functions/admin-org-brands.ts",
+  "netlifyRouting": "netlify.toml:12-15 rewrites /api/* -> /.netlify/functions/:splat (status 200)",
+  "methods": ["GET", "POST", "DELETE"],
+  "methodHandling": { "otherMethods": "405 {\"error\":\"GET, POST or DELETE only\"} - but only after requireAdmin, so non-admins get 401/403 first.", "cite": "netlify/functions/admin-org-brands.ts:136" },
+  "auth": { "kind": "requireAdmin", "cite": "netlify/functions/admin-org-brands.ts:64", "notes": "First statement; the test asserts 403 before any DB access." },
+  "query": [
+    { "name": "domain", "type": "string", "required": "DELETE: one of domain|brandId", "parse": "trim().toLowerCase() only. NOT run through normalizeDomain: no '@' stripping, no format or public-provider check.", "default": null, "bounds": null, "invalidBehaviour": "Any string; deleting an unmapped domain still returns {ok:true}.", "cite": "netlify/functions/admin-org-brands.ts:120-126" },
+    { "name": "brandId", "type": "string", "required": "DELETE: one of domain|brandId", "parse": "used only if `domain` is absent/empty (domain wins when both given)", "default": null, "bounds": null, "invalidBehaviour": "not an org brand, or malformed id -> 404 'Organization brand not found'", "cite": "netlify/functions/admin-org-brands.ts:121, 127-132" }
+  ],
+  "request": {
+    "contentType": "POST: application/json (header not checked)",
+    "parse": "POST: `await req.json().catch(() => null)`; null (malformed JSON, empty body, JSON null, JSON 0/false/'') -> 400 'Invalid JSON body'. A JSON array or truthy primitive passes and fails the action check with 400 'action must be createBrand or addDomain'.",
+    "fields": [
+      { "name": "action", "type": "'createBrand' | 'addDomain'", "required": true, "default": null, "bounds": null, "validation": "anything else -> 400 'action must be createBrand or addDomain'", "cite": "netlify/functions/admin-org-brands.ts:92, 96, 115" },
+      { "name": "name (createBrand)", "type": "string", "required": true, "default": null, "bounds": "trimmed length 1..120", "validation": "non-string, blank or >120 after trim -> 400 'name is required (1-120 characters)'. Stored trimmed.", "cite": "netlify/functions/admin-org-brands.ts:16, 36-41" },
+      { "name": "brandId (addDomain)", "type": "string", "required": true, "default": null, "bounds": null, "validation": "non-string/empty -> 400 'brandId is required'; not an existing is_org brand (or a malformed id causing a Postgres error) -> 404 'Organization brand not found'. Checked BEFORE domain.", "cite": "netlify/functions/admin-org-brands.ts:43-49, 97" },
+      { "name": "domain (addDomain)", "type": "string", "required": true, "default": null, "bounds": "regex ^[a-z0-9-]+(\\.[a-z0-9-]+)+$ after trim, lowercase, one leading '@' stripped", "validation": "non-string -> 400 'domain is required'; regex fail -> 400 'Enter a bare domain like acme.com'; in the 24-entry public provider list -> 400 '<d> is a public email provider and can't be mapped to a brand'", "cite": "netlify/functions/admin-org-brands.ts:17, 21-34, 98" }
+    ],
+    "unknownFields": "Ignored."
+  },
+  "checkOrder": [
+    "1. requireAdmin (:64)",
+    "GET: brands + domains in parallel, then one count query per domain (:67-86)",
+    "POST: parse (:89-90) -> action -> createBrand: validName -> insertOrgBrand (:92-94); addDomain: requireOrgBrand -> normalizeDomain -> existing mapping lookup -> 200 same brand / 409 other brand / insert 201 (:96-113)",
+    "DELETE: domain first, else brandId (requireOrgBrand then delete), else 400 (:118-134)",
+    "other method: 405 (:136)"
+  ],
+  "responses": [
+    { "status": 200, "contentType": "application/json", "headers": {}, "when": "GET", "bodyShape": { "brands": "[{id, name, kit (raw jsonb), updatedAt, domains: [{domain, accounts:int}]}] all is_org brands ordered by name; domains ordered by domain" }, "example": { "brands": [ { "id": "0b8e...uuid", "name": "Acme", "kit": {}, "updatedAt": "2026-10-01T12:00:00Z", "domains": [ { "domain": "acme.com", "accounts": 3 } ] } ] }, "cite": "netlify/functions/admin-org-brands.ts:67-86" },
+    { "status": 201, "contentType": "application/json", "headers": {}, "when": "POST createBrand", "bodyShape": { "id": "uuid", "name": "string (trimmed)", "kit": "{} (always empty on create)", "isOrg": true }, "example": { "id": "0b8e1c2d-3e4f-4a5b-8c6d-7e8f9a0b1c2d", "name": "Acme", "kit": {}, "isOrg": true }, "cite": "netlify/functions/admin-org-brands.ts:93, netlify/functions/_shared/db.ts:275-283" },
+    { "status": 201, "contentType": "application/json", "headers": {}, "when": "POST addDomain, new mapping", "bodyShape": { "domain": "normalized domain", "brandId": "string" }, "example": { "domain": "acme.com", "brandId": "0b8e1c2d-3e4f-4a5b-8c6d-7e8f9a0b1c2d" }, "cite": "netlify/functions/admin-org-brands.ts:110-112" },
+    { "status": 200, "contentType": "application/json", "headers": {}, "when": "POST addDomain, domain already mapped to the SAME brand (idempotent)", "bodyShape": { "domain": "string", "brandId": "string" }, "example": { "domain": "acme.com", "brandId": "0b8e1c2d-3e4f-4a5b-8c6d-7e8f9a0b1c2d" }, "cite": "netlify/functions/admin-org-brands.ts:106" },
+    { "status": 200, "contentType": "application/json", "headers": {}, "when": "DELETE ?domain= (whether or not it was mapped) or DELETE ?brandId= of an existing org brand (domains cascade in DB)", "bodyShape": { "ok": true }, "example": { "ok": true }, "cite": "netlify/functions/admin-org-brands.ts:122-132" }
+  ],
+  "errors": [
+    { "status": 401, "body": { "error": "Missing bearer token" }, "when": "no bearer", "cite": "netlify/functions/_shared/http.ts:23" },
+    { "status": 401, "body": { "error": "Invalid or expired session" }, "when": "token rejected", "cite": "netlify/functions/_shared/auth.ts:23" },
+    { "status": 403, "body": { "error": "Admin access required" }, "when": "caller not admin", "cite": "netlify/functions/_shared/auth.ts:31" },
+    { "status": 400, "body": { "error": "Invalid JSON body" }, "when": "POST body unparseable or falsy JSON", "cite": "netlify/functions/admin-org-brands.ts:90" },
+    { "status": 400, "body": { "error": "name is required (1-120 characters)" }, "when": "createBrand bad name", "cite": "netlify/functions/admin-org-brands.ts:38" },
+    { "status": 400, "body": { "error": "brandId is required" }, "when": "addDomain brandId not a non-empty string", "cite": "netlify/functions/admin-org-brands.ts:44" },
+    { "status": 404, "body": { "error": "Organization brand not found" }, "when": "addDomain or DELETE ?brandId= for a missing/non-org/malformed id", "cite": "netlify/functions/admin-org-brands.ts:47" },
+    { "status": 400, "body": { "error": "domain is required" }, "when": "addDomain domain not a string", "cite": "netlify/functions/admin-org-brands.ts:29" },
+    { "status": 400, "body": { "error": "Enter a bare domain like acme.com" }, "when": "domain fails regex (e.g. an email address, single label)", "cite": "netlify/functions/admin-org-brands.ts:31" },
+    { "status": 400, "body": { "error": "gmail.com is a public email provider and can't be mapped to a brand" }, "when": "domain in PUBLIC_EMAIL_DOMAINS (message templated with the normalized domain)", "cite": "netlify/functions/admin-org-brands.ts:21-26, 32" },
+    { "status": 409, "body": { "error": "acme.com is already mapped to \"Other Brand\" — remove it there first" }, "when": "domain mapped to a different brand; the brand name comes from the brands(name) join, 'another brand' if unavailable. Note the em dash (U+2014).", "cite": "netlify/functions/admin-org-brands.ts:105-108" },
+    { "status": 400, "body": { "error": "action must be createBrand or addDomain" }, "when": "POST with any other action", "cite": "netlify/functions/admin-org-brands.ts:115" },
+    { "status": 400, "body": { "error": "domain or brandId required" }, "when": "DELETE with neither param", "cite": "netlify/functions/admin-org-brands.ts:133" },
+    { "status": 405, "body": { "error": "GET, POST or DELETE only" }, "when": "PUT/PATCH/etc. (after admin check)", "cite": "netlify/functions/admin-org-brands.ts:136" },
+    { "status": 500, "body": { "error": "Internal error" }, "when": "any Supabase error in GET, insert (incl. a unique-violation race on insert), lookup or delete", "cite": "netlify/functions/_shared/http.ts:14-18" }
+  ],
+  "sideEffects": [
+    "createBrand: inserts brands {user_id: calling admin, name, kit: {}, is_org: true} (db.ts:275-283). The creating admin's id becomes the blob namespace for the brand's assets.",
+    "addDomain: inserts org_brand_domains {domain, brand_id, created_by: admin} (admin-org-brands.ts:110).",
+    "DELETE ?domain: deletes from org_brand_domains (:123). DELETE ?brandId: deletes the brands row where is_org (:129); domain rows cascade (per the header comment :14). Blobs are not deleted."
+  ],
+  "externalCalls": [],
+  "quirks": [
+    "The createBrand 201 body includes `isOrg: true` (added in insertOrgBrand), although the handler's header comment says { id, name, kit }.",
+    "addDomain is idempotent for the same brand (200, not 201) and conflicts with 409 for another brand.",
+    "requireOrgBrand runs before domain validation, so a bad brandId with a bad domain yields 404, not 400.",
+    "DELETE ?domain= does not normalise like POST does (no '@' strip) and never 404s.",
+    "When both domain and brandId are given on DELETE, only the domain is removed.",
+    "GET `accounts` counts profiles.email ILIKE '%@<domain>' (a sign-up snapshot), not authoritative membership (:51-60). One count query per domain (N+1).",
+    "GET returns the raw kit jsonb, not normalised."
+  ],
+  "beforeAnyState": "GET with no org brands -> 200 {\"brands\": []}.",
+  "tests": [ { "file": "netlify/functions/_tests/admin-org-brands.test.ts", "asserts": "normalizeDomain: trims/lowercases/strips '@'; rejects non-domains and emails; refuses public providers. Handler: 403 for non-admins before DB; createBrand 201 owned by the calling admin; addDomain 201; 409 when mapped to a different brand; 404 when the brand is not an org brand; 400 on unknown action." } ],
+  "callers": [ { "who": "frontend", "where": "src/lib/api.ts:383-401 (listOrgBrands GET, createOrgBrand POST createBrand, addOrgBrandDomain POST addDomain, removeOrgBrandDomain DELETE ?domain=, deleteOrgBrand DELETE ?brandId=)", "expects": "GET {brands: OrgBrandSummary[]} with updatedAt and domains[].accounts; createBrand {id, name}; addDomain {domain, brandId}; DELETE {ok}. Errors surfaced via body.error (src/lib/api.ts:14-19)." } ],
+  "docs": { "openapi": "absent from public/openapi.yaml", "postman": "absent from docs/postman_collection.json" },
+  "planSection65": "Row says `DELETE ?domain=&brandId=` and `201 {domain, brandId} / brand; {ok:true}`. Corrections: DELETE takes ?domain= OR ?brandId= (domain wins if both); addDomain returns 200 when already mapped to the same brand; createBrand 201 body is {id, name, kit:{}, isOrg:true}; plus 405 for other methods."
+}

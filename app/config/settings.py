@@ -22,6 +22,7 @@ from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from app.config.ai import AISettings, ai_settings, check_ai_config, check_ai_production
+from app.config.darwin import DarwinSettings, check_darwin_config, darwin_settings
 from app.config.engine import EngineSettings, check_engine_config, check_engine_production, engine_settings
 from app.config.storyline import check_storyline_config, storyline_settings
 
@@ -34,6 +35,10 @@ PRODUCTION_ENVIRONMENTS = frozenset({"production", "prod", "staging"})
 NON_PRODUCTION_ENVIRONMENTS = frozenset({"development", "dev", "local", "test"})
 
 STORAGE_BACKENDS = ("fake", "local", "general")
+
+# Token signature algorithms the service will verify. Asymmetric only: a shared secret
+# (HS*) would let anyone holding it mint tokens, and "none" is no signature at all.
+AUTH_ALGORITHMS = frozenset({"RS256", "RS384", "RS512", "PS256", "PS384", "PS512", "ES256", "ES384", "ES512"})
 
 # An HTTP header name (RFC 9110 token), kept to the characters a gateway would use.
 _HEADER_NAME = re.compile(r"^[A-Za-z0-9-]{1,64}$")
@@ -90,6 +95,25 @@ class Settings(BaseSettings):
     # outside it. Empty: <system temp>/slideforge-scratch. Must be absolute if set.
     scratch_root: str = ""
 
+    # Who signs the bearer tokens Darwin's /api routes accept (app/core/auth.py). The real
+    # issuer is open (decisions D7/D8), so this is a plain JWKS-verified JWT: the issuer
+    # (`iss`), the audience (`aud`) and where its public keys are published. All three are
+    # required in production. There is no DEV_SECRET_KEY bypass (plan §4.3): development
+    # and tests use their own issuer and keys.
+    auth_issuer: str = ""
+    auth_audience: str = ""
+    auth_jwks_url: str = ""
+    # Signature algorithms accepted, comma separated. Asymmetric only: never HS* or none.
+    auth_algorithms: str = "RS256"
+    # How long fetched signing keys are reused before the JWKS is read again.
+    auth_jwks_cache_s: int = 600
+    # Clock skew tolerated on exp / nbf / iat, in seconds.
+    auth_leeway_s: int = 30
+
+    # Job worker loops this process runs alongside the API (app/core/darwin/runtime.py).
+    # 0 runs none: the jobs a route enqueues then wait for a worker process.
+    worker_concurrency: int = 0
+
     @field_validator("environment", "storage_backend")
     @classmethod
     def _normalise_environment(cls, value: str) -> str:
@@ -98,6 +122,10 @@ class Settings(BaseSettings):
     @property
     def cors_origins(self) -> list[str]:
         return [o.strip().rstrip("/") for o in self.cors_allowed_origins.split(",") if o.strip()]
+
+    @property
+    def auth_algorithm_list(self) -> list[str]:
+        return [a.strip() for a in self.auth_algorithms.split(",") if a.strip()]
 
 
 settings = Settings()
@@ -117,12 +145,13 @@ def is_production(s: Settings) -> bool:
     return bool(s.website_instance_id)
 
 
-def secret_values(s: Settings, ai: AISettings | None = None) -> list[str]:
+def secret_values(s: Settings, ai: AISettings | None = None, darwin: DarwinSettings | None = None) -> list[str]:
     """Every secret this process holds, for the log scrubber (core/logging_config).
     Nothing here is logged or returned anywhere else. `ai` defaults to the process's
-    AI settings (the provider keys)."""
+    AI settings (the provider keys), `darwin` to Darwin's (the OpenAI key)."""
     ai = ai if ai is not None else ai_settings
-    values: list[str] = [ai.anthropic_key, ai.gemini_key]
+    darwin = darwin if darwin is not None else darwin_settings
+    values: list[str] = [ai.anthropic_key, ai.gemini_key, darwin.openai_key]
     try:
         values.append(urlparse(s.redis_url).password or "")
     except ValueError:
@@ -151,7 +180,38 @@ def _origin_problem(origin: str, production: bool) -> str | None:
     return None
 
 
-def check_config(s: Settings, engine: EngineSettings | None = None, ai: AISettings | None = None) -> list[str]:
+def _auth_problems(s: Settings, production: bool) -> list[str]:
+    problems: list[str] = []
+    algorithms = s.auth_algorithm_list
+    if not algorithms or any(a not in AUTH_ALGORITHMS for a in algorithms):
+        problems.append(f"AUTH_ALGORITHMS must list only asymmetric algorithms from {sorted(AUTH_ALGORITHMS)}.")
+    if s.auth_jwks_cache_s < 0 or s.auth_jwks_cache_s > 86_400:
+        problems.append("AUTH_JWKS_CACHE_S must be between 0 and 86400.")
+    if s.auth_leeway_s < 0 or s.auth_leeway_s > 300:
+        problems.append("AUTH_LEEWAY_S must be between 0 and 300.")
+    if s.auth_jwks_url:
+        try:
+            jwks = urlparse(s.auth_jwks_url)
+        except ValueError:
+            jwks = urlparse("")
+        if jwks.scheme not in ("http", "https") or not jwks.netloc:
+            problems.append("AUTH_JWKS_URL must be an http(s) URL.")
+        elif production and jwks.scheme != "https":
+            problems.append("AUTH_JWKS_URL must use https in production.")
+    if production:
+        for name, value in (("AUTH_ISSUER", s.auth_issuer), ("AUTH_AUDIENCE", s.auth_audience),
+                            ("AUTH_JWKS_URL", s.auth_jwks_url)):
+            if not value:
+                problems.append(f"{name} is empty in production; no bearer token could be verified.")
+    return problems
+
+
+def check_config(
+    s: Settings,
+    engine: EngineSettings | None = None,
+    ai: AISettings | None = None,
+    darwin: DarwinSettings | None = None,
+) -> list[str]:
     """Return the configuration problems in `s`, the engine and the AI settings (empty means all good).
 
     `engine` defaults to the process's `SLIDE_ENGINE_*` settings (app/config/engine.py) and `ai` to
@@ -202,6 +262,10 @@ def check_config(s: Settings, engine: EngineSettings | None = None, ai: AISettin
             problems.append("GENERAL_SERVICE_URL must use https in production.")
     if s.scratch_root and not Path(s.scratch_root).is_absolute():
         problems.append("SCRATCH_ROOT must be an absolute path.")
+    if not 0 <= s.worker_concurrency <= 32:
+        problems.append("WORKER_CONCURRENCY must be between 0 and 32.")
+    problems.extend(_auth_problems(s, production))
+    problems.extend(check_darwin_config(darwin if darwin is not None else darwin_settings, production))
 
     # --- the AI features (app/config/ai.py) -------------------------------------
     ai = ai if ai is not None else ai_settings

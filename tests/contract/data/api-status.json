@@ -1,0 +1,49 @@
+{
+  "route": "/api/status",
+  "handler": "netlify/functions/status.ts",
+  "netlifyRouting": "netlify.toml:12-15",
+  "methods": ["GET"],
+  "methodHandling": { "otherMethods": "Not checked; any method behaves like GET.", "cite": "status.ts:7-38" },
+  "auth": { "kind": "requireUser", "cite": "status.ts:9; _shared/auth.ts:9-25", "notes": "Auth before deckId check." },
+  "query": [
+    { "name": "deckId", "type": "string", "required": true, "parse": "searchParams.get('deckId')", "default": null, "bounds": "UUID in practice", "invalidBehaviour": "missing/empty -> 400 'deckId is required'; non-UUID -> Postgres error in ownsDeck -> 500 'Internal error'; unknown/foreign UUID -> 403 'Not your deck'", "cite": "status.ts:10-12; _shared/db.ts:124-128" }
+  ],
+  "request": { "contentType": "none", "parse": "No body read.", "fields": [], "unknownFields": "Unknown query params ignored." },
+  "checkOrder": ["1. requireUser", "2. deckId present (400)", "3. ownsDeck (403)", "4. readJobState (blob 'deck-jobs' job/{deckId}.json, normalized from legacy {A,B} shape)", "5. no state -> starting body", "6. build per-slide view"],
+  "responses": [
+    { "status": 200, "contentType": "application/json", "headers": {}, "when": "deck owned but no job-state blob yet", "bodyShape": { "deckId": "string", "slides": "{} (empty object)", "progress": "'Starting…' (U+2026 ellipsis)", "done": false }, "example": { "deckId": "dk", "slides": {}, "progress": "Starting…", "done": false }, "cite": "status.ts:15. Note: NO masterApplied / masterSkipReason keys in this branch." },
+    { "status": 200, "contentType": "application/json", "headers": {}, "when": "job state exists", "bodyShape": { "deckId": "string", "slides": { "<slideNumber as string key>": { "status": "'idle'|'generating'|'done'|'error' (key omitted if undefined in blob)", "error": "string — key present only when set", "url": "'/api/image?deckId={deckId}&slide={n}&v={current}' — key present ONLY when status==='done' (otherwise omitted, never null)", "current": "integer: vs.current, else max(versions.v), else vs.version, else 1", "versions": "[{v:int, instruction:string|null}] — stored versions; or synthesized [{v:1,instruction:null}] for a done slide without versions; [] otherwise" } }, "progress": "'Generated {doneCount} of {totalSlides} slides…'", "done": "boolean: every slide status is 'done' or 'error' (true for zero slides)", "masterApplied": "boolean (!!state.masterUsed)", "masterSkipReason": "'no-brand'|'no-master-uploaded'|'blob-unavailable'|'load-error' — key omitted when undefined (never null)" }, "example": { "deckId": "3fa85f64-5717-4562-b3fc-2c963f66afa6", "slides": { "1": { "status": "done", "url": "/api/image?deckId=3fa85f64-5717-4562-b3fc-2c963f66afa6&slide=1&v=2", "current": 2, "versions": [ { "v": 1, "instruction": null }, { "v": 2, "instruction": "fewer words" } ] }, "2": { "status": "generating", "current": 1, "versions": [] }, "3": { "status": "error", "error": "Image generation failed", "current": 1, "versions": [] } }, "progress": "Generated 1 of 3 slides…", "done": false, "masterApplied": true }, "cite": "status.ts:17-34; _shared/jobState.ts:48-50,85-93,97-107,123-130" }
+  ],
+  "errors": [
+    { "status": 401, "body": { "error": "Missing bearer token" }, "when": "no bearer", "cite": "_shared/http.ts:20-25" },
+    { "status": 401, "body": { "error": "Invalid or expired session" }, "when": "bad token", "cite": "_shared/auth.ts:22-23" },
+    { "status": 400, "body": { "error": "deckId is required" }, "when": "missing deckId", "cite": "status.ts:11; _tests/status.test.ts:41-45" },
+    { "status": 403, "body": { "error": "Not your deck" }, "when": "not owned / not found", "cite": "status.ts:12; _tests/status.test.ts:35-40" },
+    { "status": 500, "body": { "error": "Internal error" }, "when": "non-UUID deckId, DB/Blobs failure", "cite": "_shared/http.ts:14-18" }
+  ],
+  "sideEffects": ["None (read-only)."],
+  "externalCalls": ["Supabase decks (ownership), Netlify Blobs 'deck-jobs' (_shared/blobs.ts:55-60)"],
+  "quirks": [
+    "Slide-map keys are strings (Object.entries).",
+    "`url`, `error`, `status` and `masterSkipReason` are OMITTED (not null) when undefined, because JSON.stringify drops undefined. openapi/api.md show null.",
+    "The pre-state body has no masterApplied key.",
+    "Legacy blobs storing {A:{...},B:{...}} per slide are collapsed to A on read (_shared/jobState.ts:59-73).",
+    "The url's v uses currentVersion, so a reverted slide's url points at the reverted version.",
+    "A phantom slide can appear after /api/refine on a slide number that does not exist in the deck (refine.ts:35-36 inserts it into the job state), changing the progress total.",
+    "Each call does one Supabase query + one Blobs read; polled every 2s by the frontend."
+  ],
+  "beforeAnyState": "{\"deckId\":\"<id>\",\"slides\":{},\"progress\":\"Starting…\",\"done\":false} (status.ts:15).",
+  "tests": [
+    { "file": "netlify/functions/_tests/status.test.ts", "asserts": "403 non-owner (35-40); 400 missing deckId (41-45). STALE TEST — DO NOT USE AS ORACLE: 'returns job state + progress + image urls for an owned deck' (22-34) mocks readJobState with the legacy {A,B} per-slide shape (bypassing normalizeJobState, which lives in the mocked blobs module) and expects slides['1'].A.url === '/api/image?deckId=dk&slide=1&variant=A&v=1'. It FAILS today (TypeError reading 'url'). The handler code is the truth: the current url format has no variant param and the slide view is flat." }
+  ],
+  "callers": [
+    { "who": "frontend", "where": "src/lib/api.ts:167-169 (getStatus) polled by src/lib/useDeckStatus.ts:11-46 every 2s until done:true (unless forcePolling)", "expects": "done, slides[n].status/url/current/versions/error, masterApplied, masterSkipReason" },
+    { "who": "Auxi_Connector", "where": "app/api/routes/forge.py:614-636 (/forge/status) — passes the JSON through unchanged to the panel; _report_outcomes (forge.py:575-611) reads slides[n].status=='error', slides[n].current, slides[n].error, top-level error, done", "expects": "status < 400 else 502 'Status failed (<code>).'; body identical (it is relayed verbatim)" }
+  ],
+  "docs": {
+    "openapi": "public/openapi.yaml:694-751. Discrepancies: example progress 'Generated 1 of 3' lacks the ' slides…' suffix; url shown as null for non-done slides (actually omitted); masterSkipReason null (actually omitted); example url '/api/image?deckId=3fa85f64&slide=1' lacks &v=; pre-state response (no masterApplied) undocumented; non-done example slides omit current/versions which are always present.",
+    "postman": "'2.4 Poll deck status' — test script only checks `done` and slide count; consistent.",
+    "apiMd": "docs/api.md:380 (same null/progress-format discrepancies)"
+  },
+  "planSection65": "Row '{deckId, slides, progress, done, masterApplied, masterSkipReason}' — accurate for the state-exists case; add the pre-state body {deckId, slides:{}, progress:'Starting…', done:false} without masterApplied, and that masterSkipReason/url/error are omitted rather than null."
+}

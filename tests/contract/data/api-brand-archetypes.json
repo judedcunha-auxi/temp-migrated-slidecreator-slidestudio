@@ -1,0 +1,60 @@
+{
+  "route": "/api/brand-archetypes",
+  "handler": "netlify/functions/brand-archetypes.ts",
+  "netlifyRouting": "netlify.toml:12-15 rewrites /api/* -> /.netlify/functions/:splat (status 200)",
+  "methods": ["POST"],
+  "methodHandling": { "otherMethods": "405 {\"error\":\"POST only\"} checked BEFORE requireUser (an unauthenticated GET gets 405, not 401)", "cite": "netlify/functions/brand-archetypes.ts:37-38" },
+  "auth": { "kind": "requireUser", "cite": "netlify/functions/brand-archetypes.ts:38", "notes": "Needs canEdit on the brand: 404 if unreachable, 403 if read-only org member." },
+  "query": [],
+  "request": {
+    "contentType": "application/json",
+    "parse": "`req.json().catch(() => null)`; malformed/empty -> body null -> 400 'brandId required'",
+    "fields": [
+      { "name": "brandId", "type": "string", "required": true, "default": null, "bounds": "UUID", "validation": "non-string/empty -> 400 'brandId required'", "cite": "netlify/functions/brand-archetypes.ts:40" },
+      { "name": "layouts", "type": "object {cover:int, divider:int, content:int}", "required": true, "default": null, "bounds": "each a non-negative integer; all three keys required", "validation": "parseArchetypeLayouts: non-object or any key missing/non-integer/negative -> 400 'layouts must map cover, divider and content to layout indices'. Extra keys ignored. Same index may be used for several archetypes.", "cite": "netlify/functions/brand-archetypes.ts:41-42; netlify/functions/_shared/furniture.ts:106-116" }
+    ],
+    "unknownFields": "ignored (top level and inside layouts)"
+  },
+  "checkOrder": ["1. method (405)", "2. requireUser (401)", "3. body/brandId (400)", "4. layouts (400)", "5. getBrandAccess -> 404 / 403", "6. read all 3 layout previews (404/422) before any write", "7. write masters", "8. rebuild furniture if furniture-all.json exists", "9. shallow-merge kit + update row"],
+  "responses": [
+    { "status": 200, "contentType": "application/json", "headers": {}, "when": "applied", "bodyShape": { "kit": { "archetypeLayouts": "{cover,divider,content}", "titleMasterKey": "brand/<ownerId>/<brandId>/titleMaster.png", "dividerMasterKey": "brand/<ownerId>/<brandId>/dividerMaster.png", "masterKey": "brand/<ownerId>/<brandId>/master.png", "furnitureKey": "only when furniture rebuilt with >=1 archetype", "furnitureArchetypes": "subset of cover/divider/content, in that order", "headingPlaceholders": "normalized per archetype" }, "furnitureRebuilt": "boolean" }, "example": { "kit": { "archetypeLayouts": { "cover": 0, "divider": 2, "content": 5 }, "titleMasterKey": "brand/owner1/b1/titleMaster.png", "dividerMasterKey": "brand/owner1/b1/dividerMaster.png", "masterKey": "brand/owner1/b1/master.png", "furnitureKey": "brand/owner1/b1/furniture.json", "furnitureArchetypes": ["cover", "divider", "content"], "headingPlaceholders": { "content": { "left": 0.05, "top": 0.05, "width": 0.9, "height": 0.12 } } }, "furnitureRebuilt": true }, "notes": "kit is only the PATCH that was applied (not the whole kit); already persisted.", "cite": "netlify/functions/brand-archetypes.ts:57-83; _tests/brand-archetypes.test.ts:49-79" }
+  ],
+  "errors": [
+    { "status": 405, "body": { "error": "POST only" }, "when": "non-POST (before auth)", "cite": "netlify/functions/brand-archetypes.ts:37" },
+    { "status": 401, "body": { "error": "Missing bearer token" }, "when": "no bearer", "cite": "netlify/functions/_shared/http.ts:20-25" },
+    { "status": 401, "body": { "error": "Invalid or expired session" }, "when": "bad token", "cite": "netlify/functions/_shared/auth.ts:22-23" },
+    { "status": 400, "body": { "error": "brandId required" }, "when": "bad/missing body or brandId", "cite": "netlify/functions/brand-archetypes.ts:40" },
+    { "status": 400, "body": { "error": "layouts must map cover, divider and content to layout indices" }, "when": "bad layouts", "cite": "netlify/functions/brand-archetypes.ts:42; _tests/brand-archetypes.test.ts:105-107" },
+    { "status": 404, "body": { "error": "Brand not found" }, "when": "unreachable brand", "cite": "netlify/functions/brand-archetypes.ts:45; _tests/brand-archetypes.test.ts:108" },
+    { "status": 403, "body": { "error": "Organization brands can only be edited by an admin" }, "when": "read-only member", "cite": "netlify/functions/brand-archetypes.ts:46; _tests/brand-archetypes.test.ts:99-102" },
+    { "status": 404, "body": { "error": "No rendered layout at index <n> — re-import the template" }, "when": "a chosen layout-preview blob is missing (em dash U+2014); no writes happen", "cite": "netlify/functions/brand-archetypes.ts:52; _tests/brand-archetypes.test.ts:91-97" },
+    { "status": 422, "body": { "error": "Rendered layout is not a PNG" }, "when": "stored preview lacks PNG magic", "cite": "netlify/functions/brand-archetypes.ts:54" },
+    { "status": 500, "body": { "error": "Internal error" }, "when": "blob/DB failure, or furniture-all.json is not valid JSON (JSON.parse throws)", "cite": "netlify/functions/brand-archetypes.ts:67; netlify/functions/_shared/http.ts:14-18" }
+  ],
+  "sideEffects": [
+    "Copies layout-preview-<i>.png -> titleMaster.png / dividerMaster.png / master.png under brand/<ownerId>/<brandId>/ (brand-archetypes.ts:58-62)",
+    "If brand/<ownerId>/<brandId>/furniture-all.json exists and has layoutsByIndex: rewrites furniture.json from the chosen indices (media pruned) (brand-archetypes.ts:66-77; furniture.ts:67-89)",
+    "Updates brands.kit = {...storedKit, ...patch} (shallow, no validation) + updated_at (brand-archetypes.ts:80-81)"
+  ],
+  "externalCalls": ["Supabase, Netlify Blobs; no paid APIs"],
+  "quirks": [
+    "Method check precedes auth (405 without a token) - opposite of /api/brands and /api/brand-pptx.",
+    "Not atomic: master blobs are written before the furniture rebuild and kit update; a later failure leaves masters overwritten.",
+    "furnitureRebuilt is true whenever furniture-all.json had layoutsByIndex, even if no chosen index existed in it (archetypes empty) - in that case no furniture fields are in kit and furniture.json is untouched.",
+    "Brands imported before per-layout capture (no furniture-all.json) -> furnitureRebuilt:false, existing furniture kept.",
+    "Response kit holds full canonical key strings (not `true`)."
+  ],
+  "beforeAnyState": "Before a PPTX import with brandId (no layout previews) -> 404 'No rendered layout at index <cover index> — re-import the template' (the three reads run concurrently in Promise.all, so <n> is whichever missing read rejects first - nondeterministic when several are missing).",
+  "tests": [
+    { "file": "netlify/functions/_tests/brand-archetypes.test.ts", "asserts": "masters copied under brand owner; furniture.json rebuilt + kit patch returned; merge over stored kit; legacy brands keep furniture; fails before writing when a preview is missing (404); 403 read-only member; 404 unreachable; 400 bad mapping" }
+  ],
+  "callers": [
+    { "who": "frontend", "where": "src/lib/api.ts:189-195 (applyArchetypeLayouts); src/pages/BrandEditorPage.tsx:127", "expects": "{kit, furnitureRebuilt}; merges kit into editor state" }
+  ],
+  "docs": {
+    "openapi": "absent (no /api/brand-archetypes path in public/openapi.yaml)",
+    "postman": "absent",
+    "apiMd": "docs/api.md:915-967 (documents errors 400/403/404/422)"
+  },
+  "planSection65": "Row: 'POST {brandId, layouts} -> {kit, furnitureRebuilt}'. Accurate. Add: 405 precedes auth; non-atomic writes."
+}

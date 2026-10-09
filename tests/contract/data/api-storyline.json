@@ -1,0 +1,74 @@
+{
+  "route": "/api/storyline",
+  "handler": "netlify/functions/storyline.ts",
+  "netlifyRouting": "netlify.toml:12-15 rewrites /api/* -> /.netlify/functions/:splat (status 200). Background worker: netlify/functions/storyline-background.ts (config type 'background', storyline-background.ts:49) reached via POST {origin}/.netlify/functions/storyline-background (_shared/trigger.ts:35-41).",
+  "methods": ["POST"],
+  "methodHandling": {
+    "otherMethods": "Method is never checked. GET/HEAD requests have no body, so req.json() throws SyntaxError -> 500 {\"error\":\"Internal error\"} (after auth). Any other method with a valid JSON body behaves exactly like POST.",
+    "cite": "storyline.ts:8-24; _shared/http.ts:14-18"
+  },
+  "auth": {
+    "kind": "requireUser",
+    "cite": "storyline.ts:10; _shared/auth.ts:9-25",
+    "notes": "Auth runs first, before body parse. Missing/non-Bearer Authorization -> 401 'Missing bearer token' (_shared/http.ts:20-25). Token equal to DEV_SECRET_KEY -> dev user (DEV_USER_ID; 500 'DEV_SECRET_KEY set but DEV_USER_ID missing' if unset) (_shared/auth.ts:14-20). Otherwise Supabase auth.getUser; failure -> 401 'Invalid or expired session' (_shared/auth.ts:22-23)."
+  },
+  "query": [],
+  "request": {
+    "contentType": "application/json (content-type header not checked; body parsed with req.json())",
+    "parse": "const inputs = await req.json() (storyline.ts:11). Malformed/empty JSON -> SyntaxError -> errorResponse -> 500 {\"error\":\"Internal error\"}. JSON null or a non-object -> inputs?.topic falsy -> 400 'Topic is required'.",
+    "fields": [
+      { "name": "topic", "type": "string", "required": true, "default": null, "bounds": "none (no length cap)", "validation": "truthy check only: !inputs?.topic -> 400 'Topic is required' (any truthy value, e.g. a number, passes)", "cite": "storyline.ts:12" },
+      { "name": "numSlides", "type": "number", "required": false, "default": null, "bounds": ">= 1, no upper cap (cap removed)", "validation": "inputs.numSlides < 1 -> 400 'Slides must be at least 1'. JS comparison: missing/undefined passes (undefined < 1 is false); null, 0, negatives, '0', false and '' fail; non-numeric strings like 'abc' pass (NaN < 1 false).", "cite": "storyline.ts:13-15; _tests/storyline.test.ts:33-45" },
+      { "name": "company, audience, style, brandId, primaryColor, accentColor, fontStyle, styleInstructions, context, keyMessages, language", "type": "WizardInputs (see _shared/anthropic.ts:12-32)", "required": false, "default": null, "bounds": "not validated in the foreground", "validation": "None in the foreground. Passed verbatim to the background as `inputs`; storyline-background uses inputs.brandId (resolveBrandKitRaw), inputs.styleInstructions, inputs.language; generateStoryline consumes the rest.", "cite": "storyline.ts:19; storyline-background.ts:20-26" }
+    ],
+    "unknownFields": "Ignored by validation but forwarded verbatim inside `inputs` to the background and echoed back in the storyline-status result.inputs (storyline-background.ts:31)."
+  },
+  "checkOrder": [
+    "1. requireUser (401/500)",
+    "2. req.json() (500 on malformed)",
+    "3. topic truthy (400 'Topic is required')",
+    "4. numSlides >= 1 (400 'Slides must be at least 1')",
+    "5. jobId = randomUUID(); writeStorylineJob(jobId, {status:'pending', userId})",
+    "6. triggerStorylineBackground({jobId, userId, inputs}, origin) — failures swallowed",
+    "7. 202 {jobId}"
+  ],
+  "responses": [
+    { "status": 202, "contentType": "application/json", "headers": {}, "when": "accepted", "bodyShape": { "jobId": "string (UUID v4 from node:crypto randomUUID)" }, "example": { "jobId": "3fa85f64-5717-4562-b3fc-2c963f66afa6" }, "cite": "storyline.ts:16-20; _shared/http.ts:7-12" }
+  ],
+  "errors": [
+    { "status": 401, "body": { "error": "Missing bearer token" }, "when": "no/invalid Authorization header format", "cite": "_shared/http.ts:20-25" },
+    { "status": 401, "body": { "error": "Invalid or expired session" }, "when": "Supabase rejects token", "cite": "_shared/auth.ts:22-23; _tests/storyline.test.ts:47-52" },
+    { "status": 500, "body": { "error": "DEV_SECRET_KEY set but DEV_USER_ID missing" }, "when": "dev bypass misconfigured", "cite": "_shared/auth.ts:17-18" },
+    { "status": 400, "body": { "error": "Topic is required" }, "when": "topic falsy or body null/non-object", "cite": "storyline.ts:12" },
+    { "status": 400, "body": { "error": "Slides must be at least 1" }, "when": "numSlides < 1", "cite": "storyline.ts:15; _tests/storyline.test.ts:40-45" },
+    { "status": 500, "body": { "error": "Internal error" }, "when": "malformed JSON body, Netlify Blobs write failure, any non-HttpError", "cite": "_shared/http.ts:14-18" }
+  ],
+  "sideEffects": [
+    "Blob store 'storyline-jobs', key storyline/{jobId}.json = {status:'pending', userId} (storyline.ts:17; _shared/blobs.ts:142-153)",
+    "POST {origin}/.netlify/functions/storyline-background with {jobId, userId, inputs}; up to 3 attempts with 200ms/600ms delays; never throws (_shared/trigger.ts:1-25,35-41)",
+    "Background (not part of this response): Claude call, then writes storyline/{jobId}.json = {status:'done', userId, result:{presentationTitle, inputs, slides:[...slide, prompt], warnings}} or {status:'error', userId, error} (storyline-background.ts:20-45)"
+  ],
+  "externalCalls": [
+    "None in the foreground. Background calls Anthropic (generateStoryline, requireEnv('ANTHROPIC_API_KEY'), model STORYLINE_MODEL default 'claude-sonnet-4-6') — PAID (storyline-background.ts:20; _shared/config.ts:33)"
+  ],
+  "quirks": [
+    "Trigger failures are swallowed: the 202 is returned even if the background never started; storyline-status then reports {status:'pending'} forever (_shared/trigger.ts:3-25). Frontend gives up after 90 polls x 2s with 'Storyline timed out — please try again' (src/lib/api.ts:48-61).",
+    "No per-user cap and no upper slide-count cap (comment storyline.ts:13-14; test 'accepts large slide counts' _tests/storyline.test.ts:33-38).",
+    "numSlides validation is a raw JS `<` comparison (see field notes) — missing numSlides is accepted.",
+    "Content-Type is not checked."
+  ],
+  "beforeAnyState": "Stateless submit; always creates a new job. No idempotency key.",
+  "tests": [
+    { "file": "netlify/functions/_tests/storyline.test.ts", "asserts": "202 + string jobId; writeStorylineJob(jobId,{status:'pending',userId:'u1'}); trigger arg {jobId,userId,inputs}; numSlides large accepted; numSlides<1 -> 400; unauthenticated -> 401 (lines 20-52)" }
+  ],
+  "callers": [
+    { "who": "frontend", "where": "src/lib/api.ts:23-25 (startStoryline), used by src/pages/IntakeChat.tsx:3 and the wizard form", "expects": "2xx JSON {jobId}; on non-2xx throws Error(body.error || 'HTTP <status>') (src/lib/api.ts:14-21)" },
+    { "who": "Auxi_Connector", "where": "none (Connector builds the storyline itself and calls /api/generate directly)", "expects": "-" }
+  ],
+  "docs": {
+    "openapi": "public/openapi.yaml:550-582 — matches path/method/202 {jobId}. Discrepancies: WizardInputs (openapi.yaml:73-91) marks topic, company, numSlides, audience, style as required and numSlides maximum 12; the handler only requires topic, numSlides is optional and has no max. No 400/401/500 responses documented.",
+    "postman": "docs/postman_collection.json '2 · Full Deck Flow' POST /api/storyline — body matches; consistent.",
+    "apiMd": "docs/api.md:252"
+  },
+  "planSection65": "Row '/api/storyline (POST) | WizardInputs → 202 {jobId}' — accurate. Add: only topic is required; 400 'Topic is required' / 'Slides must be at least 1'."
+}

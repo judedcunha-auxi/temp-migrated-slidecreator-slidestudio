@@ -1,0 +1,48 @@
+{
+  "route": "/api/userinfo",
+  "handler": "netlify/functions/userinfo.ts",
+  "netlifyRouting": "Declares `export const config = { path: '/api/userinfo' }` (userinfo.ts:32): served on that path directly as a Functions v2 custom path, independent of the netlify.toml /api/* rewrite.",
+  "methods": ["GET (any method accepted)"],
+  "methodHandling": { "otherMethods": "Not checked; every method is handled identically.", "cite": "netlify/functions/userinfo.ts:1-30" },
+  "auth": { "kind": "custom", "cite": "netlify/functions/userinfo.ts:2-8", "notes": "Does NOT use requireUser and does NOT verify the token signature, issuer, audience or expiry. It base64-decodes the JWT payload segment. The DEV_SECRET_KEY bypass is not supported (a dev key with no '.' gives 401 Invalid token). It is an OIDC userinfo shim for Supabase Auth's custom:auxi provider (DETAILED-PLAN.md C8)." },
+  "query": [],
+  "request": {
+    "contentType": "none",
+    "parse": "token = Authorization header with a leading /^Bearer\\s+/i removed (userinfo.ts:3). Any header value without that prefix is used whole as the token.",
+    "fields": [
+      { "name": "Authorization header", "type": "string 'Bearer <JWT>'", "required": true, "default": null, "bounds": null, "validation": "empty after stripping -> 401 Unauthorized; JWT payload = token.split('.')[1], '-'->'+', '_'->'/', atob, JSON.parse", "cite": "netlify/functions/userinfo.ts:2-12" }
+    ],
+    "unknownFields": "Unknown JWT claims ignored."
+  },
+  "checkOrder": ["1. token present (:5-7)", "2. decode payload (:10-12), any throw -> 401 Invalid token (:27-29)", "3. email = emails[0] || email || upn (:13)", "4. no email -> 400 (:14-16)", "5. 200 (:17-26)"],
+  "responses": [
+    { "status": 200, "contentType": "application/json", "headers": { "content-type": "application/json" }, "when": "payload decodes and has an email", "bodyShape": { "sub": "payload.oid || payload.sub (omitted if both absent)", "email": "payload.emails[0] || payload.email || payload.upn", "name": "payload.name (omitted if absent)", "given_name": "payload.given_name (omitted if absent)", "family_name": "payload.family_name (omitted if absent)" }, "example": { "sub": "9f1c2d3e-0000-4000-8000-1234567890ab", "email": "jane@acme.com", "name": "Jane Doe", "given_name": "Jane", "family_name": "Doe" }, "cite": "netlify/functions/userinfo.ts:13, 17-26" }
+  ],
+  "errors": [
+    { "status": 401, "body": { "error": "Unauthorized" }, "contentType": "text/plain;charset=UTF-8 (no content-type header is set, so the Response default for a string body applies)", "when": "no Authorization header, or 'Bearer ' with nothing after it", "cite": "netlify/functions/userinfo.ts:5-7" },
+    { "status": 400, "body": { "error": "No email in token" }, "contentType": "text/plain;charset=UTF-8 (no header set)", "when": "payload decodes but has none of emails[0], email, upn", "cite": "netlify/functions/userinfo.ts:13-16" },
+    { "status": 401, "body": { "error": "Invalid token", "detail": "String(e), e.g. \"TypeError: Cannot read properties of undefined (reading 'replace')\" (no '.' in token), \"InvalidCharacterError: The string to be decoded is not correctly encoded.\" (bad base64 length), \"InvalidCharacterError: Invalid character\", or a JSON SyntaxError message" }, "contentType": "text/plain;charset=UTF-8 (no header set)", "when": "payload segment missing, not base64, or not JSON", "cite": "netlify/functions/userinfo.ts:27-29" }
+  ],
+  "sideEffects": [],
+  "externalCalls": [],
+  "quirks": [
+    "Error responses carry no content-type header; only the 200 sets application/json. Bodies are still JSON text.",
+    "The 401 'Invalid token' body has an extra `detail` member with the JS exception text, which depends on the runtime (strings above observed on Node v24.15.0). This is the only route with {error, detail}.",
+    "No signature verification: any well-formed JWT-shaped string with an email claim yields 200.",
+    "atob() returns a Latin-1 binary string, so non-ASCII UTF-8 claims come out garbled: a name 'José' is returned as 'JosÃ©' (verified with Node v24.15.0). A Python port that decodes UTF-8 properly would change the output.",
+    "`sub` prefers the B2C/Entra `oid` claim over `sub`.",
+    "A token in a non-Bearer header ('Basic x.y.z') is still decoded, because only a Bearer prefix is stripped.",
+    "Claims with undefined values are omitted from the JSON (JSON.stringify drops undefined)."
+  ],
+  "beforeAnyState": "Stateless.",
+  "tests": [ { "file": "none", "asserts": "No test covers this route." } ],
+  "callers": [
+    { "who": "Supabase Auth (custom OIDC provider 'custom:auxi'), server-side", "where": "configured in Supabase (not in this repo); sign-in entry at src/pages/SignIn.tsx:15,24 per DETAILED-PLAN.md C8", "expects": "OIDC userinfo JSON with `email` (and `sub`)." },
+    { "who": "API portal link", "where": "public/api-portal.html:415 (Verify auth header link to /api/userinfo)", "expects": "human inspection" }
+  ],
+  "docs": {
+    "openapi": "public/openapi.yaml:1709-1740. Discrepancies: claims 'With the dev bypass key, returns the dev@sales.invalid identity' - false, the handler never checks DEV_SECRET_KEY, a dev key without '.' returns 401 {error:'Invalid token', detail}; 400 and 401 responses undocumented; says it decodes 'identity claims' without noting B2C `emails`/`oid`/`upn` precedence.",
+    "postman": "docs/postman_collection.json '7.1 Inspect JWT (userinfo)': uses the collection's dev_key bearer, which yields 401 Invalid token, not identity claims."
+  },
+  "planSection65": "Row says `IdP bearer -> {email, name, given_name, family_name}; 400 {error:\"No email in token\"}, 401`. Correction: the 200 body also includes `sub` (oid || sub); the 401 has two bodies ({error:'Unauthorized'} and {error:'Invalid token', detail}); error responses have no content-type header."
+}

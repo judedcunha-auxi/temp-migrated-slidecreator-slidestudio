@@ -1,0 +1,115 @@
+{
+  "route": "/api/brands",
+  "handler": "netlify/functions/brands.ts",
+  "netlifyRouting": "netlify.toml:12-15 rewrites /api/* -> /.netlify/functions/:splat (status 200)",
+  "methods": ["GET", "POST", "PATCH", "DELETE"],
+  "methodHandling": {
+    "otherMethods": "Any other method (PUT, HEAD, OPTIONS...) -> 405 {\"error\":\"GET, POST, PATCH or DELETE only\"}, but only AFTER requireUser succeeds (unauthenticated PUT gets 401, not 405).",
+    "cite": "netlify/functions/brands.ts:87,153; _tests/brands.test.ts:150-153"
+  },
+  "auth": {
+    "kind": "requireUser",
+    "cite": "netlify/functions/brands.ts:87; netlify/functions/_shared/auth.ts:9-25; netlify/functions/_shared/http.ts:20-25",
+    "notes": "Runs first for every method. Bearer = Supabase JWT, or DEV_SECRET_KEY bypass mapping to DEV_USER_ID. Auxi_Connector calls with its own service bearer (settings.slide_forge_token, forge_brands.py:195-199); which identity that resolves to (dev bypass or a real Supabase user) is not visible from code (unverified). All Connector-created brands therefore belong to that single identity."
+  },
+  "query": [
+    { "name": "id", "type": "string", "required": true, "appliesTo": "DELETE only", "parse": "URL searchParams.get('id'); not UUID-validated", "default": null, "bounds": null, "invalidBehaviour": "missing/empty -> 400 'id required'; a non-UUID string reaches Postgres (uuid column) -> PostgrestError thrown -> 500 {\"error\":\"Internal error\"} (deleteBrandRow does not UUID-guard, unlike getBrandAccess)", "cite": "netlify/functions/brands.ts:147-149; netlify/functions/_shared/db.ts:297-305" },
+    { "name": "(any)", "type": "-", "required": false, "parse": "GET/POST/PATCH ignore the query string entirely", "default": null, "bounds": null, "invalidBehaviour": "ignored", "cite": "netlify/functions/brands.ts:89-144" }
+  ],
+  "request": {
+    "contentType": "application/json (POST, PATCH); none (GET, DELETE)",
+    "parse": "POST/PATCH: `await req.json().catch(() => null)`; malformed JSON, empty body, or a falsy JSON value (null, 0, false, \"\") -> 400 {\"error\":\"Invalid JSON body\"}. A truthy non-object (e.g. 5, \"x\", []) passes and then fails field validation (name -> 400 name message; PATCH -> 400 'brandId is required').",
+    "fields": [
+      { "name": "name", "method": "POST", "type": "string", "required": true, "default": null, "bounds": "1-120 characters AFTER trim", "validation": "typeof string && trim() non-empty && trim().length <= 120, else 400 'name is required (1-120 characters)'; stored trimmed", "cite": "netlify/functions/brands.ts:7,78-83,96" },
+      { "name": "kit", "method": "POST", "type": "object", "required": false, "default": "{}", "bounds": "JSON.stringify(kit).length <= 262144 chars (256*1024), checked on UTF-16 string length, not bytes", "validation": "If present: any own key in {logoKey, masterKey, titleMasterKey, dividerMasterKey, furnitureKey} (even with value null) -> 400 '<key> cannot be set on create — upload the asset first, then PATCH'. Then sanitizeKitPatch (see kitFieldRules). kit: null or a non-object -> 400 'kit must be an object'.", "cite": "netlify/functions/brands.ts:10,101-111,40-46" },
+      { "name": "brandId", "method": "PATCH", "type": "string", "required": true, "default": null, "bounds": null, "validation": "typeof string && non-empty else 400 'brandId is required'. Non-UUID strings -> getBrandAccess returns null -> 404 'Brand not found'.", "cite": "netlify/functions/brands.ts:120-122; netlify/functions/_shared/db.ts:189,228" },
+      { "name": "name", "method": "PATCH", "type": "string", "required": false, "default": null, "bounds": "1-120 after trim", "validation": "only validated when !== undefined; name: null -> 400 'name is required (1-120 characters)'", "cite": "netlify/functions/brands.ts:126" },
+      { "name": "kit", "method": "PATCH", "type": "object", "required": false, "default": null, "bounds": "256KB (string length)", "validation": "sanitizeKitPatch(kit, existing.ownerId, brandId); then SHALLOW merge over stored kit; a null value deletes that key from the stored kit. kit: {} is accepted and counts as an update (rewrites kit + updated_at).", "cite": "netlify/functions/brands.ts:127-138" }
+    ],
+    "kitFieldRules": {
+      "cite": "netlify/functions/brands.ts:11-34,40-76",
+      "nullValue": "any key with value null is accepted without validation (even unknown keys!) and becomes 'delete this key' in PATCH; on POST the null is stored literally in the kit jsonb (brands.ts:49)",
+      "blobKeyFields": "logoKey->logo, masterKey->master, titleMasterKey->titleMaster, dividerMasterKey->dividerMaster: any truthy value accepted, stored as canonical 'brand/<ownerId>/<brandId>/<kind>.png' (never the sent string). Falsy non-null (false, 0, \"\") -> 400 '<key> must be a truthy value or null'. The server does NOT check that the blob exists.",
+      "furnitureKey": "truthy -> stored as 'brand/<ownerId>/<brandId>/furniture.json'; falsy non-null -> 400 'furnitureKey must be a truthy value or null'",
+      "furnitureArchetypes": "array whose every element is 'cover'|'divider'|'content' (empty array OK) else 400 'furnitureArchetypes must be an array of \"cover\" | \"divider\" | \"content\"'",
+      "hexFields": "primaryColor, accentColor, neutralColor: /^#[0-9a-fA-F]{6}$/ else 400 '<key> must be a hex color like #1A2B3C'",
+      "stringFields": "company, headingFont, bodyFont, styleTemplate: typeof string (no length cap, empty allowed) else 400 '<key> must be a string'",
+      "passthroughFields": "layouts, workzone, typographyScale, masterDecorations, logoShapes, allColors, headingPlaceholders, archetypeLayouts: stored verbatim, no validation (normalizeKit re-validates on read)",
+      "unknownField": "any other non-null key -> 400 'Unknown kit field: <key>' (first offending key in object iteration order; whole request rejected)"
+    },
+    "unknownFields": "Top-level body: unknown keys ignored. Inside kit: unknown non-null keys rejected 400 'Unknown kit field: <key>'; unknown keys with null value silently accepted."
+  },
+  "checkOrder": [
+    "1. requireUser (401/500)",
+    "2. method dispatch",
+    "POST: 3. JSON parse (400 Invalid JSON body) 4. name (400) 5. blob-key-on-create scan (400) 6. sanitizeKitPatch (400) 7. insertBrand",
+    "PATCH: 3. JSON parse 4. brandId (400) 5. getBrandAccess -> 404 / 403 6. name (400) 7. sanitizeKitPatch (400) 8. 'Nothing to update' (400) 9. updateBrandRow 10. re-read via getBrandAccess",
+    "DELETE: 3. id (400) 4. deleteBrandRow",
+    "5. else 405"
+  ],
+  "responses": [
+    { "status": 200, "method": "GET", "contentType": "application/json", "headers": {}, "when": "always on success", "bodyShape": { "brands": [{ "id": "uuid", "name": "string", "kit": "raw stored jsonb (NOT normalized)", "isOrg": "boolean" }] }, "example": { "brands": [{ "id": "6f1c...", "name": "Acme Org", "kit": {}, "isOrg": true }, { "id": "b1", "name": "Acme", "kit": { "primaryColor": "#1A2B3C" }, "isOrg": false }] }, "notes": "Org brands reachable via the caller's verified email domain come FIRST, then personal brands ordered updated_at DESC. Org brands' order is unspecified (no .order). Empty: {\"brands\":[]}.", "cite": "netlify/functions/brands.ts:89-91; netlify/functions/_shared/db.ts:243-258" },
+    { "status": 201, "method": "POST", "contentType": "application/json", "headers": {}, "when": "created", "bodyShape": { "id": "uuid", "name": "string (trimmed)", "kit": "object as sanitized" }, "example": { "id": "b1", "name": "Acme", "kit": { "primaryColor": "#1A2B3C" } }, "notes": "No isOrg key on the create response (insertBrand selects id,name,kit only), unlike GET/PATCH.", "cite": "netlify/functions/brands.ts:112-113; netlify/functions/_shared/db.ts:263-271" },
+    { "status": 200, "method": "PATCH", "contentType": "application/json", "headers": {}, "when": "updated", "bodyShape": { "id": "uuid", "name": "string", "kit": "merged kit as stored", "isOrg": "boolean" }, "example": { "id": "b1", "name": "Acme", "kit": { "primaryColor": "#222222", "masterKey": "brand/u1/b1/master.png" }, "isOrg": false }, "notes": "If the row disappeared between update and re-read, body is the JSON literal null with status 200 (`updated && {...}`).", "cite": "netlify/functions/brands.ts:141-143" },
+    { "status": 200, "method": "DELETE", "contentType": "application/json", "headers": {}, "when": "always when id present and a valid UUID: owner-scoped, idempotent; deleting a non-existent, someone else's, or an ORG brand is a silent no-op", "bodyShape": { "ok": true }, "example": { "ok": true }, "cite": "netlify/functions/brands.ts:146-151; netlify/functions/_shared/db.ts:297-305; _tests/brands.test.ts:135-143" }
+  ],
+  "errors": [
+    { "status": 401, "body": { "error": "Missing bearer token" }, "when": "no/invalid Authorization header format", "cite": "netlify/functions/_shared/http.ts:20-25" },
+    { "status": 401, "body": { "error": "Invalid or expired session" }, "when": "Supabase getUser fails", "cite": "netlify/functions/_shared/auth.ts:22-23" },
+    { "status": 500, "body": { "error": "DEV_SECRET_KEY set but DEV_USER_ID missing" }, "when": "dev bypass misconfigured", "cite": "netlify/functions/_shared/auth.ts:18" },
+    { "status": 400, "body": { "error": "Invalid JSON body" }, "when": "POST/PATCH body unparsable or falsy JSON", "cite": "netlify/functions/brands.ts:95,119" },
+    { "status": 400, "body": { "error": "name is required (1-120 characters)" }, "when": "POST missing/blank/too-long name; PATCH name present but invalid", "cite": "netlify/functions/brands.ts:78-83" },
+    { "status": 400, "body": { "error": "<key> cannot be set on create — upload the asset first, then PATCH" }, "when": "POST kit contains logoKey|masterKey|titleMasterKey|dividerMasterKey|furnitureKey (any value). Note em dash U+2014.", "cite": "netlify/functions/brands.ts:104-108; _tests/brands.test.ts:69-73" },
+    { "status": 400, "body": { "error": "kit must be an object" }, "when": "kit is null, array, or a primitive", "cite": "netlify/functions/brands.ts:41-43" },
+    { "status": 400, "body": { "error": "kit too large (max 256KB)" }, "when": "JSON.stringify(kit).length > 262144", "cite": "netlify/functions/brands.ts:44-46" },
+    { "status": 400, "body": { "error": "<key> must be a truthy value or null" }, "when": "blob-key field with falsy non-null value (PATCH)", "cite": "netlify/functions/brands.ts:51" },
+    { "status": 400, "body": { "error": "furnitureKey must be a truthy value or null" }, "when": "furnitureKey falsy non-null", "cite": "netlify/functions/brands.ts:54" },
+    { "status": 400, "body": { "error": "furnitureArchetypes must be an array of \"cover\" | \"divider\" | \"content\"" }, "when": "bad furnitureArchetypes", "cite": "netlify/functions/brands.ts:57-59; _tests/brands.test.ts:107-110" },
+    { "status": 400, "body": { "error": "<key> must be a hex color like #1A2B3C" }, "when": "primaryColor/accentColor/neutralColor not #RRGGBB", "cite": "netlify/functions/brands.ts:62-64; _tests/brands.test.ts:59-61" },
+    { "status": 400, "body": { "error": "<key> must be a string" }, "when": "company/headingFont/bodyFont/styleTemplate not a string", "cite": "netlify/functions/brands.ts:67" },
+    { "status": 400, "body": { "error": "Unknown kit field: <key>" }, "when": "kit key outside the allow-list with non-null value", "cite": "netlify/functions/brands.ts:72; _tests/brands.test.ts:63-67" },
+    { "status": 400, "body": { "error": "brandId is required" }, "when": "PATCH brandId missing/non-string/empty", "cite": "netlify/functions/brands.ts:120" },
+    { "status": 404, "body": { "error": "Brand not found" }, "when": "PATCH: brand unreachable (non-UUID, absent, someone else's personal brand, org brand not granted to caller's domain)", "cite": "netlify/functions/brands.ts:121-122; netlify/functions/_shared/db.ts:227-240; _tests/brands.test.ts:112-115" },
+    { "status": 403, "body": { "error": "Organization brands can only be edited by an admin" }, "when": "PATCH by a non-admin domain member of an org brand", "cite": "netlify/functions/brands.ts:123; _tests/brands.test.ts:117-121" },
+    { "status": 400, "body": { "error": "Nothing to update — provide name and/or kit" }, "when": "PATCH with neither name nor kit (em dash U+2014)", "cite": "netlify/functions/brands.ts:139; _tests/brands.test.ts:129-132" },
+    { "status": 400, "body": { "error": "id required" }, "when": "DELETE without ?id=", "cite": "netlify/functions/brands.ts:148; _tests/brands.test.ts:145-147" },
+    { "status": 405, "body": { "error": "GET, POST, PATCH or DELETE only" }, "when": "other methods (after auth)", "cite": "netlify/functions/brands.ts:153" },
+    { "status": 500, "body": { "error": "Internal error" }, "when": "any Supabase/PostgREST error (e.g. DELETE ?id=not-a-uuid, DB outage)", "cite": "netlify/functions/_shared/http.ts:14-18" }
+  ],
+  "sideEffects": [
+    "POST: inserts brands row {user_id: caller, name, kit} via service-role client (db.ts:263-271)",
+    "PATCH: updates name and/or kit + updated_at (db.ts:286-292). For org brands edited by an admin, canonical blob keys use the brand OWNER id, not the editor (brands.ts:128; _tests/brands.test.ts:123-127)",
+    "DELETE: deletes personal brand row owned by caller (is_org=false). Blobs are NOT deleted (db.ts:294-296)"
+  ],
+  "externalCalls": ["Supabase (service role) only; no paid APIs"],
+  "quirks": [
+    "The 20-personal-brand cap exists only in the RLS insert policy (supabase/migrations/0005_brands.sql:18-22, 0011_org_domain_brands.sql:109-117); POST /api/brands inserts with the service-role client, which bypasses RLS, so the API path has NO brand cap.",
+    "POST response has no isOrg; GET and PATCH responses do.",
+    "GET returns the raw stored kit (no normalizeKit), so whatever PATCH stored (incl. passthrough garbage) is echoed back.",
+    "null kit values bypass all validation, including for unknown keys; on POST they are stored as literal nulls.",
+    "Blob-key fields are canonicalized server-side; sending `true` is the documented idiom. The asset need not exist.",
+    "DELETE never returns 404; org brands cannot be deleted here (silent 200 no-op). Auxi_Connector's delete_brand treats 404 as 'already gone' (forge_brands.py:256) - a branch this handler never produces.",
+    "DELETE with a non-UUID id is a 500, not 400/200.",
+    "Kit size limit measured as JS string length of JSON.stringify, not bytes.",
+    "PATCH 404 vs 403 split: unreachable -> 404 (indistinguishable from not found); reachable read-only org brand -> 403.",
+    "PATCH validates name/kit only after the access check, so a bad kit on someone else's brand yields 404, not 400.",
+    "Frontend does NOT call this route: the web app reads/writes the brands table directly through Supabase RLS (src/lib/brands.ts:26-65). Only Auxi_Connector uses /api/brands."
+  ],
+  "beforeAnyState": "GET with no brands -> 200 {\"brands\":[]}. PATCH on a non-existent brand -> 404 'Brand not found'. DELETE on a non-existent brand -> 200 {\"ok\":true}.",
+  "tests": [
+    { "file": "netlify/functions/_tests/brands.test.ts", "asserts": "GET lists ({brands:[{id,name,kit}]}); POST 201 + validated kit; POST 400 missing name / bad hex / unknown kit field (error contains key) / blob-key on create (error contains 'masterKey'); PATCH shallow merge, blob-key canonicalization, null deletes, bad furnitureArchetypes 400, 404 not-owned, 403 read-only org member, admin edit keyed under owner, 400 nothing to update; DELETE {ok:true} and 400 without id; 405 on PUT" }
+  ],
+  "callers": [
+    { "who": "Auxi_Connector", "where": "C:/Github/Auxi_Connector/app/core/forge_brands.py:203-220 (create_brand)", "expects": "POST {name[:120], kit} -> any status <400, reads resp.json()['id']; kit carries colours/fonts/workzone only because blob keys are rejected on create" },
+    { "who": "Auxi_Connector", "where": "C:/Github/Auxi_Connector/app/core/forge_brands.py:223-242 (patch_brand)", "expects": "PATCH {brandId, kit?, name?}; success = status <400 (body ignored). Relies on shallow merge and truthy blob-key activation; its _KIT_FIELDS allow-list (forge_brands.py:332-346) exists because PATCH 400s the WHOLE request on one unknown key (observed 'Unknown kit field: layoutPreviews')" },
+    { "who": "Auxi_Connector", "where": "C:/Github/Auxi_Connector/app/core/forge_brands.py:245-261 (delete_brand)", "expects": "DELETE ?id=; 404 or <400 = gone" },
+    { "who": "Auxi_Connector", "where": "C:/Github/Auxi_Connector/app/core/forge_brands.py:264-286 (brand_exists)", "expects": "GET -> dict with list 'brands' whose items have 'id'; >=400 or malformed = unknown" },
+    { "who": "frontend", "where": "none (src/lib/brands.ts uses supabase.from('brands') directly)", "expects": "-" }
+  ],
+  "docs": {
+    "openapi": "public/openapi.yaml:1235-1338. Discrepancies: (1) GET described as 'All brands owned by the caller' but also returns domain-granted org brands, and items carry isOrg which components.schemas.Brand (openapi.yaml:219-228) lacks; (2) BrandKitData (230-279) omits accepted passthrough fields layouts, workzone, typographyScale, masterDecorations, logoShapes, allColors, headingPlaceholders, archetypeLayouts; (3) PATCH 403 (org brand, non-admin) and 400s undocumented; POST 400s undocumented; (4) DELETE says owner-scoped no-op but does not mention org brands are undeletable here or that non-UUID id is 500; (5) no 405 documented.",
+    "postman": "absent (docs/postman_collection.json has no /api/brands request)",
+    "apiMd": "docs/api.md:704-824. api.md:700 claims a 20-brand personal cap; not enforced on this API path (service role bypasses RLS)."
+  },
+  "planSection65": "Row: '/api/brands (GET, POST, PATCH, DELETE) | GET -> {brands}; POST {name, kit?} -> 201 brand; PATCH {brandId, name?, kit?}; DELETE'. Accurate but incomplete: DELETE takes ?id= (query, not body) and returns {ok:true}; PATCH returns {id,name,kit,isOrg}; POST 201 body lacks isOrg; frontend is not a caller (Supabase direct) - Auxi_Connector is the only caller."
+}

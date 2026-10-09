@@ -98,7 +98,8 @@ class ScriptedProvider:
         return RoundRequest(model=request.model, system=request.system,
                             messages=[dict(m) for m in request.messages], tools=list(request.tools),
                             max_tokens=request.max_tokens, effort=request.effort,
-                            attachments_root=request.attachments_root, minimal_thinking=request.minimal_thinking)
+                            attachments_root=request.attachments_root, minimal_thinking=request.minimal_thinking,
+                            output_schema=request.output_schema)
 
     def stream_round(self, request: RoundRequest) -> Generator[Event, None, RoundResult]:
         self.requests.append(self._snapshot(request))

@@ -1,0 +1,57 @@
+{
+  "route": "/api/revert",
+  "handler": "netlify/functions/revert.ts",
+  "netlifyRouting": "netlify.toml:12-15",
+  "methods": ["POST"],
+  "methodHandling": { "otherMethods": "Not checked. Bodyless GET -> 500 'Internal error'; other methods with JSON body behave like POST.", "cite": "revert.ts:7-37" },
+  "auth": { "kind": "requireUser", "cite": "revert.ts:9; _shared/auth.ts:9-25", "notes": "Auth first." },
+  "query": [],
+  "request": {
+    "contentType": "application/json",
+    "parse": "Destructures {deckId, number, version} from await req.json() (revert.ts:10-12). Malformed/null JSON -> 500 'Internal error'.",
+    "fields": [
+      { "name": "deckId", "type": "string", "required": true, "default": null, "bounds": "UUID in practice (non-UUID -> 500)", "validation": "falsy -> 400 'deckId, number, version required'", "cite": "revert.ts:13" },
+      { "name": "number", "type": "integer", "required": true, "default": null, "bounds": "> 0", "validation": "!Number.isInteger || <= 0 -> 400 'deckId, number, version required'", "cite": "revert.ts:13" },
+      { "name": "version", "type": "integer", "required": true, "default": null, "bounds": ">= 1 and must exist in the slide's version list", "validation": "!Number.isInteger || < 1 -> 400 'deckId, number, version required'; not in versions -> 404 'No such version'", "cite": "revert.ts:13,18-20" }
+    ],
+    "unknownFields": "Ignored."
+  },
+  "checkOrder": ["1. requireUser", "2. req.json()", "3. field validation (400)", "4. ownsDeck (403)", "5. readJobState; no state or no slide -> 404 'No such slide'", "6. slideVersions (stored or synthesized v1 for a done slide) ; version missing -> 404 'No such version'", "7. writeJobState with versions persisted, key/version set to target, current=version", "8. setSlideStatus(deckId, number, {status:'done', blob_key: target.key}) — errors swallowed", "9. 200 {ok:true}"],
+  "responses": [
+    { "status": 200, "contentType": "application/json", "headers": {}, "when": "reverted (synchronous)", "bodyShape": { "ok": true }, "example": { "ok": true }, "cite": "revert.ts:33; _tests/revert.test.ts:15-21" }
+  ],
+  "errors": [
+    { "status": 401, "body": { "error": "Missing bearer token" }, "when": "no bearer", "cite": "_shared/http.ts:20-25" },
+    { "status": 401, "body": { "error": "Invalid or expired session" }, "when": "bad token", "cite": "_shared/auth.ts:22-23; _tests/revert.test.ts:32-36" },
+    { "status": 400, "body": { "error": "deckId, number, version required" }, "when": "any field missing/invalid", "cite": "revert.ts:13" },
+    { "status": 403, "body": { "error": "Not your deck" }, "when": "not owned / not found", "cite": "revert.ts:14; _tests/revert.test.ts:27-31" },
+    { "status": 404, "body": { "error": "No such slide" }, "when": "no job-state blob, or slide number absent from it", "cite": "revert.ts:15-17" },
+    { "status": 404, "body": { "error": "No such version" }, "when": "version not in slideVersions (a non-done slide with no stored versions has [] -> always 404)", "cite": "revert.ts:18-20; _shared/jobState.ts:97-101; _tests/revert.test.ts:22-26" },
+    { "status": 500, "body": { "error": "Internal error" }, "when": "malformed JSON, non-UUID deckId, Blobs failure", "cite": "_shared/http.ts:14-18" }
+  ],
+  "sideEffects": [
+    "Job-state blob: slides[number] = {...vs, versions, key: target.key, version: target.v, current: version} (revert.ts:23-24; _shared/jobState.ts:114-118)",
+    "slides.variant_a_status='done', variant_a_blob_key=target.key (best-effort; failure logged, still 200) (revert.ts:30-32; _tests/revert.test.ts:37-42)"
+  ],
+  "externalCalls": ["Supabase; Netlify Blobs. No paid calls."],
+  "quirks": [
+    "The job-state slide `status` is NOT changed (only the DB is set to 'done'); reverting a slide currently in 'error' or 'generating' that has stored versions leaves that status in /api/status.",
+    "`version` field set to target.v also changes the image cache-bust counter.",
+    "Legacy done slides without a versions array get [{v:1, key: deck/{deckId}/slide_{n}.png, instruction:null}] synthesized and persisted.",
+    "DB failure after the blob write is swallowed (200)."
+  ],
+  "beforeAnyState": "Owned deck without job state -> 404 'No such slide'.",
+  "tests": [
+    { "file": "netlify/functions/_tests/revert.test.ts", "asserts": "200, current moved, setSlideStatus {status:'done', blob_key}; 404 missing version; 403; 401; 200 when setSlideStatus rejects (lines 14-42)" }
+  ],
+  "callers": [
+    { "who": "frontend", "where": "src/lib/api.ts:163-165 (postRevert)", "expects": "2xx {ok}" },
+    { "who": "Auxi_Connector", "where": "app/api/routes/forge.py:734-764 (/forge/revert) — defaults number 0, version 1 if absent", "expects": "status < 400 else 502 'Revert failed (<code>).'; relays resp.json() verbatim" }
+  ],
+  "docs": {
+    "openapi": "public/openapi.yaml:881-916 — matches; 400/403/404 undocumented.",
+    "postman": "'4 · Slide Editing' POST /api/revert — consistent.",
+    "apiMd": "docs/api.md:659"
+  },
+  "planSection65": "Row '{deckId, number, version} → {ok:true}' — accurate; add 404 'No such slide' / 'No such version'."
+}

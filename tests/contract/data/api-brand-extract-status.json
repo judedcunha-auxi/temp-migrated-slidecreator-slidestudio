@@ -1,0 +1,44 @@
+{
+  "route": "/api/brand-extract-status",
+  "handler": "netlify/functions/brand-extract-status.ts",
+  "netlifyRouting": "netlify.toml:12-15 rewrites /api/* -> /.netlify/functions/:splat (status 200)",
+  "methods": ["GET"],
+  "methodHandling": { "otherMethods": "No method check: every method behaves like GET.", "cite": "netlify/functions/brand-extract-status.ts:5-17" },
+  "auth": { "kind": "requireUser", "cite": "netlify/functions/brand-extract-status.ts:7", "notes": "job.userId must match caller." },
+  "query": [
+    { "name": "jobId", "type": "string", "required": true, "parse": "searchParams.get('jobId')", "default": null, "bounds": null, "invalidBehaviour": "missing -> 400 'jobId is required'; unknown -> 200 {status:'pending'}", "cite": "netlify/functions/brand-extract-status.ts:8-11" }
+  ],
+  "request": { "contentType": "none", "parse": "body ignored", "fields": [], "unknownFields": "ignored" },
+  "checkOrder": ["1. requireUser", "2. jobId", "3. read", "4. missing -> pending", "5. owner", "6. return"],
+  "responses": [
+    { "status": 200, "contentType": "application/json", "headers": {}, "when": "no job record", "bodyShape": { "status": "pending" }, "example": { "status": "pending" }, "cite": "netlify/functions/brand-extract-status.ts:11; _tests/brand-extract.test.ts:89-94" },
+    { "status": 200, "contentType": "application/json", "headers": {}, "when": "job owned by caller", "bodyShape": { "status": "pending|done|error", "fields": "only when done: subset of {company (1-120 chars), primaryColor (#RRGGBB), accentColor (#RRGGBB), headingFont (1-80), bodyFont (1-80), styleTemplate (1-4000)} - invalid values dropped per field; may be {}", "error": "only when error" }, "example": { "status": "done", "fields": { "company": "Auxi", "primaryColor": "#0B2D4F", "headingFont": "Georgia", "bodyFont": "Arial", "styleTemplate": "Use {primaryColor} for structure..." } }, "cite": "netlify/functions/brand-extract-status.ts:13; netlify/functions/_shared/brandExtract.ts:7-36" }
+  ],
+  "fieldsProducer": {
+    "producer": "netlify/functions/brand-extract-background.ts:16 writes {status:'done', userId, fields}; :18-22 writes {status:'error', userId, error}",
+    "errorStrings": ["Guidelines PDF not found (brand-extract-background.ts:14)", "Missing required env var: ANTHROPIC_API_KEY (config.ts:27-31)", "Claude did not return an extraction tool call (brandExtract.ts:83)", "Anthropic SDK error messages verbatim", "Extraction failed (non-Error throw, brand-extract-background.ts:21)"]
+  },
+  "errors": [
+    { "status": 401, "body": { "error": "Missing bearer token" }, "when": "no bearer", "cite": "netlify/functions/_shared/http.ts:20-25" },
+    { "status": 401, "body": { "error": "Invalid or expired session" }, "when": "bad token", "cite": "netlify/functions/_shared/auth.ts:22-23" },
+    { "status": 400, "body": { "error": "jobId is required" }, "when": "no jobId", "cite": "netlify/functions/brand-extract-status.ts:9" },
+    { "status": 403, "body": { "error": "Not your job" }, "when": "other user's job", "cite": "netlify/functions/brand-extract-status.ts:12; _tests/brand-extract.test.ts:89-92" },
+    { "status": 500, "body": { "error": "Internal error" }, "when": "blob read failure", "cite": "netlify/functions/_shared/http.ts:14-18" }
+  ],
+  "sideEffects": ["none"],
+  "externalCalls": ["Netlify Blobs; no paid APIs"],
+  "quirks": ["Unknown jobId -> pending forever.", "Extraction failure is a 200 with status 'error'.", "No method check.", "fields is not merged into any brand; the client applies it."],
+  "beforeAnyState": "200 {\"status\":\"pending\"}",
+  "tests": [
+    { "file": "netlify/functions/_tests/brand-extract.test.ts", "asserts": "status returns fields to owner (toMatchObject {status:'done', fields:{company:'Auxi'}}); 403 other user; unknown job -> pending; background writes done/error and deletes ephemeral PDFs" }
+  ],
+  "callers": [
+    { "who": "frontend", "where": "src/lib/api.ts:313-327 (getBrandExtractStatus/pollBrandExtract 60x2s); src/pages/BrandEditorPage.tsx:192", "expects": "done -> fields ?? {}; error -> throw s.error || 'Extraction failed'" }
+  ],
+  "docs": {
+    "openapi": "public/openapi.yaml:1438-1463. fields typed as full BrandKitData, but only 6 keys can appear; 400/403 undocumented.",
+    "postman": "docs/postman_collection.json:626-638 (5.4) - matches",
+    "apiMd": "docs/api.md:1044-1072"
+  },
+  "planSection65": "Row: 'GET ?jobId= -> {status, fields?, error?}'. Accurate."
+}

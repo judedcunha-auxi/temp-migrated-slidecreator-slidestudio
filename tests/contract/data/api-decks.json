@@ -1,0 +1,46 @@
+{
+  "route": "/api/decks",
+  "handler": "netlify/functions/decks.ts",
+  "netlifyRouting": "netlify.toml:12-15",
+  "methods": ["GET", "DELETE"],
+  "methodHandling": { "otherMethods": "Only DELETE is distinguished; EVERY other method (POST, PUT, PATCH, HEAD...) is handled as GET (list or single deck). Body never read.", "cite": "decks.ts:9-17" },
+  "auth": { "kind": "requireUser", "cite": "decks.ts:7; _shared/auth.ts:9-25", "notes": "Auth first for all methods." },
+  "query": [
+    { "name": "id", "type": "string", "required": "GET: no (absent -> list); DELETE: yes", "parse": "searchParams.get('id')", "default": null, "bounds": "UUID in practice", "invalidBehaviour": "DELETE without id -> 400 'id required'. Non-UUID id -> Postgres invalid-uuid error -> 500 'Internal error' (GET single and DELETE). GET with empty id (?id=) is treated as absent -> list.", "cite": "decks.ts:8-16; _shared/db.ts:146-169" }
+  ],
+  "request": { "contentType": "none", "parse": "No body read.", "fields": [], "unknownFields": "Unknown query params ignored." },
+  "checkOrder": ["1. requireUser", "2. id = query id", "3. DELETE: id required (400) -> deleteDeck(owner-scoped) -> {ok:true}", "4. no id -> {decks}", "5. getDeckWithSlides -> 404 if null -> {deck, slides}"],
+  "responses": [
+    { "status": 200, "contentType": "application/json", "headers": {}, "when": "GET without id", "bodyShape": { "decks": "[{id, title, status ('draft'|'generating'|'done'|'failed'), created_at}] ordered created_at desc; [] when none" }, "example": { "decks": [ { "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6", "title": "Q3 2026 Financial Results", "status": "generating", "created_at": "2026-10-08T10:00:00.000000+00:00" } ] }, "cite": "decks.ts:14; _shared/db.ts:136-144; _tests/decks.test.ts:20-26" },
+    { "status": 200, "contentType": "application/json", "headers": {}, "when": "GET with id of an owned deck", "bodyShape": { "deck": "the full decks row (select *): id, owner, title, inputs (verbatim client inputs jsonb), storyline (jsonb), status, created_at, updated_at, plus analytics columns added by later migrations (e.g. slide_count, brand_id, creation_method, generation_started_at)", "slides": "full slides rows (select *) ordered by number: id, deck_id, number, title, framework, description, bullets, prompt, variant_a_blob_key, variant_b_blob_key, variant_a_status, variant_b_status, variant_a_error, variant_b_error (+ later columns), plus `type` folded in from deck.storyline when the storyline has a string type for that number" }, "example": { "deck": { "id": "d1", "owner": "u1", "title": "T", "inputs": {}, "storyline": { "presentationTitle": "T", "slides": [] }, "status": "done" }, "slides": [ { "number": 1, "title": "x", "type": "title", "variant_a_status": "done" } ] }, "cite": "decks.ts:15-17; _shared/db.ts:151-169,483-492; supabase/migrations/0001_init.sql:12-44" },
+    { "status": 200, "contentType": "application/json", "headers": {}, "when": "DELETE with id (owned, foreign or non-existent — idempotent no-op)", "bodyShape": { "ok": true }, "example": { "ok": true }, "cite": "decks.ts:9-13; _shared/db.ts:146-149" }
+  ],
+  "errors": [
+    { "status": 401, "body": { "error": "Missing bearer token" }, "when": "no bearer", "cite": "_shared/http.ts:20-25" },
+    { "status": 401, "body": { "error": "Invalid or expired session" }, "when": "bad token", "cite": "_shared/auth.ts:22-23" },
+    { "status": 400, "body": { "error": "id required" }, "when": "DELETE without id", "cite": "decks.ts:10" },
+    { "status": 404, "body": { "error": "Deck not found" }, "when": "GET id not owned or missing", "cite": "decks.ts:16; _tests/decks.test.ts:34-39" },
+    { "status": 500, "body": { "error": "Internal error" }, "when": "non-UUID id; Supabase errors", "cite": "_shared/http.ts:14-18" }
+  ],
+  "sideEffects": ["DELETE: decks row delete (owner-scoped); slides cascade; blobs (images, job state) are left in place (_shared/db.ts:146-149; openapi.yaml:1585-1600)"],
+  "externalCalls": ["Supabase only."],
+  "quirks": [
+    "POST/PUT/PATCH behave as GET.",
+    "DELETE of a foreign or missing deck returns 200 {ok:true} (no 404/403).",
+    "Single-deck response exposes raw DB column names (variant_a_*), including legacy variant_b_* columns, and every column added by future migrations — snapshot must allow column additions or pin the exact current set.",
+    "Slide `type` is not a DB column; it is merged from the storyline and absent when the storyline lacks it.",
+    "Empty list returns {\"decks\":[]}."
+  ],
+  "beforeAnyState": "GET list for a new user -> 200 {\"decks\":[]}.",
+  "tests": [ { "file": "netlify/functions/_tests/decks.test.ts", "asserts": "list without id; single deck with slides (deck.id); 404 for missing/foreign (lines 19-39). No DELETE test." } ],
+  "callers": [
+    { "who": "frontend", "where": "src/lib/api.ts:210-220 (listDecks, getDeck, deleteDeck); src/pages/MyDecks.tsx:27,38; src/pages/Generation.tsx:61", "expects": "{decks} / {deck, slides} / {ok}" },
+    { "who": "Auxi_Connector", "where": "none", "expects": "-" }
+  ],
+  "docs": {
+    "openapi": "public/openapi.yaml:1520-1601 — GET/DELETE documented and consistent; deck.storyline is typed as StorylineResponse but the stored storyline has no `inputs`/`warnings` (it is the repaired Storyline); slides items untyped; 400/404 undocumented.",
+    "postman": "'6 · Deck Management' has GET list and GET single only; DELETE absent.",
+    "apiMd": "docs/api.md:473 (GET), :542 (DELETE)"
+  },
+  "planSection65": "Row 'GET → {decks}; ?id= → deck; DELETE ?id= → {ok:true}' — accurate; '?id= → deck' is precisely {deck, slides}."
+}

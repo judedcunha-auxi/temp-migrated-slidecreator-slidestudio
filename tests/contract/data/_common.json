@@ -1,0 +1,59 @@
+{
+  "title": "Behaviour shared by every /api/* route (http.ts, auth.ts, netlify.toml)",
+  "routing": {
+    "rule": "netlify.toml rewrites /api/* to /.netlify/functions/:splat with status 200, so /api/<name> reaches netlify/functions/<name>.ts. The rewrite is placed before the SPA catch-all.",
+    "cite": "netlify.toml:12-15, netlify.toml:17-20",
+    "exceptions": [
+      "userinfo.ts declares `export const config = { path: '/api/userinfo' }` (userinfo.ts:32), so it is served on that path directly (Functions v2 custom path), not via the rewrite.",
+      "The 7 *-background functions are also reachable through the rewrite as /api/<name>-background (no auth). See api-background-functions.json."
+    ],
+    "unknownApiPath": "An /api/<x> with no matching function is not handled by any handler (Netlify returns its own 404 page, not a JSON {error}). Not covered by the code; record it as platform behaviour, not contract."
+  },
+  "jsonHelper": {
+    "fact": "json(body, status=200) returns `new Response(JSON.stringify(body), {status, headers: {'content-type': 'application/json'}})`. Only content-type is set: no cache-control, no charset.",
+    "cite": "netlify/functions/_shared/http.ts:7-12"
+  },
+  "errorBody": {
+    "fact": "errorResponse(e): an HttpError becomes `{\"error\": e.message}` with e.status. Anything else (Supabase PostgrestError objects, TypeError, SyntaxError from req.json(), Blob errors, fetch errors) is logged and becomes 500 `{\"error\":\"Internal error\"}`.",
+    "cite": "netlify/functions/_shared/http.ts:14-18",
+    "consequence": "A malformed JSON body read with a bare `await req.json()` (no .catch) produces 500 {\"error\":\"Internal error\"}, not 400. Routes that wrap req.json() in .catch() behave differently; each route file says which it does."
+  },
+  "auth": {
+    "bearerToken": {
+      "fact": "The Authorization header must match /^Bearer\\s+(.+)$/i (scheme case-insensitive). Otherwise throws HttpError(401, 'Missing bearer token').",
+      "cite": "netlify/functions/_shared/http.ts:20-25",
+      "errors": [ { "status": 401, "body": { "error": "Missing bearer token" }, "when": "header absent, empty, not 'Bearer <x>' (e.g. 'Basic ...', 'Bearer' with no token)" } ]
+    },
+    "requireUser": {
+      "fact": "1) bearerToken. 2) Dev bypass: when env DEV_SECRET_KEY is set and the token equals it, returns {userId: DEV_USER_ID, email: DEV_USER_EMAIL ?? null}; if DEV_USER_ID is unset throws 500. 3) Otherwise supabase adminClient().auth.getUser(token); an error or no user throws 401.",
+      "cite": "netlify/functions/_shared/auth.ts:9-25",
+      "errors": [
+        { "status": 401, "body": { "error": "Missing bearer token" }, "cite": "netlify/functions/_shared/http.ts:23" },
+        { "status": 500, "body": { "error": "DEV_SECRET_KEY set but DEV_USER_ID missing" }, "when": "token equals DEV_SECRET_KEY but DEV_USER_ID unset (an HttpError, so the message is passed through)", "cite": "netlify/functions/_shared/auth.ts:18" },
+        { "status": 401, "body": { "error": "Invalid or expired session" }, "when": "Supabase getUser returns an error or no user", "cite": "netlify/functions/_shared/auth.ts:23" },
+        { "status": 500, "body": { "error": "Internal error" }, "when": "getUser throws (network failure), or SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY missing (requireEnv throws a plain Error)", "cite": "netlify/functions/_shared/db.ts:6-12, netlify/functions/_shared/config.ts:27-31" }
+      ],
+      "tests": [ { "file": "netlify/functions/_shared/auth.test.ts", "asserts": "valid token -> {userId,email}; no token -> HttpError; Supabase rejection -> HttpError (status not asserted)" } ]
+    },
+    "requireAdmin": {
+      "fact": "requireUser, then profiles.is_admin must be truthy; else HttpError(403, 'Admin access required'). A DB error reading profiles throws a PostgrestError -> 500 Internal error.",
+      "cite": "netlify/functions/_shared/auth.ts:29-33, netlify/functions/_shared/db.ts:198-202",
+      "errors": [ { "status": 403, "body": { "error": "Admin access required" } } ]
+    },
+    "authBeforeMethod": "Every handler that uses requireUser/requireAdmin calls it as the first statement inside try, before any method check or body parse, so a request with no token always gets 401 regardless of method or body. Exceptions are noted per route (userinfo has its own scheme)."
+  },
+  "methodHandling": "There is no global method filter. Each handler either branches on req.method (and returns a route-specific 405 or falls through) or ignores the method entirely. Each route file says which.",
+  "headersNotSet": "No handler sets CORS headers. The 'json' helper sets only content-type. Binary routes set their own content-type / cache-control (see each route).",
+  "jobBlobStores": {
+    "fact": "Async job records live in Netlify Blobs stores: storyline-jobs, brand-extract-jobs, quick-jobs, brand-pptx-jobs, brand-preview-jobs, deck-jobs (deck JobState). Each record carries userId; status routes compare it to the caller.",
+    "cite": "netlify/functions/_shared/blobs.ts:4-5, 142-280"
+  },
+  "caps": {
+    "fact": "Env-tunable caps with defaults: DECKS_PER_USER_PER_DAY=2, MAX_SLIDES_PER_DECK=12, GLOBAL_IMAGES_PER_DAY=400, INTAKE_TURNS_PER_USER_PER_DAY=120, BRAND_EXTRACTS_PER_USER_PER_DAY=10. Non-numeric env values fall back to the default.",
+    "cite": "netlify/functions/_shared/config.ts:1-25"
+  },
+  "testBaseline": {
+    "fact": "Offline run of `npx vitest run netlify/functions` on 2026-10-08 (Node v24.15.0): 50 files, 391 tests, 6 failing in 4 files: _tests/status.test.ts (1, expects the pre-variant-removal {A,B} slide shape), _tests/image.test.ts (2), _tests/brand-preview.test.ts (file fails to load), _tests/brand-pptx-background.test.ts (3, 5s timeouts). Those tests are NOT a valid oracle until fixed; the handler code is. See the per-route files for details.",
+    "command": "npx vitest run netlify/functions --reporter=verbose"
+  }
+}

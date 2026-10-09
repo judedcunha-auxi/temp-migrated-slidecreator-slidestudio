@@ -1,0 +1,61 @@
+{
+  "route": "/api/pptx-deck-submit",
+  "handler": "netlify/functions/pptx-deck-submit.ts",
+  "netlifyRouting": "netlify.toml:12-15 rewrites /api/* -> /.netlify/functions/:splat (status 200)",
+  "methods": ["POST"],
+  "methodHandling": { "otherMethods": "Any non-POST -> 405 {\"error\":\"Method not allowed\"}, checked BEFORE auth.", "cite": "netlify/functions/pptx-deck-submit.ts:8" },
+  "auth": { "kind": "requireUser", "cite": "netlify/functions/pptx-deck-submit.ts:9", "notes": "After method check, before body parse." },
+  "query": [],
+  "request": {
+    "contentType": "application/json (header not checked)",
+    "parse": "await req.json() uncaught: malformed/empty -> 500 'Internal error'; JSON null -> TypeError -> 500; non-object -> fields undefined -> 400 'Missing params'.",
+    "fields": [
+      { "name": "deckId", "type": "string", "required": true, "default": null, "bounds": "truthy; non-UUID -> 500 via ownsDeck", "validation": "!deckId -> 400 'Missing params'", "cite": "netlify/functions/pptx-deck-submit.ts:12-13,15" },
+      { "name": "jobIds", "type": "string[]", "required": true, "default": null, "bounds": "Array.isArray && length > 0; element types/count NOT validated, not checked against the deck or user", "validation": "else 400 'Missing params'", "cite": "netlify/functions/pptx-deck-submit.ts:12-13" },
+      { "name": "presentationTitle", "type": "string", "required": false, "default": "''", "bounds": "none; forwarded verbatim (presentationTitle ?? '')", "validation": "none (a non-string would be rejected upstream -> 502)", "cite": "netlify/functions/pptx-deck-submit.ts:23" }
+    ],
+    "unknownFields": "ignored"
+  },
+  "checkOrder": ["1. method POST (405)", "2. requireUser", "3. req.json()", "4. deckId && non-empty jobIds array (400 'Missing params')", "5. ownsDeck (403)", "6. requireEnv (500)", "7. POST {PPTX_API_URL}/decks (502 on non-2xx)", "8. incrementExportCounts (fire-and-forget); 200 {deckJobId}"],
+  "responses": [
+    {
+      "status": 200,
+      "contentType": "application/json",
+      "headers": { "content-type": "application/json" },
+      "when": "upstream /decks 2xx",
+      "bodyShape": { "deckJobId": "string = upstream deck_id (key omitted if upstream had none)" },
+      "example": { "deckJobId": "d_9a1b2c3d4e5f" },
+      "cite": "netlify/functions/pptx-deck-submit.ts:31-33"
+    }
+  ],
+  "errors": [
+    { "status": 405, "body": { "error": "Method not allowed" }, "when": "method != POST", "cite": "netlify/functions/pptx-deck-submit.ts:8" },
+    { "status": 401, "body": { "error": "Missing bearer token" }, "when": "no bearer", "cite": "netlify/functions/_shared/http.ts:20-24" },
+    { "status": 401, "body": { "error": "Invalid or expired session" }, "when": "bad token", "cite": "netlify/functions/_shared/auth.ts:22-23" },
+    { "status": 500, "body": { "error": "DEV_SECRET_KEY set but DEV_USER_ID missing" }, "when": "dev bypass misconfigured", "cite": "netlify/functions/_shared/auth.ts:16-18" },
+    { "status": 400, "body": { "error": "Missing params" }, "when": "deckId falsy, jobIds not an array, or empty", "cite": "netlify/functions/pptx-deck-submit.ts:13" },
+    { "status": 403, "body": { "error": "Not your deck" }, "when": "deck missing/not owned", "cite": "netlify/functions/pptx-deck-submit.ts:15" },
+    { "status": 502, "body": { "error": "PPTX service error" }, "when": "upstream non-2xx (no 413/422 passthrough here, unlike pptx-submit)", "cite": "netlify/functions/pptx-deck-submit.ts:25-29" },
+    { "status": 500, "body": { "error": "Internal error" }, "when": "malformed JSON, null body, non-UUID deckId, missing env, network error, upstream 2xx non-JSON", "cite": "netlify/functions/_shared/http.ts:14-18" }
+  ],
+  "sideEffects": ["Creates an upstream stitch job.", "void incrementExportCounts(userId, deckId) on success - counts a deck export in addition to each per-slide pptx-submit count."],
+  "externalCalls": ["POST ${PPTX_API_URL}/decks, headers Authorization: Bearer ${PPTX_API_TOKEN}, Content-Type: application/json, body {job_ids: jobIds, presentation_title: presentationTitle ?? ''} (pptx-deck-submit.ts:20-24). Upstream (slidestudio compat routes.py:176-189) returns 202 {deck_id, status:'queued', poll_url}; 422 if job_ids empty/not strings."],
+  "quirks": [
+    "Returns 200 (not 202).",
+    "jobIds are not checked to belong to deckId or the caller - any job ids are stitched.",
+    "deckId is only used for the ownership check and export counter; it is not sent upstream.",
+    "Method check before auth."
+  ],
+  "beforeAnyState": "Deck missing -> 403. Unknown jobIds: upstream accepts and the stitch later fails (status 'failed').",
+  "tests": [ { "file": "none", "asserts": "No unit test covers pptx-deck-submit.ts." } ],
+  "callers": [
+    { "who": "frontend", "where": "src/lib/api.ts:256-258 (submitPptxDeck) via src/lib/pptxDownload.ts:113-116", "expects": "{deckJobId}; sends presentationTitle always" },
+    { "who": "Auxi_Connector", "where": "C:/Github/Auxi_Connector/app/api/routes/forge_deck.py:368-397", "expects": "body {deckId, jobIds, presentationTitle? (only when title query present)}; any >=400 -> 'PPTX stitch failed (<status>)'; 2xx must have non-empty deckJobId" }
+  ],
+  "docs": {
+    "openapi": "public/openapi.yaml:1077-1113 - matches 200 {deckJobId}; no error responses documented.",
+    "postman": "docs/postman_collection.json:335-361 (2.8) - matches.",
+    "apiMd": "docs/api.md:1328-1352 - matches."
+  },
+  "planSection65": "Row '/api/pptx-deck-submit (POST) | {deckId, jobIds[], presentationTitle} -> {deckJobId}' - accurate; add status 200, 405-before-auth, 400 'Missing params', 403, 502 'PPTX service error'."
+}

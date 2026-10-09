@@ -1,0 +1,72 @@
+{
+  "route": "/api/quick-generate",
+  "handler": "netlify/functions/quick-generate.ts",
+  "netlifyRouting": "netlify.toml:12-15 rewrites /api/* -> /.netlify/functions/:splat (status 200)",
+  "methods": ["POST"],
+  "methodHandling": { "otherMethods": "Not checked. Any method is processed identically. A GET has no body, so req.json() throws a SyntaxError -> 500 {\"error\":\"Internal error\"} (after auth).", "cite": "netlify/functions/quick-generate.ts:13-19, netlify/functions/_shared/http.ts:14-18" },
+  "auth": { "kind": "requireUser", "cite": "netlify/functions/quick-generate.ts:15", "notes": "First statement; 401 precedes any body validation. See _common.json for exact 401/500 bodies." },
+  "query": [],
+  "request": {
+    "contentType": "application/json (not checked; body is parsed with req.json() regardless of the header)",
+    "parse": "`const { layoutImageB64, ...inputs } = await req.json()` with no .catch: malformed or empty body -> 500 {\"error\":\"Internal error\"}. A JSON `null` body makes the destructuring throw TypeError -> 500 {\"error\":\"Internal error\"}. A JSON array/primitive yields inputs without `topic` -> 400 'Topic is required'.",
+    "fields": [
+      { "name": "topic", "type": "any (string expected)", "required": true, "default": null, "bounds": null, "validation": "`if (!inputs?.topic)`: falsy ('' , 0, false, null, missing) -> 400. Any truthy value passes, including non-strings.", "cite": "netlify/functions/quick-generate.ts:20" },
+      { "name": "numSlides", "type": "number expected", "required": false, "default": null, "bounds": "only a lower bound: `inputs.numSlides < 1` -> 400. NO upper bound (MAX_SLIDES_PER_DECK is not applied here). Missing/undefined or a non-numeric string passes because `undefined < 1` and `'abc' < 1` are false; '0' (string) is rejected because '0' < 1 is true.", "validation": "inputs.numSlides < 1", "cite": "netlify/functions/quick-generate.ts:21, netlify/functions/_shared/anthropic.ts:93-98" },
+      { "name": "company, audience, style, keyMessages, context, brandId, primaryColor, accentColor, fontStyle, styleInstructions, language", "type": "WizardInputs fields", "required": false, "default": null, "bounds": null, "validation": "None in this handler. Typed as WizardInputs only (TypeScript cast, no runtime check).", "cite": "netlify/functions/quick-generate.ts:19, netlify/functions/_shared/anthropic.ts:12-32" },
+      { "name": "layoutImageB64", "type": "string (base64 PNG)", "required": false, "default": null, "bounds": "decoded length 1..4194304 bytes (4 MB); first 4 bytes must be 89 50 4E 47", "validation": "If present (!== undefined): non-string or empty string -> 400 'layoutImageB64 must be a base64 string'; decoded length 0 or > 4MB -> 400 'Layout image must be a PNG up to 4MB'; wrong magic -> 400 'Layout image must be a PNG'. JSON null counts as present and non-string -> 400. Decoding uses Buffer.from(s,'base64'), which silently skips invalid characters.", "cite": "netlify/functions/quick-generate.ts:10-11, 24-34" }
+    ],
+    "unknownFields": "Forwarded verbatim. Everything except layoutImageB64 is passed as `inputs` to the background trigger and on to generateStoryline/prompt assembly. layoutImageB64 is stripped from inputs.",
+    "unknownFieldsCite": "netlify/functions/quick-generate.ts:16-19, 40"
+  },
+  "checkOrder": [
+    "1. requireUser (quick-generate.ts:15)",
+    "2. parse body (quick-generate.ts:19)",
+    "3. topic truthy (quick-generate.ts:20)",
+    "4. numSlides >= 1 (quick-generate.ts:21)",
+    "5. layoutImageB64 type -> size -> PNG magic (quick-generate.ts:24-34)",
+    "6. jobId = randomUUID(); write layout blob (if any), then the pending job record, then trigger background (quick-generate.ts:36-40)"
+  ],
+  "responses": [
+    { "status": 202, "contentType": "application/json", "headers": {}, "when": "accepted", "bodyShape": { "jobId": "string (UUID v4 from crypto.randomUUID)" }, "example": { "jobId": "3f2b6c1e-8a4d-4f6e-9b1a-2c3d4e5f6a7b" }, "cite": "netlify/functions/quick-generate.ts:36, 41" }
+  ],
+  "errors": [
+    { "status": 401, "body": { "error": "Missing bearer token" }, "when": "no/invalid Authorization header", "cite": "netlify/functions/_shared/http.ts:23" },
+    { "status": 401, "body": { "error": "Invalid or expired session" }, "when": "token rejected by Supabase", "cite": "netlify/functions/_shared/auth.ts:23" },
+    { "status": 400, "body": { "error": "Topic is required" }, "when": "topic falsy/missing", "cite": "netlify/functions/quick-generate.ts:20" },
+    { "status": 400, "body": { "error": "Slides must be at least 1" }, "when": "numSlides < 1", "cite": "netlify/functions/quick-generate.ts:21" },
+    { "status": 400, "body": { "error": "layoutImageB64 must be a base64 string" }, "when": "layoutImageB64 present but not a non-empty string", "cite": "netlify/functions/quick-generate.ts:25-27" },
+    { "status": 400, "body": { "error": "Layout image must be a PNG up to 4MB" }, "when": "decoded bytes empty or > 4*1024*1024", "cite": "netlify/functions/quick-generate.ts:29-31" },
+    { "status": 400, "body": { "error": "Layout image must be a PNG" }, "when": "first 4 decoded bytes are not the PNG magic", "cite": "netlify/functions/quick-generate.ts:32" },
+    { "status": 500, "body": { "error": "Internal error" }, "when": "malformed/empty JSON body, JSON null body, or a Blobs write failure", "cite": "netlify/functions/_shared/http.ts:14-18" }
+  ],
+  "sideEffects": [
+    "If layoutImageB64 valid: writes the PNG to deck-images store at quick/<jobId>/layout.png (quick-generate.ts:37, blobs.ts:194-196). The background deletes it after use (quick-generate-background.ts:119-123).",
+    "Writes quick-jobs blob quick/<jobId>.json = {status:'pending', userId} (quick-generate.ts:38, blobs.ts:198-200).",
+    "POSTs {jobId, userId, inputs, layoutImage:boolean} to <origin>/.netlify/functions/quick-generate-background (quick-generate.ts:39-40, trigger.ts:51-57).",
+    "No DB writes: no deck row, no deck cap reservation, no usage_events (openapi.yaml:403-405 says so too)."
+  ],
+  "externalCalls": [
+    "None in the foreground. The background run calls Anthropic (generateStoryline, ANTHROPIC_API_KEY) and OpenAI image generation/edit (OPENAI_API_KEY), up to 10 concurrent images (quick-generate-background.ts:22, 36-37, 41, 94-110)."
+  ],
+  "quirks": [
+    "Trigger failures are swallowed: triggerWithRetry retries twice (200ms, 600ms) then only logs, so the route still returns 202 and the job stays {status:'pending'} forever (trigger.ts:1-25, quick-generate.ts:40-41).",
+    "No upper bound on numSlides and no deck cap: the client controls how many slides (and so how many paid images) are generated.",
+    "The background does NOT call reserveImageSlot, so quick-generate images bypass GLOBAL_IMAGES_PER_DAY (quick-generate-background.ts has no reserveImageSlot import; compare generate-background / brand-preview-background).",
+    "storyline divider insertion (insertDividers) runs in the background, so the number of images can exceed numSlides (quick-generate-background.ts:41).",
+    "The 202 body carries only jobId (no warnings); warnings appear later on /api/quick-status.",
+    "Content-Type header is not checked."
+  ],
+  "beforeAnyState": "Stateless submit: no prior state required. A brandId that the caller cannot read silently falls back to the legacy profile kit/defaults in the background (db.ts:322-328), it is not rejected here.",
+  "tests": [
+    { "file": "netlify/functions/_tests/quick-generate.test.ts", "asserts": "202 + string jobId + pending job write + trigger payload {jobId,userId,inputs}; 400 on empty topic; 400 on numSlides 0; 401 passthrough; inline layout: no field -> layoutImage false and no blob write; valid PNG -> blob at quick/<jobId>/layout.png and layoutImage true and inputs.layoutImageB64 stripped; non-PNG -> 400; >4MB -> 400; non-string -> 400. Status codes only, no error strings asserted." }
+  ],
+  "callers": [
+    { "who": "none in Slide-Creator src/ or Auxi_Connector", "where": "grep of src/ and C:\\Github\\Auxi_Connector\\app for '/api/quick-' finds nothing", "expects": "External/programmatic API users only (documented as the 'Quick start' path in openapi.yaml:23-28 and postman '1 · Quick Generate')." }
+  ],
+  "docs": {
+    "openapi": "public/openapi.yaml:396-468. Matches the 202 {jobId} and layoutImageB64 description. Discrepancies: does not document the 500 on malformed JSON; 401 has no body schema; WizardInputs schema may mark fields required that the handler does not check (only topic and numSlides>=1 are checked).",
+    "postman": "docs/postman_collection.json '1.1 Start quick generate': valid example body. The collection-level auth uses a hard-coded dev bypass key in the `dev_key` variable (a committed secret; see INDEX.md).",
+    "apiMd": "docs/api.md"
+  },
+  "planSection65": "Row '/api/quick-generate (POST) ... 202 {jobId}' is accurate."
+}

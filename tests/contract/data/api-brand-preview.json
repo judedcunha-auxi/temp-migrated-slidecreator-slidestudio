@@ -1,0 +1,54 @@
+{
+  "route": "/api/brand-preview",
+  "handler": "netlify/functions/brand-preview.ts",
+  "netlifyRouting": "netlify.toml:12-15 rewrites /api/* -> /.netlify/functions/:splat (status 200)",
+  "methods": ["POST"],
+  "methodHandling": { "otherMethods": "No method check. Any method with a JSON body {brandId} works identically; a GET (no body) makes req.json() throw -> 500 'Internal error'.", "cite": "netlify/functions/brand-preview.ts:8-21" },
+  "auth": { "kind": "requireUser", "cite": "netlify/functions/brand-preview.ts:10", "notes": "Requires canEdit on brandId; read-only org members get 404." },
+  "query": [],
+  "request": {
+    "contentType": "application/json",
+    "parse": "`await req.json()` with NO catch -> malformed/empty body -> 500 {\"error\":\"Internal error\"}; JSON null -> TypeError -> 500.",
+    "fields": [
+      { "name": "brandId", "type": "string", "required": true, "default": null, "bounds": "UUID", "validation": "non-string/empty -> 400 'brandId required'; !canEdit -> 404 'Brand not found'", "cite": "netlify/functions/brand-preview.ts:12-13" }
+    ],
+    "unknownFields": "ignored"
+  },
+  "checkOrder": ["1. requireUser", "2. JSON parse (500)", "3. brandId (400)", "4. canEdit (404)", "5. pending job + trigger"],
+  "responses": [
+    { "status": 202, "contentType": "application/json", "headers": {}, "when": "accepted", "bodyShape": { "jobId": "uuid" }, "example": { "jobId": "3fa85f64-5717-4562-b3fc-2c963f66afa6" }, "cite": "netlify/functions/brand-preview.ts:14-17" }
+  ],
+  "errors": [
+    { "status": 401, "body": { "error": "Missing bearer token" }, "when": "no bearer", "cite": "netlify/functions/_shared/http.ts:20-25" },
+    { "status": 401, "body": { "error": "Invalid or expired session" }, "when": "bad token", "cite": "netlify/functions/_shared/auth.ts:22-23" },
+    { "status": 400, "body": { "error": "brandId required" }, "when": "missing brandId", "cite": "netlify/functions/brand-preview.ts:12" },
+    { "status": 404, "body": { "error": "Brand not found" }, "when": "brand not editable by caller", "cite": "netlify/functions/brand-preview.ts:13" },
+    { "status": 500, "body": { "error": "Internal error" }, "when": "unparsable/absent JSON body; blob/DB failure", "cite": "netlify/functions/brand-preview.ts:11; netlify/functions/_shared/http.ts:14-18" }
+  ],
+  "sideEffects": [
+    "Job {status:'pending', userId} in store 'brand-preview-jobs' key preview/<jobId>.json (blobs.ts:274-276)",
+    "Triggers brand-preview-background {jobId, userId, brandId}; failures swallowed (trigger.ts:59-65)",
+    "Background (brand-preview-background.ts:5-29 -> brandPreview.ts:72-121): content-hash cache under store 'brand-preview' key preview/<userId>/<brandId>/<hash>.png (hash over colours/fonts/company/styleTemplate + master/wireframe bytes); on miss reserves a global image slot (reserve_image RPC, GLOBAL_IMAGES_PER_DAY default 400) and calls OpenAI image edit (with master or synthesized layout wireframe) or image generate - PAID"
+  ],
+  "externalCalls": ["OpenAI image API (OPENAI_API_KEY) from the background - paid; cached by content hash"],
+  "quirks": [
+    "No method check and uncaught req.json(): GET or malformed body -> 500.",
+    "Read-only org members get 404 even though they can read the brand.",
+    "Preview of an unchanged kit is served from cache (no image slot spent).",
+    "Global (not per-user) image cap; exceeding it surfaces only as status 'error' with 'Daily image limit reached — try again tomorrow.' in brand-preview-status."
+  ],
+  "beforeAnyState": "Brand must exist and be editable; empty kit renders with defaults (normalizeKit).",
+  "tests": [
+    { "file": "netlify/functions/_tests/brand-preview.test.ts", "asserts": "Intended: 401 on rejected auth; 400 missing brandId; 404 unowned brand; 202 + pending job + trigger payload {jobId,userId:'u1',brandId:'b1'}; status tests. STATUS 2026-10-08: the WHOLE FILE FAILS TO LOAD - esbuild transform error at line 69:35 ('Expected \")\" but found \"s\"'): the test title `it('forbids reading another user's job', ...)` contains an unescaped apostrophe inside a single-quoted string. Last touched in commit 4e75d22. Zero tests in this file run; it is BROKEN (syntax), not stale. Handler code is the oracle; the asserted values above match the handler." },
+    { "file": "netlify/functions/_tests/brand-preview-background.test.ts", "asserts": "background writes an error job when the run fails; does not throw on malformed body" }
+  ],
+  "callers": [
+    { "who": "frontend", "where": "src/lib/api.ts:222-224 (postBrandPreview); src/components/BrandPreviewPanel.tsx:22", "expects": "{jobId}" }
+  ],
+  "docs": {
+    "openapi": "public/openapi.yaml:1465-1488 - only 202 documented.",
+    "postman": "docs/postman_collection.json:640-663 (5.5) - matches",
+    "apiMd": "docs/api.md:1144-1170"
+  },
+  "planSection65": "Row: 'POST {brandId} -> 202 {jobId}'. Accurate. Add: needs edit access (404 otherwise); bad/missing JSON -> 500."
+}

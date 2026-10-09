@@ -1,0 +1,71 @@
+{
+  "route": "/api/refine",
+  "handler": "netlify/functions/refine.ts",
+  "netlifyRouting": "netlify.toml:12-15. Background: netlify/functions/refine-background.ts (type 'background', refine-background.ts:94) via _shared/trigger.ts:67-73.",
+  "methods": ["POST"],
+  "methodHandling": { "otherMethods": "Not checked. Bodyless GET -> 500 'Internal error'; other methods with JSON body behave like POST.", "cite": "refine.ts:8-50" },
+  "auth": { "kind": "requireUser", "cite": "refine.ts:10; _shared/auth.ts:9-25", "notes": "Auth first; validation; then ownership." },
+  "query": [],
+  "request": {
+    "contentType": "application/json",
+    "parse": "Destructures {deckId, number, instruction, attachments} from await req.json() (refine.ts:11-14). Malformed JSON or null -> 500 'Internal error'.",
+    "fields": [
+      { "name": "deckId", "type": "string", "required": true, "default": null, "bounds": "UUID in practice (non-UUID -> 500 from ownsDeck)", "validation": "falsy -> 400 'deckId and a valid slide number are required'", "cite": "refine.ts:15,19" },
+      { "name": "number", "type": "integer", "required": true, "default": null, "bounds": "> 0; NOT checked against the deck's slide count", "validation": "!Number.isInteger(number) || number <= 0 -> 400 'deckId and a valid slide number are required' (strings like '2' rejected)", "cite": "refine.ts:15" },
+      { "name": "instruction", "type": "string", "required": true, "default": null, "bounds": "1..600 chars AFTER trim()", "validation": "(instruction ?? '').trim(); empty -> 400 'instruction is required'; length > 600 -> 400 'instruction is too long (max 600 chars)'. A non-string instruction (e.g. number) -> .trim TypeError -> 500.", "cite": "refine.ts:16-18" },
+      { "name": "attachments", "type": "array of {type:'image', media_type, data}", "required": false, "default": "[]", "bounds": "no server-side size or count limit", "validation": "Silently filtered: kept only if a.type==='image' && typeof a.data==='string' && media_type in [image/jpeg,image/png,image/gif,image/webp]; PDFs and malformed entries dropped without error. A non-array truthy value (object/string) -> .filter TypeError -> 500 (a string has no .filter).", "cite": "refine.ts:20-24" }
+    ],
+    "unknownFields": "Ignored."
+  },
+  "checkOrder": [
+    "1. requireUser",
+    "2. req.json()",
+    "3. deckId + positive integer number (400)",
+    "4. instruction non-empty (400), <= 600 (400)",
+    "5. ownsDeck (403)",
+    "6. filter attachments",
+    "7. best-effort: readJobState; if a state exists set slides[number] = {...existing ?? {status:'idle'}, status:'generating'} and writeJobState (errors logged, swallowed)",
+    "8. best-effort: setSlideStatus(deckId, number, {status:'generating'}) (errors swallowed)",
+    "9. triggerRefineBackground({deckId, userId, number, instruction: trimmed, attachments: filtered}) — failures swallowed",
+    "10. 202 {deckId}"
+  ],
+  "responses": [
+    { "status": 202, "contentType": "application/json", "headers": {}, "when": "refine triggered", "bodyShape": { "deckId": "string (echo)" }, "example": { "deckId": "3fa85f64-5717-4562-b3fc-2c963f66afa6" }, "cite": "refine.ts:46; _tests/refine.test.ts:25-30" }
+  ],
+  "errors": [
+    { "status": 401, "body": { "error": "Missing bearer token" }, "when": "no bearer", "cite": "_shared/http.ts:20-25" },
+    { "status": 401, "body": { "error": "Invalid or expired session" }, "when": "bad token", "cite": "_shared/auth.ts:22-23" },
+    { "status": 400, "body": { "error": "deckId and a valid slide number are required" }, "when": "deckId falsy or number not a positive integer", "cite": "refine.ts:15" },
+    { "status": 400, "body": { "error": "instruction is required" }, "when": "instruction missing/blank after trim", "cite": "refine.ts:17; _tests/refine.test.ts:15-19" },
+    { "status": 400, "body": { "error": "instruction is too long (max 600 chars)" }, "when": "trimmed length > 600", "cite": "refine.ts:18" },
+    { "status": 403, "body": { "error": "Not your deck" }, "when": "not owned / not found", "cite": "refine.ts:19; _tests/refine.test.ts:20-24" },
+    { "status": 500, "body": { "error": "Internal error" }, "when": "malformed/null JSON; non-string instruction; non-array attachments; non-UUID deckId; Supabase error in ownsDeck", "cite": "_shared/http.ts:14-18" }
+  ],
+  "sideEffects": [
+    "Job-state blob: target slide status -> 'generating' synchronously before the 202 (only if a job-state blob exists) (refine.ts:32-40)",
+    "slides.variant_a_status='generating' (setSlideStatus maps status->variant_a_status) (refine.ts:42-44; _shared/db.ts:70-84)",
+    "Background trigger -> refine-background (OpenAI image edit, new version v{n})"
+  ],
+  "externalCalls": ["Supabase; Netlify Blobs; background OpenAI image edit — PAID"],
+  "quirks": [
+    "The pre-mark to 'generating' is synchronous so the first /api/status poll after the 202 is non-terminal (refine.ts:25-30); both pre-mark writes swallow errors and the 202 is still returned (_tests/refine.test.ts:46-51).",
+    "A slide number not in the deck is accepted: the job state gains a new slide {status:'generating'} (refine.ts:35-36), so /api/status shows a phantom slide and progress total increases.",
+    "Attachments are silently filtered; PDFs dropped (comment refine.ts:20).",
+    "The trigger receives the trimmed instruction.",
+    "No refine cap/budget is enforced server-side (the Connector enforces its own spend budget, forge.py:701-702)."
+  ],
+  "beforeAnyState": "Non-existent deck -> 403. Owned deck with no job-state blob: blob pre-mark skipped, DB pre-mark attempted, 202 returned.",
+  "tests": [
+    { "file": "netlify/functions/_tests/refine.test.ts", "asserts": "empty instruction 400 and no trigger; 403 non-owner; 202 + trigger {deckId,userId,number:2,instruction:'fewer words'}; synchronous DB + job-state pre-mark; 202 even when DB pre-mark fails (lines 14-51)" }
+  ],
+  "callers": [
+    { "who": "frontend", "where": "src/lib/api.ts:159-161 (postRefine(deckId, number, instruction, attachments=[]))", "expects": "2xx {deckId}" },
+    { "who": "Auxi_Connector", "where": "app/api/routes/forge.py:698-731 (/forge/refine) sends only {deckId, number, instruction} (no attachments)", "expects": "status < 400 else 502 'Refine failed (<code>).'; reads resp.json().deckId with fallback to the request deckId" }
+  ],
+  "docs": {
+    "openapi": "public/openapi.yaml:792-845 — mostly matches. Discrepancies: says attachment data 'max 4 MB each' (not enforced server-side); does not say non-image attachments are silently dropped; 202 schema DeckJobResponse mentions warnings (never returned); no 400/403 documented; maxLength 600 applies after trim.",
+    "postman": "'4 · Slide Editing' two refine requests (plain + image attachment) — consistent.",
+    "apiMd": "docs/api.md:606"
+  },
+  "planSection65": "Row '{deckId, number, instruction, attachments} → 202 {deckId}' — accurate."
+}

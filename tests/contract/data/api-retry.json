@@ -1,0 +1,63 @@
+{
+  "route": "/api/retry",
+  "handler": "netlify/functions/retry.ts",
+  "netlifyRouting": "netlify.toml:12-15. Triggers generate-background (_shared/trigger.ts:27-33).",
+  "methods": ["POST"],
+  "methodHandling": { "otherMethods": "Not checked. Bodyless GET -> 500 'Internal error' (req.json throws); any method with JSON body behaves like POST.", "cite": "retry.ts:5-33" },
+  "auth": { "kind": "requireUser", "cite": "retry.ts:8; _shared/auth.ts:9-25", "notes": "Auth first; then body; then ownership (403)." },
+  "query": [],
+  "request": {
+    "contentType": "application/json",
+    "parse": "Destructures {deckId, retryOnly} from await req.json() (retry.ts:9-12). Malformed JSON -> 500 'Internal error'. JSON null -> TypeError on destructuring -> 500 'Internal error'.",
+    "fields": [
+      { "name": "deckId", "type": "string", "required": true, "default": null, "bounds": "must be a UUID in practice: a non-UUID reaches Postgres in ownsDeck and the type error surfaces as 500 'Internal error'", "validation": "falsy -> 400 'deckId and retryOnly required'", "cite": "retry.ts:13-14; _shared/db.ts:124-128" },
+      { "name": "retryOnly", "type": "array (intended number[] of 1-based slide numbers)", "required": true, "default": null, "bounds": "none; elements NOT validated", "validation": "!Array.isArray -> 400 'deckId and retryOnly required'. Elements passed verbatim to the background, which regenerates slides where retryOnly.includes(slide.number) (_shared/generateCore.ts:128). Non-number elements (e.g. {number, variant}) silently match nothing.", "cite": "retry.ts:13,28; _shared/generateCore.ts:108-130" }
+    ],
+    "unknownFields": "Ignored."
+  },
+  "checkOrder": [
+    "1. requireUser",
+    "2. req.json()",
+    "3. deckId truthy && Array.isArray(retryOnly) (400)",
+    "4. ownsDeck (403 'Not your deck'; 500 on non-UUID)",
+    "5. parallel: getSlidePrompts, getSlideTypes, getDeckBrandId, getDeckLanguage",
+    "6. setDeckStatus(deckId,'generating')",
+    "7. triggerBackground({deckId, userId, brandId, language, slides:[{number, prompt, type}], retryOnly}) — failures swallowed",
+    "8. 202 {deckId}"
+  ],
+  "responses": [
+    { "status": 202, "contentType": "application/json", "headers": {}, "when": "retry triggered", "bodyShape": { "deckId": "string (echo of request deckId)" }, "example": { "deckId": "3fa85f64-5717-4562-b3fc-2c963f66afa6" }, "cite": "retry.ts:29; _tests/retry.test.ts:25-36" }
+  ],
+  "errors": [
+    { "status": 401, "body": { "error": "Missing bearer token" }, "when": "no bearer", "cite": "_shared/http.ts:20-25" },
+    { "status": 401, "body": { "error": "Invalid or expired session" }, "when": "bad token", "cite": "_shared/auth.ts:22-23" },
+    { "status": 400, "body": { "error": "deckId and retryOnly required" }, "when": "deckId falsy or retryOnly not an array", "cite": "retry.ts:13" },
+    { "status": 403, "body": { "error": "Not your deck" }, "when": "deck not owned by caller or does not exist", "cite": "retry.ts:14; _tests/retry.test.ts:48-53" },
+    { "status": 500, "body": { "error": "Internal error" }, "when": "malformed/null JSON, non-UUID deckId, DB errors", "cite": "_shared/http.ts:14-18" }
+  ],
+  "sideEffects": [
+    "decks.status='generating', updated_at=now (_shared/db.ts:99-102)",
+    "Background trigger; the background overlays the prior job state, keeps the deck's original masterUsed decision and regenerates only listed slides (_shared/generateCore.ts:108-130)"
+  ],
+  "externalCalls": ["Supabase; background OpenAI image generation — PAID"],
+  "quirks": [
+    "Unlike /api/refine, retry does NOT pre-mark slides 'generating' in the job state, so the first /api/status poll after the 202 can still report done:true (frontend calls restart() on the poller; src/lib/useDeckStatus.ts:5-10).",
+    "retryOnly:[] is accepted: deck status flips to 'generating' but nothing is regenerated (empty array is truthy in generateCore.ts:108 and wanted() matches nothing).",
+    "Not counted against any cap; brandId and language are recovered from decks.inputs, not the request (_shared/db.ts:461-478).",
+    "Slide types are re-attached from the persisted storyline (types[s.number] may be undefined) (retry.ts:25)."
+  ],
+  "beforeAnyState": "A non-existent deck -> 403 'Not your deck' (indistinguishable from foreign).",
+  "tests": [
+    { "file": "netlify/functions/_tests/retry.test.ts", "asserts": "202; trigger arg deckId, retryOnly passed verbatim (test uses [{number:2, variant:'B'}] objects, legacy shape), slides from prompts, setDeckStatus 'generating'; type re-attached; 403 non-owner; brandId and language recovered (lines 24-71). Passing as of 2026-10-08." }
+  ],
+  "callers": [
+    { "who": "frontend", "where": "src/lib/api.ts:155-157 (postRetry(deckId, numbers)); src/pages/Generation.tsx:151 sends [number]", "expects": "2xx {deckId}" },
+    { "who": "Auxi_Connector", "where": "none", "expects": "-" }
+  ],
+  "docs": {
+    "openapi": "public/openapi.yaml:847-879 — matches (retryOnly integer[], 202 DeckJobResponse). DeckJobResponse lists `warnings`, which retry never returns. No 400/403 documented.",
+    "postman": "'4 · Slide Editing' POST /api/retry {deckId, retryOnly:[2,4]} — consistent.",
+    "apiMd": "docs/api.md:569"
+  },
+  "planSection65": "Row '{deckId, retryOnly} → 202 {deckId}' — accurate."
+}

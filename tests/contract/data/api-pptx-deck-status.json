@@ -1,0 +1,51 @@
+{
+  "route": "/api/pptx-deck-status",
+  "handler": "netlify/functions/pptx-deck-status.ts",
+  "netlifyRouting": "netlify.toml:12-15 rewrites /api/* -> /.netlify/functions/:splat (status 200)",
+  "methods": ["GET"],
+  "methodHandling": { "otherMethods": "Not checked; any method behaves like GET.", "cite": "netlify/functions/pptx-deck-status.ts:5-24" },
+  "auth": { "kind": "requireUser", "cite": "netlify/functions/pptx-deck-status.ts:7", "notes": "No ownership check on deckJobId." },
+  "query": [
+    { "name": "deckJobId", "type": "string", "required": true, "parse": "searchParams.get('deckJobId'), URL-encoded upstream", "default": null, "bounds": "none", "invalidBehaviour": "missing -> 400 'Missing deckJobId'; unknown -> 502", "cite": "netlify/functions/pptx-deck-status.ts:8-9,14" }
+  ],
+  "request": { "contentType": "none", "parse": "Body never read.", "fields": [], "unknownFields": "ignored" },
+  "checkOrder": ["1. requireUser", "2. deckJobId present (400)", "3. requireEnv (500)", "4. GET {PPTX_API_URL}/decks/{id} (502)", "5. map status"],
+  "responses": [
+    {
+      "status": 200,
+      "contentType": "application/json",
+      "headers": { "content-type": "application/json" },
+      "when": "upstream 2xx",
+      "bodyShape": { "status": "string verbatim from upstream (queued | running | done | failed)", "done": "status === 'done'", "failed": "status === 'failed'" },
+      "example": { "status": "done", "done": true, "failed": false },
+      "cite": "netlify/functions/pptx-deck-status.ts:19-20"
+    }
+  ],
+  "errors": [
+    { "status": 401, "body": { "error": "Missing bearer token" }, "when": "no bearer", "cite": "netlify/functions/_shared/http.ts:20-24" },
+    { "status": 401, "body": { "error": "Invalid or expired session" }, "when": "bad token", "cite": "netlify/functions/_shared/auth.ts:22-23" },
+    { "status": 500, "body": { "error": "DEV_SECRET_KEY set but DEV_USER_ID missing" }, "when": "dev bypass misconfigured", "cite": "netlify/functions/_shared/auth.ts:16-18" },
+    { "status": 400, "body": { "error": "Missing deckJobId" }, "when": "absent/empty", "cite": "netlify/functions/pptx-deck-status.ts:9" },
+    { "status": 502, "body": { "error": "PPTX service error" }, "when": "upstream non-2xx incl. 404 unknown/reaped deck job", "cite": "netlify/functions/pptx-deck-status.ts:17; C:/Github/slidestudio/server/compat/routes.py:195-196" },
+    { "status": 500, "body": { "error": "Internal error" }, "when": "missing env, network error, non-JSON 2xx", "cite": "netlify/functions/_shared/http.ts:14-18" }
+  ],
+  "sideEffects": ["none"],
+  "externalCalls": ["GET ${PPTX_API_URL}/decks/${encodeURIComponent(deckJobId)} with Bearer PPTX_API_TOKEN"],
+  "quirks": [
+    "Identical shape/logic to /api/pptx-status but the param is deckJobId and upstream path /decks/{id}.",
+    "Upstream error text and slide_count are not forwarded.",
+    "No ownership check; unknown id -> 502 not 404."
+  ],
+  "beforeAnyState": "Unknown deckJobId -> 502 {\"error\":\"PPTX service error\"}.",
+  "tests": [ { "file": "none", "asserts": "No unit test." } ],
+  "callers": [
+    { "who": "frontend", "where": "src/lib/api.ts:260-262 via src/lib/pptxDownload.ts:21-37 (5 s poll)", "expects": "done/failed booleans" },
+    { "who": "Auxi_Connector", "where": "C:/Github/Auxi_Connector/app/api/routes/forge_deck.py:259-261 (_check_conversion endpoint=/api/pptx-deck-status param=deckJobId); classification forge.py:828-869", "expects": "5xx/429/unreachable -> running; other 4xx -> terminal; done/failed via flags or status" }
+  ],
+  "docs": {
+    "openapi": "public/openapi.yaml:1115-1132 - PptxJobStatus enum says pending|done|failed; actual queued|running|done|failed. No errors documented.",
+    "postman": "docs/postman_collection.json:363-374 (2.9) - matches.",
+    "apiMd": "docs/api.md:1356-1372 - same enum discrepancy."
+  },
+  "planSection65": "Row '/api/pptx-deck-status (GET ?deckJobId=) | {status, done, failed}' - accurate; add 400 'Missing deckJobId', 502 'PPTX service error' (unknown id), status vocabulary."
+}

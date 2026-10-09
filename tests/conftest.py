@@ -22,6 +22,7 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 from app.config.ai import AISettings
+from app.config.darwin import DarwinSettings
 from app.config.engine import EngineSettings
 from app.config.settings import Settings
 from app.core.redis_client import RedisClient, RedisStore
@@ -45,6 +46,13 @@ def build_ai_settings(**overrides: Any) -> AISettings:
     values: dict[str, Any] = {"anthropic_api_key": "", "gemini_api_key": ""}
     values.update(overrides)
     return AISettings(_env_file=None, **values)  # type: ignore[call-arg]
+
+
+def build_darwin_settings(**overrides: Any) -> DarwinSettings:
+    """Darwin's settings from explicit values only: no environment, no .env, no OpenAI key unless given."""
+    values: dict[str, Any] = {"openai_api_key": ""}
+    values.update(overrides)
+    return DarwinSettings(_env_file=None, **values)  # type: ignore[call-arg]
 
 
 @pytest.fixture
@@ -79,11 +87,13 @@ class _RealProviderForbidden(AssertionError):
 def no_paid_model_calls(monkeypatch: pytest.MonkeyPatch) -> None:
     """No test may build a real provider client, so no test can make a paid model call.
 
-    The Anthropic and Gemini SDK clients refuse to be constructed for the whole run, whatever keys
-    the environment holds. Provider tests hand their provider a fake client object instead
-    (tests/core/llm), and everything above the providers runs on tests/fakes/llm.py.
+    The Anthropic, Gemini and OpenAI SDK clients refuse to be constructed for the whole run, whatever
+    keys the environment holds. Provider tests hand their provider a fake client object instead
+    (tests/core/llm, tests/core/darwin), and everything above the providers runs on tests/fakes/llm.py,
+    tests/fakes/storyline_model.py and tests/fakes/image_gen.py.
     """
     import anthropic
+    import openai
     from google import genai
 
     def refuse(*_args: Any, **_kwargs: Any) -> Any:
@@ -92,3 +102,5 @@ def no_paid_model_calls(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(anthropic, "Anthropic", refuse)
     monkeypatch.setattr(anthropic, "AsyncAnthropic", refuse)
     monkeypatch.setattr(genai, "Client", refuse)
+    monkeypatch.setattr(openai, "OpenAI", refuse)
+    monkeypatch.setattr(openai, "AsyncOpenAI", refuse)

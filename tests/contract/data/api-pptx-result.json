@@ -1,0 +1,54 @@
+{
+  "route": "/api/pptx-result",
+  "handler": "netlify/functions/pptx-result.ts",
+  "netlifyRouting": "netlify.toml:12-15 rewrites /api/* -> /.netlify/functions/:splat (status 200)",
+  "methods": ["GET"],
+  "methodHandling": { "otherMethods": "Not checked; any method behaves like GET.", "cite": "netlify/functions/pptx-result.ts:5-31" },
+  "auth": { "kind": "requireUser", "cite": "netlify/functions/pptx-result.ts:7", "notes": "No ownership check on jobId." },
+  "query": [
+    { "name": "jobId", "type": "string", "required": true, "parse": "searchParams.get('jobId'), URL-encoded upstream", "default": null, "bounds": "none", "invalidBehaviour": "missing -> 400 'Missing jobId'; unknown/not-done -> 502 'PPTX service unavailable'", "cite": "netlify/functions/pptx-result.ts:8-9,14" }
+  ],
+  "request": { "contentType": "none", "parse": "Body never read.", "fields": [], "unknownFields": "ignored" },
+  "checkOrder": ["1. requireUser", "2. jobId present (400)", "3. requireEnv (500)", "4. GET {PPTX_API_URL}/jobs/{id}/result, redirect: 'follow' (502 on non-2xx)", "5. stream bytes back"],
+  "responses": [
+    {
+      "status": 200,
+      "contentType": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+      "headers": { "content-type": "application/vnd.openxmlformats-officedocument.presentationml.presentation", "content-disposition": "attachment; filename=\"slide.pptx\"" },
+      "when": "upstream result 2xx (after following redirects server-side)",
+      "bodyShape": "upstream bytes verbatim (a .pptx zip, starts with 'PK'); content-type forced regardless of upstream type; no cache-control",
+      "example": "<binary PK...>",
+      "cite": "netlify/functions/pptx-result.ts:14-27"
+    }
+  ],
+  "errors": [
+    { "status": 401, "body": { "error": "Missing bearer token" }, "when": "no bearer", "cite": "netlify/functions/_shared/http.ts:20-24" },
+    { "status": 401, "body": { "error": "Invalid or expired session" }, "when": "bad token", "cite": "netlify/functions/_shared/auth.ts:22-23" },
+    { "status": 500, "body": { "error": "DEV_SECRET_KEY set but DEV_USER_ID missing" }, "when": "dev bypass misconfigured", "cite": "netlify/functions/_shared/auth.ts:16-18" },
+    { "status": 400, "body": { "error": "Missing jobId" }, "when": "jobId absent/empty", "cite": "netlify/functions/pptx-result.ts:9" },
+    { "status": 502, "body": { "error": "PPTX service unavailable" }, "when": "upstream non-2xx (unknown job, job not done, reaped after 24h -> upstream 404)", "cite": "netlify/functions/pptx-result.ts:18; C:/Github/slidestudio/server/compat/routes.py:156-157" },
+    { "status": 500, "body": { "error": "Internal error" }, "when": "missing env, network failure", "cite": "netlify/functions/_shared/http.ts:14-18" }
+  ],
+  "sideEffects": ["none"],
+  "externalCalls": ["GET ${PPTX_API_URL}/jobs/${encodeURIComponent(jobId)}/result, redirect follow, Authorization: Bearer ${PPTX_API_TOKEN}"],
+  "quirks": [
+    "Error text differs from pptx-status: 'PPTX service unavailable' here vs 'PPTX service error' there (pptx-result.ts:18 vs pptx-status.ts:17).",
+    "Content-type and filename are hard-coded; an upstream HTML/JSON 200 body would be served as a .pptx (Connector guards with a PK magic check).",
+    "Calling before done -> 502 (upstream 404), not 409/404.",
+    "Body buffered fully (res.arrayBuffer) - no streaming; no size limit.",
+    "Repeatable: the same job's result can be re-downloaded until upstream reaps it (Connector comment forge.py:65).",
+    "No ownership check; also used for /api/image-to-slide jobs."
+  ],
+  "beforeAnyState": "Unknown jobId or job still running -> 502 {\"error\":\"PPTX service unavailable\"}.",
+  "tests": [ { "file": "none", "asserts": "No unit test covers pptx-result.ts." } ],
+  "callers": [
+    { "who": "frontend", "where": "src/lib/api.ts:240-253 (downloadPptxResult) via src/lib/pptxDownload.ts:50", "expects": "res.ok -> blob; else Error('Download failed'). Filename chosen client-side." },
+    { "who": "Auxi_Connector", "where": "C:/Github/Auxi_Connector/app/api/routes/forge.py:971-1007 (_download_result) and :1010-1052 (_confirm_artifact_downloadable); image_slide.py:381-420", "expects": "Streams with follow_redirects=False (forge.py:937-968) - Darwin follows upstream redirects itself so the Connector sees a 200. Body must start with b'PK' (forge.py:872) and be non-empty; >=400 -> error (confirm: 5xx/429 -> running, other 4xx -> terminal)." }
+  ],
+  "docs": {
+    "openapi": "public/openapi.yaml:1056-1075 - matches 200 content-type and disposition. No error responses documented.",
+    "postman": "docs/postman_collection.json:147-159 (1b.3) - matches.",
+    "apiMd": "docs/api.md:1295-1324 - matches."
+  },
+  "planSection65": "Row '/api/pptx-result (GET ?jobId=) | pptx bytes' - accurate. Add exact content-type, content-disposition 'attachment; filename=\"slide.pptx\"', 400 'Missing jobId', 502 'PPTX service unavailable'."
+}

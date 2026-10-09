@@ -1,0 +1,66 @@
+{
+  "route": "/api/storyline-status",
+  "handler": "netlify/functions/storyline-status.ts",
+  "netlifyRouting": "netlify.toml:12-15 rewrites /api/* -> /.netlify/functions/:splat (status 200)",
+  "methods": ["GET"],
+  "methodHandling": {
+    "otherMethods": "Method never checked; any method behaves like GET (body ignored).",
+    "cite": "storyline-status.ts:5-16"
+  },
+  "auth": {
+    "kind": "requireUser",
+    "cite": "storyline-status.ts:7; _shared/auth.ts:9-25",
+    "notes": "Auth before the jobId check: no token -> 401 'Missing bearer token'; bad token -> 401 'Invalid or expired session'."
+  },
+  "query": [
+    { "name": "jobId", "type": "string", "required": true, "parse": "searchParams.get('jobId'); not validated as UUID", "default": null, "bounds": null, "invalidBehaviour": "missing or empty -> 400 'jobId is required'. Any non-empty string is used verbatim as part of the blob key storyline/{jobId}.json; an unknown id returns {status:'pending'}.", "cite": "storyline-status.ts:8-9" }
+  ],
+  "request": {
+    "contentType": "none",
+    "parse": "No body read.",
+    "fields": [],
+    "unknownFields": "Unknown query params ignored."
+  },
+  "checkOrder": [
+    "1. requireUser",
+    "2. jobId present (400)",
+    "3. readStorylineJob(jobId); null -> 200 {status:'pending'} (NO ownership check)",
+    "4. job.userId !== caller -> 403 'Not your job'",
+    "5. 200 {status, result, error}"
+  ],
+  "responses": [
+    { "status": 200, "contentType": "application/json", "headers": {}, "when": "no job blob exists yet (or unknown jobId)", "bodyShape": { "status": "'pending'" }, "example": { "status": "pending" }, "cite": "storyline-status.ts:10-11; _tests/storyline-status.test.ts:29-34" },
+    { "status": 200, "contentType": "application/json", "headers": {}, "when": "job blob exists, status pending (written by /api/storyline)", "bodyShape": { "status": "'pending'" }, "example": { "status": "pending" }, "cite": "storyline-status.ts:13; storyline.ts:17. result/error are undefined and dropped by JSON.stringify." },
+    { "status": 200, "contentType": "application/json", "headers": {}, "when": "job done", "bodyShape": { "status": "'done'", "result": { "presentationTitle": "string", "inputs": "WizardInputs exactly as POSTed to /api/storyline (unknown fields included)", "slides": "array of Storyline slides (number,title,type,section?,framework,description,bullets,chartData?,archetypeId?) after insertDividers, each plus `prompt` (server-assembled image prompt)", "warnings": "string[] (frameworkGuard repair notes; may be [])" } }, "example": { "status": "done", "result": { "presentationTitle": "Q3 2026 Financial Results", "inputs": { "topic": "Q3", "numSlides": 3 }, "slides": [ { "number": 1, "title": "Q3 beat plan by 12%", "type": "title", "section": "Overview", "framework": "title slide", "description": "...", "bullets": [], "prompt": "..." } ], "warnings": [] } }, "cite": "storyline-status.ts:13; storyline-background.ts:20-32" },
+    { "status": 200, "contentType": "application/json", "headers": {}, "when": "job errored", "bodyShape": { "status": "'error'", "error": "string" }, "example": { "status": "error", "error": "Claude returned an incomplete storyline — please try again or reduce the number of slides" }, "cite": "storyline-status.ts:13; storyline-background.ts:33-45" }
+  ],
+  "errors": [
+    { "status": 401, "body": { "error": "Missing bearer token" }, "when": "no bearer", "cite": "_shared/http.ts:20-25" },
+    { "status": 401, "body": { "error": "Invalid or expired session" }, "when": "bad token", "cite": "_shared/auth.ts:22-23" },
+    { "status": 400, "body": { "error": "jobId is required" }, "when": "jobId missing/empty", "cite": "storyline-status.ts:9; _tests/storyline-status.test.ts:43-47" },
+    { "status": 403, "body": { "error": "Not your job" }, "when": "job exists and belongs to another user", "cite": "storyline-status.ts:12; _tests/storyline-status.test.ts:36-41" },
+    { "status": 500, "body": { "error": "Internal error" }, "when": "Blobs read failure", "cite": "_shared/http.ts:14-18" }
+  ],
+  "sideEffects": ["None (read-only)."],
+  "externalCalls": ["Netlify Blobs store 'storyline-jobs' key storyline/{jobId}.json (_shared/blobs.ts:142-157)"],
+  "quirks": [
+    "Unknown/never-written jobId returns 200 {status:'pending'} rather than 404, and before the ownership check — any user polling any non-existent id sees pending forever.",
+    "Response always built as {status, result, error}; undefined members are omitted from the JSON, so a pending job is exactly {\"status\":\"pending\"}, a done job has no `error` key, an error job has no `result` key.",
+    "Error strings in status:'error' are either the fixed Zod message 'Claude returned an incomplete storyline — please try again or reduce the number of slides', the raw Error.message of whatever failed (Anthropic SDK error text, 'Missing required env var: ANTHROPIC_API_KEY', Supabase errors), or 'Storyline generation failed' for non-Error throws (storyline-background.ts:34-44). ZodError detection is by constructor name (storyline-background.ts:34).",
+    "No TTL: job blobs are never deleted."
+  ],
+  "beforeAnyState": "200 {\"status\":\"pending\"} (storyline-status.ts:11).",
+  "tests": [
+    { "file": "netlify/functions/_tests/storyline-status.test.ts", "asserts": "done job for owner -> 200 with result.presentationTitle; missing blob -> pending; other user's job -> 403; no jobId -> 400 (lines 18-47)" }
+  ],
+  "callers": [
+    { "who": "frontend", "where": "src/lib/api.ts:39-44 (getStorylineStatus), polled by pollStoryline src/lib/api.ts:48-61 every 2s, max 90 polls", "expects": "status 'done' with result -> returns result; 'error' -> throws error || 'Storyline generation failed'; anything else keeps polling" },
+    { "who": "Auxi_Connector", "where": "none", "expects": "-" }
+  ],
+  "docs": {
+    "openapi": "public/openapi.yaml:584-634 — shape matches. Discrepancies: jobId declared format uuid (handler accepts any string); done example omits result.warnings and shows prompt:\"\" (real prompts are server-assembled, non-empty); example slide has 2 bullets on a 'kpi' slide (would not pass storylineSchema); no 400/403 documented.",
+    "postman": "'2 · Full Deck Flow' GET /api/storyline-status?jobId={{jobId}} — consistent.",
+    "apiMd": "docs/api.md:295"
+  },
+  "planSection65": "Row '{status, result?, error?} / {status:\"pending\"}' — accurate. Add 403 'Not your job' and that an unknown jobId yields pending (not 404)."
+}

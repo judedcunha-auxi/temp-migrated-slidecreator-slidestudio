@@ -1,0 +1,64 @@
+{
+  "route": "/api/brand-pptx",
+  "handler": "netlify/functions/brand-pptx.ts",
+  "netlifyRouting": "netlify.toml:12-15 rewrites /api/* -> /.netlify/functions/:splat (status 200)",
+  "methods": ["POST"],
+  "methodHandling": { "otherMethods": "405 {\"error\":\"POST only\"} - checked AFTER requireUser (unauthenticated GET gets 401)", "cite": "netlify/functions/brand-pptx.ts:16-17" },
+  "auth": { "kind": "requireUser", "cite": "netlify/functions/brand-pptx.ts:16; netlify/functions/_shared/auth.ts:9-25", "notes": "When brandId is supplied the caller needs canEdit on it (owner, or admin for an org brand); otherwise 404 (not 403)." },
+  "query": [],
+  "request": {
+    "contentType": "multipart/form-data",
+    "parse": "content-type header must CONTAIN 'multipart/form-data' (case-sensitive substring) else 415 'Expected multipart/form-data'. `req.formData().catch(() => null)` -> parse failure 400 'Could not parse form data'.",
+    "fields": [
+      { "name": "file", "type": "file part", "required": true, "default": null, "bounds": "1..5242880 bytes (5 MiB); first 4 bytes PK\\x03\\x04", "validation": "missing or a plain string field -> 400 'file is required'; empty or > 5 MiB -> 400 'Template must be a .pptx file up to 5 MB'; magic != 50 4B 03 04 -> 400 'File must be a valid .pptx' (any ZIP passes; filename/part content-type not checked)", "cite": "netlify/functions/brand-pptx.ts:11-12,27-29,37-43" },
+      { "name": "brandId", "type": "string form field", "required": false, "default": "undefined (empty string treated as absent)", "bounds": "UUID", "validation": "if non-empty string and caller lacks canEdit (unreachable, non-UUID, or read-only org member) -> 404 'Brand not found'. Checked BEFORE the file size/magic checks.", "cite": "netlify/functions/brand-pptx.ts:31-35" }
+    ],
+    "unknownFields": "other form fields ignored"
+  },
+  "checkOrder": ["1. requireUser", "2. method POST (405)", "3. content-type (415)", "4. formData parse (400)", "5. file present (400)", "6. brandId access (404)", "7. size (400)", "8. magic (400)", "9. write temp blob + pending job + trigger background"],
+  "responses": [
+    { "status": 202, "contentType": "application/json", "headers": {}, "when": "accepted", "bodyShape": { "jobId": "uuid v4 (crypto.randomUUID)" }, "example": { "jobId": "3fa85f64-5717-4562-b3fc-2c963f66afa6" }, "cite": "netlify/functions/brand-pptx.ts:45-53" }
+  ],
+  "errors": [
+    { "status": 401, "body": { "error": "Missing bearer token" }, "when": "no bearer", "cite": "netlify/functions/_shared/http.ts:20-25" },
+    { "status": 401, "body": { "error": "Invalid or expired session" }, "when": "bad token", "cite": "netlify/functions/_shared/auth.ts:22-23" },
+    { "status": 405, "body": { "error": "POST only" }, "when": "non-POST", "cite": "netlify/functions/brand-pptx.ts:17" },
+    { "status": 415, "body": { "error": "Expected multipart/form-data" }, "when": "content-type lacks multipart/form-data", "cite": "netlify/functions/brand-pptx.ts:19-22" },
+    { "status": 400, "body": { "error": "Could not parse form data" }, "when": "formData() rejects", "cite": "netlify/functions/brand-pptx.ts:24-25" },
+    { "status": 400, "body": { "error": "file is required" }, "when": "no file part", "cite": "netlify/functions/brand-pptx.ts:28" },
+    { "status": 404, "body": { "error": "Brand not found" }, "when": "brandId given but caller cannot edit it (incl. read-only org member)", "cite": "netlify/functions/brand-pptx.ts:33-35" },
+    { "status": 400, "body": { "error": "Template must be a .pptx file up to 5 MB" }, "when": "empty or > 5 MiB", "cite": "netlify/functions/brand-pptx.ts:38-40" },
+    { "status": 400, "body": { "error": "File must be a valid .pptx" }, "when": "not a ZIP (PK\\x03\\x04)", "cite": "netlify/functions/brand-pptx.ts:41-43" },
+    { "status": 500, "body": { "error": "Internal error" }, "when": "blob/DB failure", "cite": "netlify/functions/_shared/http.ts:14-18" }
+  ],
+  "sideEffects": [
+    "Writes the upload to blob store 'brand-assets' at pptx-temp/<jobId>.pptx (blobs.ts:218-220); background deletes it in finally (brand-pptx-background.ts:322)",
+    "Writes job record {status:'pending', userId} to store 'brand-pptx-jobs' key pptx/<jobId>.json (blobs.ts:257-259)",
+    "POSTs {jobId, userId, pptxKey, brandId} to <origin>/.netlify/functions/brand-pptx-background with 3 attempts (0, +200ms, +600ms); failures are only logged, never surfaced - the 202 is returned and the job stays 'pending' forever (trigger.ts:3-25,75-81)",
+    "Background (brand-pptx-background.ts) then: re-checks edit access, calls PPTX_API_URL/brand-extract (multipart file + capture_all_layouts=true, bearer PPTX_API_TOKEN, 3 attempts with 8s/20s backoff on 5xx, 100s timeout each), and when brandId is set concurrently RENDER_API_URL/render-layouts?width=1600 (2 attempts), auto-extracts logo to brand/<ownerId>/<brandId>/logo.png (converting non-PNG via sharp), stores furniture.json (+ furniture-all.json when layoutsByIndex present), layout-preview-<i>.png blobs, then writes the done/error job (brand-pptx-background.ts:161-326)"
+  ],
+  "externalCalls": ["Slide Studio / SlideForge brand-extract (PPTX_API_URL, PPTX_API_TOKEN) and layout render API (RENDER_API_URL, default https://slideforge-api.whitewater-efc2081a.eastus.azurecontainerapps.io) - from the background function, not this handler. No paid LLM call."],
+  "quirks": [
+    "Without brandId: no logo, furniture, headingPlaceholders or layoutPreviews are produced; only extracted fields come back.",
+    "Read-only org member supplying an org brandId gets 404, not 403 (docs/api.md:700 notes this).",
+    "Trigger failure is swallowed: client polls 'pending' indefinitely.",
+    "No daily cap or rate limit.",
+    "The extracted fields are NOT persisted to the brand kit; the client must PATCH /api/brands (only logo/furniture/preview blobs are written directly).",
+    "No dedicated unit test for this foreground handler (no _tests/brand-pptx.test.ts)."
+  ],
+  "beforeAnyState": "Works with no brand (brandId optional).",
+  "tests": [
+    { "file": "(none for brand-pptx.ts)", "asserts": "-" },
+    { "file": "netlify/functions/_tests/brand-pptx-background.test.ts", "asserts": "background producer only; see api-brand-pptx-status.json tests (3 of 4 tests currently time out - stale mocks)" }
+  ],
+  "callers": [
+    { "who": "frontend", "where": "src/lib/api.ts:329-341 (postBrandPptx, used by src/pages/BrandEditorPage.tsx:229)", "expects": "multipart file + optional brandId; non-ok -> body.error or 'Upload failed (<status>)'; ok -> {jobId}" },
+    { "who": "Auxi_Connector", "where": "C:/Github/Auxi_Connector/app/core/forge_brands.py:312-329 (submit_template)", "expects": "multipart files={'file': ('template.pptx', bytes, pptx mime)}, data={'brandId'}; status <400 and resp.json()['jobId']" }
+  ],
+  "docs": {
+    "openapi": "public/openapi.yaml:1340-1375. Only the 202 is documented; 400/404/405/415 undocumented. brandId 'Must be a brand you own' - actually edit access (admin for org brands); unauthorised brandId -> 404.",
+    "postman": "absent",
+    "apiMd": "docs/api.md:1073-1104"
+  },
+  "planSection65": "Row: 'POST multipart file, brandId -> 202 {jobId}'. Accurate. Note brandId is optional, 415 on non-multipart, 5 MiB limit, and 404 (not 403) for non-editable brands."
+}

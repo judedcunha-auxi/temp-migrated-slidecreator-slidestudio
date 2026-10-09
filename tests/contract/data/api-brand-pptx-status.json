@@ -1,0 +1,77 @@
+{
+  "route": "/api/brand-pptx-status",
+  "handler": "netlify/functions/brand-pptx-status.ts",
+  "netlifyRouting": "netlify.toml:12-15 rewrites /api/* -> /.netlify/functions/:splat (status 200)",
+  "methods": ["GET"],
+  "methodHandling": { "otherMethods": "No method check: any method (POST, DELETE, ...) behaves exactly like GET.", "cite": "netlify/functions/brand-pptx-status.ts:5-17" },
+  "auth": { "kind": "requireUser", "cite": "netlify/functions/brand-pptx-status.ts:7", "notes": "Ownership: job.userId must equal caller userId, else 403." },
+  "query": [
+    { "name": "jobId", "type": "string", "required": true, "parse": "searchParams.get('jobId'); not UUID-validated", "default": null, "bounds": null, "invalidBehaviour": "missing/empty -> 400 'jobId is required'; any unknown string -> 200 {status:'pending'}", "cite": "netlify/functions/brand-pptx-status.ts:8-11" }
+  ],
+  "request": { "contentType": "none", "parse": "body ignored", "fields": [], "unknownFields": "ignored" },
+  "checkOrder": ["1. requireUser", "2. jobId present", "3. read job blob", "4. missing -> pending", "5. owner check", "6. return"],
+  "responses": [
+    { "status": 200, "contentType": "application/json", "headers": {}, "when": "job record not found (never created, wrong id, or not yet visible - Netlify Blobs eventual consistency)", "bodyShape": { "status": "pending" }, "example": { "status": "pending" }, "cite": "netlify/functions/brand-pptx-status.ts:11" },
+    { "status": 200, "contentType": "application/json", "headers": {}, "when": "job exists and belongs to caller", "bodyShape": { "status": "pending | done | error", "fields": "BrandPptxFields (only when done; key omitted otherwise because undefined is dropped by JSON.stringify)", "error": "string (only when error)" }, "example": { "status": "done", "fields": { "headingFont": "Georgia", "bodyFont": "Arial", "primaryColor": "#0B2D4F", "accentColor": "#E94E1B", "layouts": [{ "index": 0, "name": "Title Slide" }], "workzone": { "left": 0.05, "top": 0.2, "width": 0.9, "height": 0.7 }, "allColors": [{ "role": "accent1", "hex": "#E94E1B" }], "logoKey": "brand/u1/b1/logo.png", "furnitureKey": "brand/u1/b1/furniture.json", "furnitureArchetypes": ["cover", "content"], "headingPlaceholders": { "content": { "left": 0.05, "top": 0.05, "width": 0.9, "height": 0.12, "font": "Georgia", "color": "#1F1F1F", "sizePt": 28 } }, "layoutPreviews": [{ "index": 0, "name": "Title Slide" }] } }, "cite": "netlify/functions/brand-pptx-status.ts:13" }
+  ],
+  "fieldsProducer": {
+    "producer": "netlify/functions/brand-pptx-background.ts:297-314 (written to store 'brand-pptx-jobs' key pptx/<jobId>.json via blobs.ts:257-259)",
+    "shape": {
+      "headingFont": "string|absent - verbatim from SlideForge /brand-extract (?? undefined)",
+      "bodyFont": "string|absent",
+      "primaryColor": "string|absent (not hex-validated here)",
+      "accentColor": "string|absent",
+      "layouts": "array|absent - verbatim SlideForge layouts (LayoutEntry[]: index, name, placeholders...)",
+      "workzone": "{left,top,width,height}|absent - normalizeWorkzoneBounds: accepts width/height or right/bottom; requires finite left/top and width>0,height>0 (workzone.ts:80-93)",
+      "typographyScale": "object|absent - verbatim",
+      "masterDecorations": "array|absent - verbatim",
+      "logoShapes": "array|absent - verbatim",
+      "allColors": "array of {role, hex}|absent - verbatim",
+      "logoKey": "'brand/<ownerId>/<brandId>/logo.png' only when brandId given AND masterImages has role 'logo' or 'logo_mark' AND the write succeeded (brand-pptx-background.ts:218-241)",
+      "furnitureKey": "'brand/<ownerId>/<brandId>/furniture.json' only when brandId given and capturedFurniture.layouts has >=1 of cover/divider/content (brand-pptx-background.ts:246-268)",
+      "furnitureArchetypes": "present iff furnitureKey; order = Object.keys(capturedFurniture.layouts) filtered",
+      "headingPlaceholders": "{cover?,divider?,content?: {left,top,width,height,font?,color?,sizePt?}} only for furniture archetypes whose heading normalizes (brand-pptx-background.ts:275-286; brandKit.ts:160-175)",
+      "layoutPreviews": "[{index, name}] sorted by index, only when brandId given and >=1 layout rendered; index re-keyed to brand-extract's layout index by slug when every rendered layout matches, else renderer order; name = extracted layout name, else slug title-cased, else 'Layout <index+1>' (brand-pptx-background.ts:135-155,290-295; layoutPreviews.ts:29-46)",
+      "masterKey": "NEVER produced (declared in BrandPptxFields blobs.ts:229 and src/types.ts:158 but not written)"
+    },
+    "errorStrings": [
+      "Brand not found (brandId given, caller lacks edit) - brand-pptx-background.ts:174",
+      "PPTX file not found in storage - brand-pptx-background.ts:178",
+      "Missing required env var: PPTX_API_URL | PPTX_API_TOKEN - config.ts:27-31 via brand-pptx-background.ts:180-181",
+      "SlideForge brand-extract failed (<status>)[: <html-stripped body, max 150 chars>] - brand-pptx-background.ts:193-197",
+      "network / AbortError messages from fetch after 3 attempts - brand-pptx-background.ts:118-126",
+      "PPTX extraction failed (non-Error throw) - brand-pptx-background.ts:319"
+    ]
+  },
+  "errors": [
+    { "status": 401, "body": { "error": "Missing bearer token" }, "when": "no bearer", "cite": "netlify/functions/_shared/http.ts:20-25" },
+    { "status": 401, "body": { "error": "Invalid or expired session" }, "when": "bad token", "cite": "netlify/functions/_shared/auth.ts:22-23" },
+    { "status": 400, "body": { "error": "jobId is required" }, "when": "no jobId", "cite": "netlify/functions/brand-pptx-status.ts:9" },
+    { "status": 403, "body": { "error": "Not your job" }, "when": "job.userId !== caller", "cite": "netlify/functions/brand-pptx-status.ts:12" },
+    { "status": 500, "body": { "error": "Internal error" }, "when": "blob read failure", "cite": "netlify/functions/_shared/http.ts:14-18" }
+  ],
+  "sideEffects": ["none (read only)"],
+  "externalCalls": ["Netlify Blobs read; no paid APIs"],
+  "quirks": [
+    "Unknown jobId -> 200 {status:'pending'} forever (no 404); a client must time out on its own (frontend 90x2s, Connector 150s).",
+    "Extraction failures are 200 with status 'error' + error text, never an HTTP error.",
+    "fields passes through SlideForge data unvalidated (layouts, typographyScale, masterDecorations, logoShapes, allColors). Some fields (layoutPreviews) are NOT accepted by PATCH /api/brands ('Unknown kit field: layoutPreviews'), so callers must filter before PATCH.",
+    "No method check.",
+    "Job records are never deleted (no TTL in code)."
+  ],
+  "beforeAnyState": "Job not yet written / never existed -> 200 {\"status\":\"pending\"}.",
+  "tests": [
+    { "file": "(none for brand-pptx-status.ts)", "asserts": "-" },
+    { "file": "netlify/functions/_tests/brand-pptx-background.test.ts", "asserts": "Producer of `fields`: furniture blob stored at brand/u1/b-1/furniture.json and fields carry furnitureKey + furnitureArchetypes; no furniture ref when capturedFurniture null or no brandId; unrecognized archetype keys ignored. STATUS 2026-10-08: 3 of 4 tests FAIL (timeout 5s) - STALE TEST, not a handler bug. The fetch stub (mockExtract, test lines 29-31) returns the same JSON for every fetch, so the render-layouts call (added after the test was written; brandId is set) gets non-ZIP bytes, JSZip throws, renderLayouts sleeps 5_000ms before its retry (brand-pptx-background.ts:78-81), exceeding vitest's 5s default timeout. Only the no-brandId test (which skips rendering) passes. Fix would be a fetch stub that routes /render-layouts, or fake timers. Handler code is the oracle." }
+  ],
+  "callers": [
+    { "who": "frontend", "where": "src/lib/api.ts:343-357 (getBrandPptxStatus/pollBrandPptx; 90 polls x 2s); src/pages/BrandEditorPage.tsx:230", "expects": "status done -> fields ?? {}; error -> throws s.error || 'PPTX extraction failed'; type BrandPptxFields src/types.ts:151-176" },
+    { "who": "Auxi_Connector", "where": "C:/Github/Auxi_Connector/app/core/forge_brands.py:349-375 (await_template)", "expects": "GET ?jobId; >=400 -> give up; status 'done' -> fields dict filtered to _KIT_FIELDS {company, primaryColor, accentColor, neutralColor, headingFont, bodyFont, logoKey, masterKey, titleMasterKey, dividerMasterKey, styleTemplate, furnitureKey, furnitureArchetypes, workzone, headingPlaceholders} (forge_brands.py:338-346); 'error' -> {}; polls every 3s for 150s" }
+  ],
+  "docs": {
+    "openapi": "public/openapi.yaml:1377-1405. fields typed as BrandKitData, which lacks layouts, workzone, typographyScale, masterDecorations, logoShapes, allColors, headingPlaceholders, layoutPreviews; 403 and 400 undocumented; 'pending for unknown job' undocumented.",
+    "postman": "absent",
+    "apiMd": "docs/api.md:1105-1143"
+  },
+  "planSection65": "Row: 'GET ?jobId= -> {status, fields?, error?}'. Accurate. Add: unknown job -> {status:'pending'}; 403 'Not your job'; any method accepted."
+}

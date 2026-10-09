@@ -9,10 +9,15 @@ matters and is fixed here:
 1. logging, then telemetry (so the Azure log handler attaches next to stdout);
 2. the startup config check, logged as errors (/readyz acts on it in production);
 3. the error handlers: legacy `{"error"}` for Darwin routes, Problem Details for
-   everything else (decision D32, app/core/errors.py);
+   everything else (decision D32, app/core/errors.py), plus the Darwin quirk 500s
+   (app/api/legacy.py);
 4. middleware: CORS for the static frontend origin, then the request id
    (outermost, so every response carries it);
 5. routers, one per area of the API.
+
+The lifespan opens Redis and the storage backend (unless a test passed its own), builds
+the Darwin runtime (job queue, models, image generator; app/core/darwin/runtime.py) and,
+when WORKER_CONCURRENCY > 0, starts that many job worker loops in this process.
 
 Tests call create_app() with their own Settings, a fakeredis-backed store and,
 when they need one, their own storage (tests/fakes/general_service.py).
@@ -31,7 +36,8 @@ from app.core.logging_config import configure_logging, register_secret_values
 
 configure_logging()
 
-from app.api.routes import health  # noqa: E402 - logging must be configured first
+from app.api.legacy import install_legacy_handlers  # noqa: E402 - logging must be configured first
+from app.api.routes import exports, health, storyline  # noqa: E402
 from app.config.settings import Settings, check_config, is_production, secret_values  # noqa: E402
 from app.config.settings import settings as default_settings  # noqa: E402
 from app.core import telemetry  # noqa: E402
@@ -50,7 +56,7 @@ SERVICE_NAME = "slideforge-service"
 # Convention (tests/test_main.py holds it): a router sets its own prefix and tags
 # in its APIRouter(...) constructor, and is included with no prefix or tags, so a
 # route's path and feature tag are the same on the route object and on the wire.
-ROUTERS = (health.router,)
+ROUTERS = (health.router, storyline.router, exports.router)
 
 
 def _build_storage(s: Settings) -> Storage | None:
@@ -82,11 +88,19 @@ def create_app(
         owns_storage = app.state.storage is None
         if owns_storage:
             app.state.storage = _build_storage(s)
+        if app.state.darwin is None and app.state.storage is not None and app.state.redis is not None:
+            from app.core.darwin.runtime import build_runtime
+
+            app.state.darwin = build_runtime(s, app.state.redis, app.state.storage)
+        if app.state.darwin is not None:
+            app.state.darwin.start_workers(s.worker_concurrency)
         _log.info("startup: environment=%s production=%s config_problems=%d",
                   s.environment or "-", is_production(s), len(problems))
         try:
             yield
         finally:
+            if app.state.darwin is not None:
+                await app.state.darwin.stop_workers()
             if owns_redis and app.state.redis is not None:
                 await app.state.redis.close()
                 app.state.redis = None
@@ -107,8 +121,13 @@ def create_app(
     app.state.redis = redis
     app.state.storage = storage
     app.state.config_problems = problems
+    # The Darwin runtime (queue, models, workers) and the token verifier: built in the
+    # lifespan / on first use, or set by a test before the first request.
+    app.state.darwin = None
+    app.state.token_verifier = None
 
     install_error_handlers(app)
+    install_legacy_handlers(app)
 
     if s.cors_origins:
         app.add_middleware(

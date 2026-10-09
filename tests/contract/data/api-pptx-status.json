@@ -1,0 +1,54 @@
+{
+  "route": "/api/pptx-status",
+  "handler": "netlify/functions/pptx-status.ts",
+  "netlifyRouting": "netlify.toml:12-15 rewrites /api/* -> /.netlify/functions/:splat (status 200)",
+  "methods": ["GET"],
+  "methodHandling": { "otherMethods": "Not checked; any method behaves like GET.", "cite": "netlify/functions/pptx-status.ts:5-24" },
+  "auth": { "kind": "requireUser", "cite": "netlify/functions/pptx-status.ts:7", "notes": "Authenticated only; the userId is discarded - NO ownership check on jobId." },
+  "query": [
+    { "name": "jobId", "type": "string", "required": true, "parse": "searchParams.get('jobId'); URL-encoded into the upstream path", "default": null, "bounds": "none", "invalidBehaviour": "missing/empty -> 400 'Missing jobId'; unknown id -> upstream 404 -> 502 'PPTX service error'", "cite": "netlify/functions/pptx-status.ts:8-9,14" }
+  ],
+  "request": { "contentType": "none", "parse": "Body never read.", "fields": [], "unknownFields": "unknown query params ignored" },
+  "checkOrder": ["1. requireUser", "2. jobId present (400)", "3. requireEnv PPTX_API_URL, PPTX_API_TOKEN (500)", "4. GET {PPTX_API_URL}/jobs/{encodeURIComponent(jobId)} (502 on non-2xx)", "5. map body.status"],
+  "responses": [
+    {
+      "status": 200,
+      "contentType": "application/json",
+      "headers": { "content-type": "application/json" },
+      "when": "upstream GET /jobs/{id} 2xx",
+      "bodyShape": { "status": "string - upstream status verbatim (SlideForge/Slide Studio vocabulary: queued | running | done | failed)", "done": "boolean = status === 'done'", "failed": "boolean = status === 'failed'" },
+      "example": { "status": "running", "done": false, "failed": false },
+      "cite": "netlify/functions/pptx-status.ts:19-20; C:/Github/slidestudio/server/compat/store.py:15,63"
+    }
+  ],
+  "errors": [
+    { "status": 401, "body": { "error": "Missing bearer token" }, "when": "no bearer", "cite": "netlify/functions/_shared/http.ts:20-24" },
+    { "status": 401, "body": { "error": "Invalid or expired session" }, "when": "bad token", "cite": "netlify/functions/_shared/auth.ts:22-23" },
+    { "status": 500, "body": { "error": "DEV_SECRET_KEY set but DEV_USER_ID missing" }, "when": "dev bypass misconfigured", "cite": "netlify/functions/_shared/auth.ts:16-18" },
+    { "status": 400, "body": { "error": "Missing jobId" }, "when": "jobId absent/empty", "cite": "netlify/functions/pptx-status.ts:9" },
+    { "status": 502, "body": { "error": "PPTX service error" }, "when": "upstream non-2xx, including 404 for an unknown or reaped (24h) job", "cite": "netlify/functions/pptx-status.ts:17; C:/Github/slidestudio/server/compat/routes.py:141" },
+    { "status": 500, "body": { "error": "Internal error" }, "when": "missing PPTX_API_URL/TOKEN, network failure, upstream 2xx non-JSON", "cite": "netlify/functions/_shared/http.ts:14-18; netlify/functions/pptx-status.ts:11-12,14,19" }
+  ],
+  "sideEffects": ["none"],
+  "externalCalls": ["GET ${PPTX_API_URL}/jobs/${encodeURIComponent(jobId)} with Authorization: Bearer ${PPTX_API_TOKEN} (pptx-status.ts:14-16). Not paid (status read)."],
+  "quirks": [
+    "No ownership check: any authenticated user can poll any SlideForge job id (pptx-status.ts:7).",
+    "Status vocabulary is passed through from upstream; docs claim 'pending' but upstream uses queued/running (slidestudio compat store.py:15).",
+    "If upstream body lacks 'status', response is {\"done\":false,\"failed\":false} (status key dropped by JSON.stringify).",
+    "Upstream error/progress fields (e.g. error text on failed jobs, slidestudio routes.py:145-150) are NOT forwarded.",
+    "Unknown job -> 502 (not 404), so callers cannot distinguish 'gone' from 'service down'. Auxi_Connector deliberately treats 502 as 'still running' (forge.py:828-869).",
+    "Also polls jobs created by /api/image-to-slide (same upstream job namespace)."
+  ],
+  "beforeAnyState": "Unknown/never-created jobId -> 502 {\"error\":\"PPTX service error\"}.",
+  "tests": [ { "file": "none", "asserts": "No unit test covers pptx-status.ts." } ],
+  "callers": [
+    { "who": "frontend", "where": "src/lib/api.ts:237-239 (getPptxStatus) via src/lib/pptxDownload.ts:3-19 (poll every 5 s)", "expects": "reads done/failed booleans only; non-2xx -> rejects the export" },
+    { "who": "Auxi_Connector", "where": "C:/Github/Auxi_Connector/app/api/routes/forge.py:828-869 (_check_conversion, default endpoint /api/pptx-status param jobId); image_slide.py:325-339 uses it for image-to-slide jobs", "expects": "exception/5xx/429 -> running; other 4xx -> terminal error 'PPTX status failed (<status>)'; 2xx unparseable -> running; done if data.done or status=='done'; failed if data.failed or status=='failed'" }
+  ],
+  "docs": {
+    "openapi": "public/openapi.yaml:1037-1054 - schema PptxJobStatus (openapi.yaml:375-384) enumerates status [pending, done, failed]; actual upstream values are queued|running|done|failed. No error responses documented.",
+    "postman": "docs/postman_collection.json:134-145 (1b.2) and :322-334 (2.7) - matches.",
+    "apiMd": "docs/api.md:1277-1293 - same 'pending' enum discrepancy."
+  },
+  "planSection65": "Row '/api/pptx-status (GET ?jobId=) | {status, done, failed}' - accurate. Add: 400 'Missing jobId', 502 'PPTX service error' for any upstream non-2xx incl. unknown job, no ownership check, status values queued|running|done|failed. After the move to an internal job record, the reimplementation must keep 502 (not 404) for unknown ids or the Connector's 'treat 502 as running' logic changes behaviour (a 404 would become terminal)."
+}

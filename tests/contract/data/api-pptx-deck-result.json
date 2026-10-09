@@ -1,0 +1,51 @@
+{
+  "route": "/api/pptx-deck-result",
+  "handler": "netlify/functions/pptx-deck-result.ts",
+  "netlifyRouting": "netlify.toml:12-15 rewrites /api/* -> /.netlify/functions/:splat (status 200)",
+  "methods": ["GET"],
+  "methodHandling": { "otherMethods": "Not checked; any method behaves like GET.", "cite": "netlify/functions/pptx-deck-result.ts:5-31" },
+  "auth": { "kind": "requireUser", "cite": "netlify/functions/pptx-deck-result.ts:7", "notes": "No ownership check on deckJobId." },
+  "query": [
+    { "name": "deckJobId", "type": "string", "required": true, "parse": "searchParams.get('deckJobId'), URL-encoded upstream", "default": null, "bounds": "none", "invalidBehaviour": "missing -> 400 'Missing deckJobId'; unknown/not done -> 502 'PPTX service unavailable'", "cite": "netlify/functions/pptx-deck-result.ts:8-9,14" }
+  ],
+  "request": { "contentType": "none", "parse": "Body never read.", "fields": [], "unknownFields": "ignored" },
+  "checkOrder": ["1. requireUser", "2. deckJobId present (400)", "3. requireEnv (500)", "4. GET {PPTX_API_URL}/decks/{id}/result redirect follow (502)", "5. bytes"],
+  "responses": [
+    {
+      "status": 200,
+      "contentType": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+      "headers": { "content-type": "application/vnd.openxmlformats-officedocument.presentationml.presentation", "content-disposition": "attachment; filename=\"deck.pptx\"" },
+      "when": "upstream 2xx",
+      "bodyShape": "upstream bytes verbatim (zip, 'PK'); fixed filename deck.pptx (not the presentation title); no cache-control",
+      "example": "<binary PK...>",
+      "cite": "netlify/functions/pptx-deck-result.ts:14-27"
+    }
+  ],
+  "errors": [
+    { "status": 401, "body": { "error": "Missing bearer token" }, "when": "no bearer", "cite": "netlify/functions/_shared/http.ts:20-24" },
+    { "status": 401, "body": { "error": "Invalid or expired session" }, "when": "bad token", "cite": "netlify/functions/_shared/auth.ts:22-23" },
+    { "status": 500, "body": { "error": "DEV_SECRET_KEY set but DEV_USER_ID missing" }, "when": "dev bypass misconfigured", "cite": "netlify/functions/_shared/auth.ts:16-18" },
+    { "status": 400, "body": { "error": "Missing deckJobId" }, "when": "absent/empty", "cite": "netlify/functions/pptx-deck-result.ts:9" },
+    { "status": 502, "body": { "error": "PPTX service unavailable" }, "when": "upstream non-2xx (unknown, not done, reaped)", "cite": "netlify/functions/pptx-deck-result.ts:18; C:/Github/slidestudio/server/compat/routes.py:211-212" },
+    { "status": 500, "body": { "error": "Internal error" }, "when": "missing env, network failure", "cite": "netlify/functions/_shared/http.ts:14-18" }
+  ],
+  "sideEffects": ["none"],
+  "externalCalls": ["GET ${PPTX_API_URL}/decks/${encodeURIComponent(deckJobId)}/result, redirect follow, Bearer PPTX_API_TOKEN"],
+  "quirks": [
+    "Error text 'PPTX service unavailable' (same as pptx-result, differs from the status routes' 'PPTX service error').",
+    "Filename is always deck.pptx; the frontend renames using the title (pptxDownload.ts:119-120).",
+    "Fully buffered; no ownership check."
+  ],
+  "beforeAnyState": "Unknown or unfinished deckJobId -> 502 {\"error\":\"PPTX service unavailable\"}.",
+  "tests": [ { "file": "none", "asserts": "No unit test." } ],
+  "callers": [
+    { "who": "frontend", "where": "src/lib/api.ts:263-276 (downloadPptxDeckResult) via src/lib/pptxDownload.ts:118", "expects": "res.ok -> blob; else Error('Download failed')" },
+    { "who": "Auxi_Connector", "where": "C:/Github/Auxi_Connector/app/api/routes/forge_deck.py:446-449 (_confirm_artifact_downloadable) and :561-563 (_download_result); forge.py:937-1052", "expects": "PK magic, non-empty; 5xx/429 -> running (retried, eventually treated as gone), other 4xx -> terminal; redirects validated (not auto-followed)" }
+  ],
+  "docs": {
+    "openapi": "public/openapi.yaml:1134-1153 - matches; no errors documented.",
+    "postman": "docs/postman_collection.json:376-388 (2.10) - matches.",
+    "apiMd": "docs/api.md:1374-1384 - matches."
+  },
+  "planSection65": "Row '/api/pptx-deck-result (GET ?deckJobId=) | pptx bytes' - accurate; add filename deck.pptx, 400/502 strings."
+}

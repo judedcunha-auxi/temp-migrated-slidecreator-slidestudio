@@ -1,0 +1,55 @@
+{
+  "route": "/api/brand-heading",
+  "handler": "netlify/functions/brand-heading.ts",
+  "netlifyRouting": "netlify.toml:12-15 rewrites /api/* -> /.netlify/functions/:splat (status 200)",
+  "methods": ["POST"],
+  "methodHandling": { "otherMethods": "405 {\"error\":\"POST only\"} checked BEFORE requireUser", "cite": "netlify/functions/brand-heading.ts:30-31" },
+  "auth": { "kind": "requireUser", "cite": "netlify/functions/brand-heading.ts:31", "notes": "Needs canEdit: 404 unreachable, 403 read-only org member." },
+  "query": [],
+  "request": {
+    "contentType": "application/json",
+    "parse": "`req.json().catch(() => null)`; malformed -> 400 'brandId required'",
+    "fields": [
+      { "name": "brandId", "type": "string", "required": true, "default": null, "bounds": "UUID", "validation": "non-string/empty -> 400 'brandId required'", "cite": "netlify/functions/brand-heading.ts:33" },
+      { "name": "archetype", "type": "string", "required": true, "default": null, "bounds": "cover | divider | content", "validation": "else 400 'archetype must be cover, divider or content'", "cite": "netlify/functions/brand-heading.ts:34" },
+      { "name": "box", "type": "object {left, top, width, height}", "required": true, "default": null, "bounds": "each a finite number in [0,1]; width>0; height>0; left+width <= 1.001; top+height <= 1.001", "validation": "parseBox else 400 'box must be {left, top, width, height} as slide fractions'. Extra keys dropped.", "cite": "netlify/functions/brand-heading.ts:18-26,36-37" }
+    ],
+    "unknownFields": "ignored"
+  },
+  "checkOrder": ["1. method (405)", "2. requireUser", "3. brandId (400)", "4. archetype (400)", "5. box (400)", "6. access 404/403", "7. compute heading", "8. update furniture.json if it has layouts[archetype]", "9. update kit"],
+  "responses": [
+    { "status": 200, "contentType": "application/json", "headers": {}, "when": "applied", "bodyShape": { "headingPlaceholders": "the full map stored on the kit: existing entries for other archetypes passed through verbatim (NOT normalized) + [archetype]: {left,top,width,height, font?, color?, sizePt?}", "furnitureUpdated": "boolean" }, "example": { "headingPlaceholders": { "cover": { "left": 0.03, "top": 0.14, "width": 0.78, "height": 0.37 }, "content": { "left": 0.04, "top": 0.05, "width": 0.92, "height": 0.1, "font": "Perpetua", "color": "#1F1F1F", "sizePt": 28 } }, "furnitureUpdated": true }, "cite": "netlify/functions/brand-heading.ts:44-75; _tests/brand-heading.test.ts:35-59" }
+  ],
+  "errors": [
+    { "status": 405, "body": { "error": "POST only" }, "when": "non-POST (before auth)", "cite": "netlify/functions/brand-heading.ts:30" },
+    { "status": 401, "body": { "error": "Missing bearer token" }, "when": "no bearer", "cite": "netlify/functions/_shared/http.ts:20-25" },
+    { "status": 401, "body": { "error": "Invalid or expired session" }, "when": "bad token", "cite": "netlify/functions/_shared/auth.ts:22-23" },
+    { "status": 400, "body": { "error": "brandId required" }, "when": "bad body / brandId", "cite": "netlify/functions/brand-heading.ts:33" },
+    { "status": 400, "body": { "error": "archetype must be cover, divider or content" }, "when": "bad archetype", "cite": "netlify/functions/brand-heading.ts:34; _tests/brand-heading.test.ts:62-68" },
+    { "status": 400, "body": { "error": "box must be {left, top, width, height} as slide fractions" }, "when": "bad box", "cite": "netlify/functions/brand-heading.ts:37; _tests/brand-heading.test.ts:62-68" },
+    { "status": 404, "body": { "error": "Brand not found" }, "when": "unreachable", "cite": "netlify/functions/brand-heading.ts:40; _tests/brand-heading.test.ts:74-76" },
+    { "status": 403, "body": { "error": "Organization brands can only be edited by an admin" }, "when": "read-only member", "cite": "netlify/functions/brand-heading.ts:41; _tests/brand-heading.test.ts:71-73" },
+    { "status": 500, "body": { "error": "Internal error" }, "when": "blob/DB failure or furniture.json not valid JSON", "cite": "netlify/functions/brand-heading.ts:61; netlify/functions/_shared/http.ts:14-18" }
+  ],
+  "sideEffects": [
+    "If brand/<ownerId>/<brandId>/furniture.json exists and has layouts[archetype]: sets layouts[archetype].placeholders.heading = {...prevHeading, ...box} (keeps e.g. font/color/size keys as stored, incl. the furniture's own 'size' key) and rewrites the blob (brand-heading.ts:57-72)",
+    "brands.kit = {...kit, headingPlaceholders} (brand-heading.ts:74)"
+  ],
+  "externalCalls": ["Supabase, Netlify Blobs; no paid APIs"],
+  "quirks": [
+    "Method check precedes auth.",
+    "Kit preview entry keeps only font/color(#RRGGBB)/sizePt from the previous normalized entry; previous 'size' alias is read as sizePt (brandKit.ts:172).",
+    "Works even when the brand has no furniture (furnitureUpdated:false) - kit still updated.",
+    "Not atomic: furniture.json written before kit update.",
+    "Bounds tolerance 0.001 on right/bottom edges."
+  ],
+  "beforeAnyState": "Brand with empty kit and no furniture: 200 {headingPlaceholders:{[archetype]: box}, furnitureUpdated:false}.",
+  "tests": [
+    { "file": "netlify/functions/_tests/brand-heading.test.ts", "asserts": "moves preview title box keeping styling and other archetypes; moves export heading in furniture.json under owner (keeps 'size'); updates preview when archetype has no furniture; 400 for bad archetype/box; 403 read-only; 404 unreachable" }
+  ],
+  "callers": [
+    { "who": "frontend", "where": "src/lib/api.ts:198-204 (setTitlePlaceholder); src/components/TitlePlaceholderPicker.tsx:97", "expects": "{headingPlaceholders}" }
+  ],
+  "docs": { "openapi": "absent", "postman": "absent", "apiMd": "docs/api.md:968-1007" },
+  "planSection65": "Row: 'POST {brandId, archetype, box} -> {headingPlaceholders, furnitureUpdated}'. Accurate."
+}

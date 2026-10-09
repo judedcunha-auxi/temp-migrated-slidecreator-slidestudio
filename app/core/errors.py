@@ -12,8 +12,15 @@ SlideForge service: core/errors. Two error formats, chosen per route (decision D
 
 The choice is made from the MATCHED route, so a path that matched nothing (a 404
 or 405 from the router) gets Problem Details. Neither format ever carries a stack
-trace, exception text, SQL, host names or keys: 5xx detail is always generic, and
-the cause is logged under the request id.
+trace, exception text, SQL, host names or keys, and the cause is logged under the
+request id:
+
+* Problem Details: 5xx detail is always generic.
+* Legacy: an unhandled error is Darwin's `{"error": "Internal error"}` (`errorResponse`
+  in `_shared/http.ts`). A deliberate `ApiError` keeps its message at any status,
+  because Darwin's contract has fixed 5xx texts the callers read (502 "PPTX service
+  error", which the Connector treats as "still running"). So on a legacy route an
+  ApiError message must be one of Darwin's fixed strings, never exception text.
 
 Raise `ApiError` from a handler for any deliberate error; it renders in whichever
 format the route uses.
@@ -45,6 +52,8 @@ LEGACY_ERRORS_TAG = "legacy-errors"
 # by validating inside the handler and raising ApiError with today's text.
 LEGACY_VALIDATION_MESSAGE = "Invalid request"
 GENERIC_5XX_DETAIL = "Something went wrong on our side. Quote the request id if you report it."
+# Darwin's body for any error that is not an HttpError (`_shared/http.ts: errorResponse`).
+LEGACY_INTERNAL_ERROR = "Internal error"
 
 _TYPES: dict[int, str] = {
     400: "bad-request",
@@ -152,8 +161,8 @@ def problem_response(
 def legacy_response(
     request: Request, status: int, message: str, *, headers: dict[str, str] | None = None
 ) -> JSONResponse:
-    if status >= 500:
-        message = GENERIC_5XX_DETAIL
+    """Darwin's `json({error: message}, status)`: content-type application/json, nothing else
+    (plus our request id header). The message is shown as is: see the module docstring."""
     return JSONResponse({"error": message}, status_code=status, headers=_headers(request, headers))
 
 
@@ -215,6 +224,8 @@ async def _validation_handler(request: Request, exc: Exception) -> JSONResponse:
 async def _unhandled_handler(request: Request, exc: Exception) -> JSONResponse:
     # The cause goes to the log under the request id; the caller gets nothing internal.
     _log.exception("unhandled error on %s %s", request.method, request.url.path)
+    if uses_legacy_errors(request):
+        return legacy_response(request, 500, LEGACY_INTERNAL_ERROR)
     return _render(request, 500, GENERIC_5XX_DETAIL)
 
 

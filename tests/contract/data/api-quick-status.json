@@ -1,0 +1,43 @@
+{
+  "route": "/api/quick-status",
+  "handler": "netlify/functions/quick-status.ts",
+  "netlifyRouting": "netlify.toml:12-15 rewrites /api/* -> /.netlify/functions/:splat (status 200)",
+  "methods": ["GET"],
+  "methodHandling": { "otherMethods": "Not checked; any method behaves like GET (body ignored).", "cite": "netlify/functions/quick-status.ts:5-28" },
+  "auth": { "kind": "requireUser", "cite": "netlify/functions/quick-status.ts:7", "notes": "Before the jobId check, so a missing token gives 401 even without jobId." },
+  "query": [
+    { "name": "jobId", "type": "string", "required": true, "parse": "searchParams.get('jobId'); no format check (any non-empty string)", "default": null, "bounds": null, "invalidBehaviour": "missing or empty -> 400 'jobId is required'; a non-UUID string is just looked up and, if absent, returns {status:'pending'}", "cite": "netlify/functions/quick-status.ts:8-9" }
+  ],
+  "request": { "contentType": "none", "parse": "Body not read.", "fields": [], "unknownFields": "Extra query params ignored." },
+  "checkOrder": ["1. requireUser (:7)", "2. jobId present (:8-9)", "3. readQuickJob (:11)", "4. null -> pending (:12)", "5. owner check -> 403 (:13)", "6. error (:15)", "7. done (:17-22)", "8. otherwise pending (:25)"],
+  "responses": [
+    { "status": 200, "contentType": "application/json", "headers": {}, "when": "job blob not yet written (or never existed)", "bodyShape": { "status": "pending" }, "example": { "status": "pending" }, "cite": "netlify/functions/quick-status.ts:12" },
+    { "status": 200, "contentType": "application/json", "headers": {}, "when": "job.status === 'pending' (or any status other than error/done)", "bodyShape": { "status": "pending" }, "example": { "status": "pending" }, "cite": "netlify/functions/quick-status.ts:25" },
+    { "status": 200, "contentType": "application/json", "headers": {}, "when": "job.status === 'error'", "bodyShape": { "status": "error", "error": "string | omitted when job.error is undefined (JSON.stringify drops undefined)" }, "example": { "status": "error", "error": "Generation failed" }, "cite": "netlify/functions/quick-status.ts:15, netlify/functions/quick-generate-background.ts:113-118" },
+    { "status": 200, "contentType": "application/json", "headers": {}, "when": "job.status === 'done'", "bodyShape": { "status": "done", "slides": [ { "slideNumber": "integer", "url": "string '/api/quick-image?jobId=<encodeURIComponent(jobId)>&slide=<n>'" } ], "warnings": "string[] (job.warnings ?? [])" }, "example": { "status": "done", "slides": [ { "slideNumber": 1, "url": "/api/quick-image?jobId=3f2b6c1e-8a4d-4f6e-9b1a-2c3d4e5f6a7b&slide=1" }, { "slideNumber": 2, "url": "/api/quick-image?jobId=3f2b6c1e-8a4d-4f6e-9b1a-2c3d4e5f6a7b&slide=2" } ], "warnings": [] }, "cite": "netlify/functions/quick-status.ts:17-22" }
+  ],
+  "errors": [
+    { "status": 401, "body": { "error": "Missing bearer token" }, "when": "no bearer", "cite": "netlify/functions/_shared/http.ts:23" },
+    { "status": 401, "body": { "error": "Invalid or expired session" }, "when": "token rejected", "cite": "netlify/functions/_shared/auth.ts:23" },
+    { "status": 400, "body": { "error": "jobId is required" }, "when": "jobId missing/empty", "cite": "netlify/functions/quick-status.ts:9" },
+    { "status": 403, "body": { "error": "Not your job" }, "when": "job exists and job.userId !== caller", "cite": "netlify/functions/quick-status.ts:13" },
+    { "status": 500, "body": { "error": "Internal error" }, "when": "Blobs read failure", "cite": "netlify/functions/_shared/http.ts:14-18" }
+  ],
+  "sideEffects": [],
+  "externalCalls": [],
+  "quirks": [
+    "An unknown jobId returns 200 {status:'pending'}, not 404, so a typo polls forever (quick-status.ts:12).",
+    "Ownership is only checked once the job exists; before that anyone gets 'pending'.",
+    "slides are sorted by slideNumber by the producer (quick-generate-background.ts:111); the done body has no per-slide partial progress while pending.",
+    "`slides` falls back to [] if the done record has none (quick-status.ts:18).",
+    "In the error body, `error` is omitted (not null) when the record has no message."
+  ],
+  "beforeAnyState": "200 {\"status\":\"pending\"} for any jobId that has no blob.",
+  "tests": [ { "file": "netlify/functions/_tests/quick-status.test.ts", "asserts": "null job -> pending; pending -> pending; done -> slides with url containing '/api/quick-image?jobId=j1&slide=1'; error -> {status:'error', error:'boom'}; other owner -> 403; no jobId -> 400. Does not assert `warnings`." } ],
+  "callers": [ { "who": "none in Slide-Creator src/ or Auxi_Connector", "where": "grep for '/api/quick-' finds no caller", "expects": "External API users (openapi/postman quick-start flow)." } ],
+  "docs": {
+    "openapi": "public/openapi.yaml:470-517. Discrepancies: the `warnings` array in the done body is not documented; 400/403/401 responses not documented; jobId documented as format uuid but not validated.",
+    "postman": "docs/postman_collection.json '1.2 Poll status': matches."
+  },
+  "planSection65": "Row says `{status, slides?, warnings?, error?}`. Accurate, with the correction that `warnings` is always present ([] default) on done, and unknown jobs return pending."
+}

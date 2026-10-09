@@ -1,0 +1,66 @@
+{
+  "route": "/api/pdf-deck",
+  "handler": "netlify/functions/pdf-deck.ts",
+  "netlifyRouting": "netlify.toml:12-15 rewrites /api/* -> /.netlify/functions/:splat (status 200)",
+  "methods": ["GET"],
+  "methodHandling": { "otherMethods": "Not checked; any method served like GET.", "cite": "netlify/functions/pdf-deck.ts:13-58" },
+  "auth": { "kind": "requireUser", "cite": "netlify/functions/pdf-deck.ts:15; netlify/functions/_shared/auth.ts:9-25", "notes": "Auth first." },
+  "query": [
+    { "name": "deckId", "type": "string", "required": true, "parse": "searchParams.get('deckId')", "default": null, "bounds": "no format check; non-UUID -> 500", "invalidBehaviour": "missing/empty -> 400 'Missing deckId'", "cite": "netlify/functions/pdf-deck.ts:17-18" }
+  ],
+  "request": { "contentType": "none", "parse": "Body never read.", "fields": [], "unknownFields": "unknown query params ignored" },
+  "checkOrder": [
+    "1. requireUser",
+    "2. deckId present (400 'Missing deckId')",
+    "3. ownsDeck (403 'Not your deck')",
+    "4. readJobState(deckId) from blob store 'deck-jobs' key job/{deckId}.json, normalized (404 'Deck not found' if absent)",
+    "5. done slides = slides with status 'done', each at currentVersion(s) (current || max(versions.v) || version || 1), sorted numerically (400 'No finished slides to export' if none)",
+    "6. for each: readSlideImage(deckId, n, version); missing blob -> skipped silently; embedPng; page [w,h]",
+    "7. zero pages -> 404 'No slide images found'",
+    "8. filename from deck title; fire-and-forget incrementExportCounts; 200"
+  ],
+  "responses": [
+    {
+      "status": 200,
+      "contentType": "application/pdf",
+      "headers": { "content-type": "application/pdf", "content-disposition": "attachment; filename=\"<safe>.pdf\"" },
+      "when": "at least one done slide has a readable PNG",
+      "bodyShape": "multi-page PDF, one full-bleed page per done slide (numeric order) sized to each PNG. <safe> = (deck title ?? '') with every char not in [a-z0-9\\s-] (case-insensitive) removed, trimmed, or 'deck' if empty. No cache-control header.",
+      "example": "content-disposition: attachment; filename=\"Q3 2026 Financial Results.pdf\"",
+      "cite": "netlify/functions/pdf-deck.ts:25-29,31-46,48-54"
+    }
+  ],
+  "errors": [
+    { "status": 401, "body": { "error": "Missing bearer token" }, "when": "no bearer", "cite": "netlify/functions/_shared/http.ts:20-24" },
+    { "status": 401, "body": { "error": "Invalid or expired session" }, "when": "bad token", "cite": "netlify/functions/_shared/auth.ts:22-23" },
+    { "status": 500, "body": { "error": "DEV_SECRET_KEY set but DEV_USER_ID missing" }, "when": "dev bypass misconfigured", "cite": "netlify/functions/_shared/auth.ts:16-18" },
+    { "status": 400, "body": { "error": "Missing deckId" }, "when": "deckId missing/empty", "cite": "netlify/functions/pdf-deck.ts:18" },
+    { "status": 403, "body": { "error": "Not your deck" }, "when": "deck missing or not owned", "cite": "netlify/functions/pdf-deck.ts:19" },
+    { "status": 404, "body": { "error": "Deck not found" }, "when": "deck row owned but no job-state blob", "cite": "netlify/functions/pdf-deck.ts:21-22" },
+    { "status": 400, "body": { "error": "No finished slides to export" }, "when": "job state has no slide with status 'done'", "cite": "netlify/functions/pdf-deck.ts:29" },
+    { "status": 404, "body": { "error": "No slide images found" }, "when": "done slides exist but none of their PNG blobs (new or legacy key) is readable", "cite": "netlify/functions/pdf-deck.ts:35,41" },
+    { "status": 500, "body": { "error": "Internal error" }, "when": "non-UUID deckId, DB/blob failure, embedPng on non-PNG bytes", "cite": "netlify/functions/_shared/http.ts:14-18" }
+  ],
+  "sideEffects": ["void incrementExportCounts(userId, deckId) (rpc increment_export_counts; errors logged only)"],
+  "externalCalls": ["Supabase (decks owner check, title)", "Netlify Blobs 'deck-jobs' and 'deck-images'. No paid API."],
+  "quirks": [
+    "Missing slide blobs are skipped silently (pdf-deck.ts:35) - the PDF may have fewer pages than done slides with no indication.",
+    "Slide list and versions come from job state only, not the request (pdf-deck.ts:8-12 comment).",
+    "Tile slides are NOT composited with the brand master (raw readSlideImage), unlike /api/image. The frontend comment in pdfDownload.ts:203-205 assumes server compositing; it applies to /api/image, not this route.",
+    "Filename sanitiser strips all non-ASCII (e.g. Arabic titles -> 'deck.pdf') (pdf-deck.ts:45).",
+    "getDeckTitle is queried after the PDF is built (pdf-deck.ts:44).",
+    "No method check; no cache-control."
+  ],
+  "beforeAnyState": "Deck row exists but generation never wrote job state -> 404 'Deck not found'. Job state exists but nothing done -> 400 'No finished slides to export'.",
+  "tests": [ { "file": "none", "asserts": "No unit test covers pdf-deck.ts." } ],
+  "callers": [
+    { "who": "frontend", "where": "src/lib/api.ts:299-307 (downloadDeckPdf) from src/lib/pdfDownload.ts:207-213 (exportDeckToPdf)", "expects": "res.ok -> blob; any failure -> silent fallback to client-side assembly via /api/image" },
+    { "who": "Auxi_Connector", "where": "C:/Github/Auxi_Connector/app/api/routes/forge_pdf.py:93-95 (_confirm_artifact_downloadable, endpoint=/api/pdf-deck param=deckId magic=%PDF) and :147-149 (_download_result); classification in forge.py:1010-1052 (_confirm_artifact_downloadable) and :971-1007 (_download_result), redirects via forge.py:937-968 (_result_stream)", "expects": "200 body starting with '%PDF' (forge_pdf.py:46). 5xx or 429 -> 'running' (503 'unavailable' to panel); any other 4xx (e.g. 400 'No finished slides', 403, 404 'Deck not found') -> terminal error (409 not-ready). Does not follow redirects automatically; validates each hop. Requires non-empty body." }
+  ],
+  "docs": {
+    "openapi": "absent - /api/pdf-deck is not in public/openapi.yaml.",
+    "postman": "docs/postman_collection.json:408-421 (2.12) - matches.",
+    "apiMd": "docs/api.md:1417-1437 - matches (400 no finished slides, 404 deck/images)."
+  },
+  "planSection65": "Row '/api/pdf-deck (GET ?deckId=) application/pdf; standard (pdf-deck: expensive)' - accurate. Add the distinct 400/404 error strings, filename sanitising, no cache-control, Connector's %PDF magic check and 4xx-terminal/5xx-retry classification."
+}
