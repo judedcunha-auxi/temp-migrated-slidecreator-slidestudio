@@ -1,7 +1,8 @@
 """Shared fixtures. No test needs a real Redis, a network or a .env file.
 
 - `make_settings(**overrides)` builds Settings from explicit values only
-  (`_env_file=None`), so a developer's .env can never change a test's result.
+  (`_env_file=None`), so a developer's .env can never change a test's result;
+  `build_engine_settings(**overrides)` does the same for the engine's settings.
 - `fake_store` is the real RedisClient over fakeredis: the same code path as
   production, minus the server.
 - `make_app` / `client` build the app through create_app(), exactly as main.py does.
@@ -17,6 +18,7 @@ import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
+from app.config.engine import EngineSettings
 from app.config.settings import Settings
 from app.core.redis_client import RedisClient, RedisStore
 from app.main import create_app
@@ -26,6 +28,11 @@ def build_settings(**overrides: Any) -> Settings:
     values: dict[str, Any] = {"environment": "test"}
     values.update(overrides)
     return Settings(_env_file=None, **values)  # type: ignore[call-arg]
+
+
+def build_engine_settings(**overrides: Any) -> EngineSettings:
+    """`SLIDE_ENGINE_*` settings from explicit values only (no environment, no .env)."""
+    return EngineSettings(_env_file=None, **overrides)  # type: ignore[call-arg]
 
 
 @pytest.fixture

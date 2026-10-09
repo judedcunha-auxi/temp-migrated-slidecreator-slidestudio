@@ -21,6 +21,8 @@ from urllib.parse import urlparse
 from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from app.config.engine import EngineSettings, check_engine_config, check_engine_production, engine_settings
+
 # Project root is three levels above this file:
 #   app/config/settings.py -> app/config/ -> app/ -> project root
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
@@ -128,16 +130,20 @@ def _origin_problem(origin: str, production: bool) -> str | None:
     return None
 
 
-def check_config(s: Settings) -> list[str]:
-    """Return the configuration problems in `s` (empty means all good).
+def check_config(s: Settings, engine: EngineSettings | None = None) -> list[str]:
+    """Return the configuration problems in `s` and the engine settings (empty means all good).
 
-    Pure function of `s`, so tests construct inputs directly. Advisory: main.py
+    `engine` defaults to the process's `SLIDE_ENGINE_*` settings (app/config/engine.py); the
+    production-only engine rules apply when `s` is production-like. Pure function of its
+    arguments, so tests construct inputs directly. Advisory: main.py
     logs the problems as errors and /readyz refuses traffic in production, but the
     process still boots, so a borderline rule cannot take a running service down.
     Messages name the variable, never its value.
     """
     problems: list[str] = []
     production = is_production(s)
+    engine = engine if engine is not None else engine_settings
+    problems.extend(check_engine_config(engine))
 
     # --- always, any environment ------------------------------------------------
     if s.environment and s.environment not in PRODUCTION_ENVIRONMENTS | NON_PRODUCTION_ENVIRONMENTS:
@@ -172,4 +178,5 @@ def check_config(s: Settings) -> list[str]:
                 "CORS_ALLOWED_ORIGINS is empty in production; the static frontend "
                 "could not call the API (decision D9)."
             )
+        problems.extend(check_engine_production(engine))
     return problems

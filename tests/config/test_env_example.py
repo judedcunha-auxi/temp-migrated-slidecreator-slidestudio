@@ -11,13 +11,15 @@ import ast
 import re
 from pathlib import Path
 
+from app.config.engine import EngineSettings
 from app.config.settings import Settings
 
 ROOT = Path(__file__).resolve().parents[2]
 ENV_EXAMPLE = ROOT / ".env.example"
 
 # Set by the platform, never by us; documented in .env.example as comments only.
-PLATFORM_SET = {"WEBSITE_INSTANCE_ID", "HOSTNAME"}
+# SystemRoot and LOCALAPPDATA are Windows' own, read to find its font folders.
+PLATFORM_SET = {"WEBSITE_INSTANCE_ID", "HOSTNAME", "SystemRoot", "LOCALAPPDATA"}
 
 
 def _example_keys() -> dict[str, str]:
@@ -67,6 +69,15 @@ def _environ_reads() -> set[str]:
 def test_every_setting_is_in_env_example():
     keys = _example_keys()
     missing = sorted(name.upper() for name in Settings.model_fields if name.upper() not in keys)
+    assert not missing, f".env.example is missing: {missing}"
+
+
+def test_every_engine_setting_is_in_env_example():
+    keys = _example_keys()
+    prefix = EngineSettings.model_config.get("env_prefix", "")
+    assert prefix == "SLIDE_ENGINE_"
+    missing = sorted(f"{prefix}{name.upper()}" for name in EngineSettings.model_fields
+                     if f"{prefix}{name.upper()}" not in keys)
     assert not missing, f".env.example is missing: {missing}"
 
 

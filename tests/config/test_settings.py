@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
-from app.config.settings import check_config, is_production, secret_values
-from tests.conftest import build_settings
+from typing import Any
+
+from app.config.settings import Settings, is_production, secret_values
+from app.config.settings import check_config as _check_config
+from tests.conftest import build_engine_settings, build_settings
 
 GOOD_PROD = {
     "environment": "production",
@@ -12,13 +15,21 @@ GOOD_PROD = {
     "cors_allowed_origins": "https://app.example.com",
 }
 
+# What production needs of the engine settings (app/config/engine.py).
+GOOD_ENGINE_PROD = {"renderer_url": "https://render.example"}
+
+
+def check_config(s: Settings, **engine: Any) -> list[str]:
+    """check_config with explicit engine settings, so the process environment cannot leak in."""
+    return _check_config(s, build_engine_settings(**engine))
+
 
 def test_a_default_local_config_has_no_problems():
     assert check_config(build_settings()) == []
 
 
 def test_a_complete_production_config_has_no_problems():
-    assert check_config(build_settings(**GOOD_PROD)) == []
+    assert check_config(build_settings(**GOOD_PROD), **GOOD_ENGINE_PROD) == []
 
 
 def test_production_requires_tls_redis_telemetry_and_a_cors_origin():
