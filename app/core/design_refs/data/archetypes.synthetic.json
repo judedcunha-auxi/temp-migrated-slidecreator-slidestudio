@@ -1,0 +1,680 @@
+{
+ "source": "synthetic starter library authored for the service; the full 1,240-archetype library is client-derived and blocked by D3",
+ "generated": "hand-written for app/core/design_refs (no client deck was used)",
+ "categoryCount": 12,
+ "archetypeCount": 24,
+ "categories": [
+  {
+   "id": "gantt-timeline-roadmap",
+   "name": "Gantt and Timeline Roadmap",
+   "archetypes": [
+    {
+     "id": "gantt-timeline-roadmap-01",
+     "name": "phased-gantt-with-milestones",
+     "purpose": "Shows a multi-month programme as workstream bars against a time axis, with the milestones that gate each phase.",
+     "directive": "Put a month or quarter header row across the top. List workstreams as row labels in a narrow left column. Draw each activity as a horizontal bar on the time grid and mark milestones as diamonds on a separate top lane; shade the current period.",
+     "units": [
+      {
+       "name": "Workstream Row",
+       "count": 5,
+       "elastic": "3-8",
+       "anatomy": "Row label on the left with a grey owner sub-line, bars on the time grid."
+      },
+      {
+       "name": "Activity Bar",
+       "count": 9,
+       "elastic": "5-16",
+       "anatomy": "Solid bar for committed work, outlined bar for tentative work, with a short label inside or beside it."
+      },
+      {
+       "name": "Milestone Marker",
+       "count": 4,
+       "elastic": "2-6",
+       "anatomy": "Diamond on the milestone lane with a date and a two-word label."
+      }
+     ],
+     "furniture": "Title at top, source line bottom-left, legend for bar styles bottom-right.",
+     "density": "high"
+    },
+    {
+     "id": "gantt-timeline-roadmap-02",
+     "name": "horizontal-phase-roadmap",
+     "purpose": "Lays out three to five phases left to right with what each phase delivers and when.",
+     "directive": "Divide the body into equal phase columns under a band of chevrons or numbered headers carrying the dates. Under each header stack the key activities as short bullets and close each column with a deliverable box aligned across all columns.",
+     "units": [
+      {
+       "name": "Phase Header",
+       "count": 4,
+       "elastic": "3-5",
+       "anatomy": "Chevron or filled block with the phase number, name and date range."
+      },
+      {
+       "name": "Activity List",
+       "count": 4,
+       "elastic": "3-5",
+       "anatomy": "Three to five short bullets per phase."
+      },
+      {
+       "name": "Deliverable Box",
+       "count": 4,
+       "elastic": "3-5",
+       "anatomy": "Outlined box at the bottom of each column naming the phase output."
+      }
+     ],
+     "furniture": "Title at top, optional takeaway strip under the columns, source line bottom-left.",
+     "density": "medium"
+    }
+   ]
+  },
+  {
+   "id": "chevron-process-flow",
+   "name": "Chevron Process Flow",
+   "archetypes": [
+    {
+     "id": "chevron-process-flow-01",
+     "name": "five-step-chevron-with-detail",
+     "purpose": "Explains a sequential process and what happens in each step.",
+     "directive": "Run a row of chevrons across the top of the body, one per step. Under each chevron place a detail card with the actions of that step; align card tops and bottoms. Add a closing strip with the overall outcome.",
+     "units": [
+      {
+       "name": "Step Chevron",
+       "count": 5,
+       "elastic": "3-7",
+       "anatomy": "Chevron shape with a step number and a two-to-four word name."
+      },
+      {
+       "name": "Detail Card",
+       "count": 5,
+       "elastic": "3-7",
+       "anatomy": "White card with a thin outline, a bold lead-in and two or three bullets."
+      }
+     ],
+     "furniture": "Title at top, takeaway strip at the bottom, source line bottom-left.",
+     "density": "medium"
+    },
+    {
+     "id": "chevron-process-flow-02",
+     "name": "process-with-owner-lanes",
+     "purpose": "Shows a process whose steps are owned by different parties.",
+     "directive": "Draw steps as boxes joined by elbowed arrows across two to four horizontal swimlanes, one lane per owner, labelled in a left column. Keep steps on a shared column grid so the sequence reads left to right.",
+     "units": [
+      {
+       "name": "Owner Lane",
+       "count": 3,
+       "elastic": "2-4",
+       "anatomy": "Light-tinted horizontal band with the owner name in the left label column."
+      },
+      {
+       "name": "Step Box",
+       "count": 8,
+       "elastic": "5-12",
+       "anatomy": "Rounded rectangle with a short verb phrase."
+      },
+      {
+       "name": "Flow Arrow",
+       "count": 7,
+       "elastic": "4-11",
+       "anatomy": "Straight or elbowed connector with an arrowhead."
+      }
+     ],
+     "furniture": "Title at top, legend for decision points if used, source line bottom-left.",
+     "density": "high"
+    }
+   ]
+  },
+  {
+   "id": "comparative-option-cards",
+   "name": "Comparative Option Cards",
+   "archetypes": [
+    {
+     "id": "comparative-option-cards-01",
+     "name": "three-option-columns-with-verdict",
+     "purpose": "Compares three options on the same criteria and recommends one.",
+     "directive": "Place three equal option columns with lettered header panels; the recommended option gets the solid hero header, the others a light tint. Run the criteria as row labels in a narrow left spine so each criterion lines up across the columns. Close with a verdict strip.",
+     "units": [
+      {
+       "name": "Option Column",
+       "count": 3,
+       "elastic": "2-4",
+       "anatomy": "Header panel with a letter, name and one-line description."
+      },
+      {
+       "name": "Criterion Row",
+       "count": 5,
+       "elastic": "3-7",
+       "anatomy": "Row label on the left; each cell holds a rating pill and a short note."
+      },
+      {
+       "name": "Verdict Strip",
+       "count": 1,
+       "elastic": "1",
+       "anatomy": "Light-tinted band stating the recommendation and why."
+      }
+     ],
+     "furniture": "Title at top, source line bottom-left.",
+     "density": "high"
+    },
+    {
+     "id": "comparative-option-cards-02",
+     "name": "pros-cons-option-pair",
+     "purpose": "Weighs two options by their advantages and drawbacks.",
+     "directive": "Split the body into two option halves. In each half stack a pros box over a cons box with check and cross bullets. Add a narrow side panel on the right with the recommendation.",
+     "units": [
+      {
+       "name": "Option Half",
+       "count": 2,
+       "elastic": "2",
+       "anatomy": "Header with the option name, then pros and cons boxes."
+      },
+      {
+       "name": "Pros/Cons Box",
+       "count": 4,
+       "elastic": "4",
+       "anatomy": "Outlined box with three or four check or cross bullets."
+      },
+      {
+       "name": "Recommendation Panel",
+       "count": 1,
+       "elastic": "1",
+       "anatomy": "Solid hero panel with the verdict and the deciding factor."
+      }
+     ],
+     "furniture": "Title at top, source line bottom-left.",
+     "density": "medium"
+    }
+   ]
+  },
+  {
+   "id": "structured-data-table",
+   "name": "Structured Data Table",
+   "archetypes": [
+    {
+     "id": "structured-data-table-01",
+     "name": "attribute-comparison-table",
+     "purpose": "Compares several entities across a set of attributes in a clean table.",
+     "directive": "Build a table with entities as columns and attributes as rows; bold the header row over a one-pixel rule, right-align numbers and tint the subject column. Add a total or median row in bold under a rule.",
+     "units": [
+      {
+       "name": "Header Row",
+       "count": 1,
+       "elastic": "1",
+       "anatomy": "Bold column names with units and period."
+      },
+      {
+       "name": "Attribute Row",
+       "count": 8,
+       "elastic": "5-12",
+       "anatomy": "Row label left-aligned, values right-aligned, thin horizontal rules."
+      },
+      {
+       "name": "Summary Row",
+       "count": 1,
+       "elastic": "0-2",
+       "anatomy": "Bold total or median row under a rule."
+      }
+     ],
+     "furniture": "Title at top, footnotes and source line bottom-left.",
+     "density": "high"
+    },
+    {
+     "id": "structured-data-table-02",
+     "name": "table-with-insight-panel",
+     "purpose": "Pairs a data table with a side panel that states what it means.",
+     "directive": "Give the table about two thirds of the width on the left. On the right place an insight panel with a bold header and three numbered observations keyed to highlighted cells in the table.",
+     "units": [
+      {
+       "name": "Data Table",
+       "count": 1,
+       "elastic": "1",
+       "anatomy": "Table with bold header row, thin row rules and highlighted key cells."
+      },
+      {
+       "name": "Insight Panel",
+       "count": 1,
+       "elastic": "1",
+       "anatomy": "Tinted panel with numbered markers matching the highlighted cells."
+      }
+     ],
+     "furniture": "Title at top, source line bottom-left.",
+     "density": "high"
+    }
+   ]
+  },
+  {
+   "id": "quadrant-matrix-layout",
+   "name": "Quadrant Matrix Layout",
+   "archetypes": [
+    {
+     "id": "quadrant-matrix-layout-01",
+     "name": "two-by-two-prioritisation-matrix",
+     "purpose": "Positions items on two axes to decide which to pursue first.",
+     "directive": "Draw a two-by-two grid with labelled axes and a short name in each quadrant; plot items as numbered circles in their positions. Key the numbers to a list in a side panel and shade the priority quadrant.",
+     "units": [
+      {
+       "name": "Quadrant",
+       "count": 4,
+       "elastic": "4",
+       "anatomy": "Light-tinted cell with a two-word name and a one-line description."
+      },
+      {
+       "name": "Plotted Item",
+       "count": 8,
+       "elastic": "4-14",
+       "anatomy": "Small numbered circle positioned by its two scores."
+      },
+      {
+       "name": "Item Key",
+       "count": 1,
+       "elastic": "1",
+       "anatomy": "Side list mapping each number to the item and its score."
+      }
+     ],
+     "furniture": "Title at top, axis labels on the grid edges, source line bottom-left.",
+     "density": "medium"
+    },
+    {
+     "id": "quadrant-matrix-layout-02",
+     "name": "swot-quadrants",
+     "purpose": "Summarises strengths, weaknesses, opportunities and threats.",
+     "directive": "Divide the body into four equal quadrants with filled header tabs; internal factors on top, external below. Each quadrant holds three or four bold-lead-in bullets. Close with a strip naming the implication.",
+     "units": [
+      {
+       "name": "Quadrant Panel",
+       "count": 4,
+       "elastic": "4",
+       "anatomy": "Header tab with the quadrant name over three or four bullets."
+      },
+      {
+       "name": "Implication Strip",
+       "count": 1,
+       "elastic": "0-1",
+       "anatomy": "Tinted band with the so-what."
+      }
+     ],
+     "furniture": "Title at top, source line bottom-left.",
+     "density": "medium"
+    }
+   ]
+  },
+  {
+   "id": "waterfall-breakdown-analysis",
+   "name": "Waterfall Breakdown Analysis",
+   "archetypes": [
+    {
+     "id": "waterfall-breakdown-analysis-01",
+     "name": "value-bridge-with-drivers",
+     "purpose": "Explains how a value moved from a start to an end figure through its drivers.",
+     "directive": "Place a native waterfall chart across about two thirds of the width with start and end totals on the axis and the rises and falls between them. On the right list the two or three largest drivers with their contribution and the reason.",
+     "units": [
+      {
+       "name": "Waterfall Chart",
+       "count": 1,
+       "elastic": "1",
+       "anatomy": "Native waterfall with totals marked and data labels on every bar."
+      },
+      {
+       "name": "Driver Callout",
+       "count": 3,
+       "elastic": "2-4",
+       "anatomy": "Bold lead-in with the signed contribution and one line of explanation."
+      }
+     ],
+     "furniture": "Title at top, chart header with metric, unit and period, source line bottom-left.",
+     "density": "medium"
+    },
+    {
+     "id": "waterfall-breakdown-analysis-02",
+     "name": "bridge-with-category-groups",
+     "purpose": "Breaks a total gap into grouped categories of levers.",
+     "directive": "Draw the waterfall with subtotals between groups of steps and mark each group with a light rail and label underneath. Add a takeaway strip below the chart.",
+     "units": [
+      {
+       "name": "Grouped Step",
+       "count": 6,
+       "elastic": "4-10",
+       "anatomy": "Waterfall step coloured by rise or fall."
+      },
+      {
+       "name": "Group Rail",
+       "count": 3,
+       "elastic": "2-4",
+       "anatomy": "Thin rail under a group of steps with the group name."
+      },
+      {
+       "name": "Takeaway Strip",
+       "count": 1,
+       "elastic": "1",
+       "anatomy": "Light band stating the conclusion."
+      }
+     ],
+     "furniture": "Title at top, source line bottom-left.",
+     "density": "medium"
+    }
+   ]
+  },
+  {
+   "id": "kpi-definition-profile",
+   "name": "KPI Definition Profile",
+   "archetypes": [
+    {
+     "id": "kpi-definition-profile-01",
+     "name": "kpi-tiles-with-trend",
+     "purpose": "Reports a small set of headline metrics against target.",
+     "directive": "Put a row of four to six equal KPI tiles across the top, each with the value, unit, change against target and a status pill. Under them place a trend chart for the most important metric and a short commentary panel.",
+     "units": [
+      {
+       "name": "KPI Tile",
+       "count": 5,
+       "elastic": "3-6",
+       "anatomy": "Large value, a unit line, a delta badge and a status pill."
+      },
+      {
+       "name": "Trend Chart",
+       "count": 1,
+       "elastic": "1",
+       "anatomy": "Native line or column chart of one metric over time."
+      },
+      {
+       "name": "Commentary Panel",
+       "count": 1,
+       "elastic": "1",
+       "anatomy": "Three bold-lead-in bullets explaining the movements."
+      }
+     ],
+     "furniture": "Title at top, source line bottom-left.",
+     "density": "high"
+    },
+    {
+     "id": "kpi-definition-profile-02",
+     "name": "kpi-definition-table",
+     "purpose": "Defines each metric: what it measures, how it is calculated, its owner and target.",
+     "directive": "Lay out a table with one row per KPI and columns for definition, formula, owner, frequency and target; tint the target column and add a status pill per row.",
+     "units": [
+      {
+       "name": "KPI Row",
+       "count": 6,
+       "elastic": "4-10",
+       "anatomy": "Bold KPI name with a grey category sub-line and the definition cells."
+      },
+      {
+       "name": "Status Pill",
+       "count": 6,
+       "elastic": "4-10",
+       "anatomy": "Short rounded chip in a muted RAG tint."
+      }
+     ],
+     "furniture": "Title at top, source line bottom-left.",
+     "density": "high"
+    }
+   ]
+  },
+  {
+   "id": "hierarchical-org-chart",
+   "name": "Hierarchical Org Chart",
+   "archetypes": [
+    {
+     "id": "hierarchical-org-chart-01",
+     "name": "three-level-org-chart",
+     "purpose": "Shows reporting lines from a leader through functions to teams.",
+     "directive": "Place the leader box at the top centre, the function boxes on one row below joined by elbowed connectors, and team boxes beneath each function. Use fill weight to show level; add a side note on changes.",
+     "units": [
+      {
+       "name": "Leader Box",
+       "count": 1,
+       "elastic": "1",
+       "anatomy": "Solid hero box with name and role."
+      },
+      {
+       "name": "Function Box",
+       "count": 5,
+       "elastic": "3-7",
+       "anatomy": "Tinted box with the function name and head."
+      },
+      {
+       "name": "Team Box",
+       "count": 10,
+       "elastic": "6-16",
+       "anatomy": "White outlined box with the team name and headcount."
+      }
+     ],
+     "furniture": "Title at top, legend for box styles, source line bottom-left.",
+     "density": "medium"
+    },
+    {
+     "id": "hierarchical-org-chart-02",
+     "name": "governance-tiers",
+     "purpose": "Explains decision rights across governance bodies.",
+     "directive": "Stack three to four horizontal tiers from board to working teams, each a band with the body name on the left and its remit, cadence and members across the row. Use arrows between tiers for escalation.",
+     "units": [
+      {
+       "name": "Governance Tier",
+       "count": 4,
+       "elastic": "3-5",
+       "anatomy": "Band with the body name, remit, meeting cadence and members."
+      },
+      {
+       "name": "Escalation Arrow",
+       "count": 3,
+       "elastic": "2-4",
+       "anatomy": "Straight arrow between tiers with a short trigger label."
+      }
+     ],
+     "furniture": "Title at top, source line bottom-left.",
+     "density": "medium"
+    }
+   ]
+  },
+  {
+   "id": "split-chart-narrative-dashboard",
+   "name": "Split Chart Narrative Dashboard",
+   "archetypes": [
+    {
+     "id": "split-chart-narrative-dashboard-01",
+     "name": "chart-left-narrative-right",
+     "purpose": "Proves one message with a chart and explains it alongside.",
+     "directive": "Give a native chart about sixty percent of the width on the left with a header stating metric, unit and period. On the right place a narrative panel with three numbered findings keyed to annotations on the chart, and a takeaway strip under both.",
+     "units": [
+      {
+       "name": "Main Chart",
+       "count": 1,
+       "elastic": "1",
+       "anatomy": "Native chart with one focus colour, data labels and one annotation."
+      },
+      {
+       "name": "Finding",
+       "count": 3,
+       "elastic": "2-4",
+       "anatomy": "Numbered marker, bold lead-in and one line of evidence."
+      },
+      {
+       "name": "Takeaway Strip",
+       "count": 1,
+       "elastic": "1",
+       "anatomy": "Light band with the so-what."
+      }
+     ],
+     "furniture": "Title at top, source line bottom-left.",
+     "density": "medium"
+    },
+    {
+     "id": "split-chart-narrative-dashboard-02",
+     "name": "two-chart-comparison",
+     "purpose": "Compares two related measures side by side.",
+     "directive": "Place two equal chart panels with shared top and bottom edges, each with its own header; keep scales consistent where they compare. Add a short insight line under each chart and a closing strip.",
+     "units": [
+      {
+       "name": "Chart Panel",
+       "count": 2,
+       "elastic": "2-3",
+       "anatomy": "Header with metric and period over a native chart."
+      },
+      {
+       "name": "Insight Line",
+       "count": 2,
+       "elastic": "2-3",
+       "anatomy": "One sentence under each chart."
+      }
+     ],
+     "furniture": "Title at top, source line bottom-left.",
+     "density": "medium"
+    }
+   ]
+  },
+  {
+   "id": "strategic-framework-pillars",
+   "name": "Strategic Framework Pillars",
+   "archetypes": [
+    {
+     "id": "strategic-framework-pillars-01",
+     "name": "vision-pillars-foundation",
+     "purpose": "Presents a strategy as an aspiration supported by pillars on a common foundation.",
+     "directive": "Put the aspiration in a wide band at the top, three to five equal pillars below it each with a name and three initiatives, and a foundation band across the bottom for the enablers.",
+     "units": [
+      {
+       "name": "Aspiration Band",
+       "count": 1,
+       "elastic": "1",
+       "anatomy": "Solid hero band with the one-sentence ambition."
+      },
+      {
+       "name": "Pillar",
+       "count": 4,
+       "elastic": "3-5",
+       "anatomy": "Column with a tinted header and three bullet initiatives."
+      },
+      {
+       "name": "Foundation Band",
+       "count": 1,
+       "elastic": "1",
+       "anatomy": "Light band listing the enablers."
+      }
+     ],
+     "furniture": "Title at top, source line bottom-left.",
+     "density": "medium"
+    },
+    {
+     "id": "strategic-framework-pillars-02",
+     "name": "pillars-with-kpis",
+     "purpose": "Links each strategic pillar to the metrics that track it.",
+     "directive": "Arrange pillars as columns with a header, the initiatives in the middle and a KPI strip at the bottom of each column aligned across all pillars; use a row-label spine for the three row kinds.",
+     "units": [
+      {
+       "name": "Pillar Column",
+       "count": 4,
+       "elastic": "3-5",
+       "anatomy": "Header, initiatives and a KPI strip."
+      },
+      {
+       "name": "Row Label",
+       "count": 3,
+       "elastic": "3",
+       "anatomy": "Narrow left labels: pillar, initiatives, KPIs."
+      }
+     ],
+     "furniture": "Title at top, source line bottom-left.",
+     "density": "high"
+    }
+   ]
+  },
+  {
+   "id": "funnel-filtering-process",
+   "name": "Funnel Filtering Process",
+   "archetypes": [
+    {
+     "id": "funnel-filtering-process-01",
+     "name": "market-sizing-funnel",
+     "purpose": "Narrows a total market to the obtainable share.",
+     "directive": "Stack three tapering bands for total, serviceable and obtainable market with the value inside each; to the right list the assumption used at each narrowing step.",
+     "units": [
+      {
+       "name": "Funnel Band",
+       "count": 3,
+       "elastic": "3-4",
+       "anatomy": "Tapering band with the market name and value."
+      },
+      {
+       "name": "Assumption Note",
+       "count": 3,
+       "elastic": "3-4",
+       "anatomy": "Short line with the filter and its rate."
+      }
+     ],
+     "furniture": "Title at top, source line bottom-left.",
+     "density": "medium"
+    },
+    {
+     "id": "funnel-filtering-process-02",
+     "name": "pipeline-conversion-funnel",
+     "purpose": "Shows how many items survive each stage of a pipeline.",
+     "directive": "Draw horizontal bars of decreasing length, one per stage, with counts and conversion rates between them; highlight the stage with the largest drop and explain it in a side panel.",
+     "units": [
+      {
+       "name": "Stage Bar",
+       "count": 5,
+       "elastic": "3-7",
+       "anatomy": "Bar with stage name and count."
+      },
+      {
+       "name": "Conversion Badge",
+       "count": 4,
+       "elastic": "2-6",
+       "anatomy": "Small badge with the stage-to-stage rate."
+      },
+      {
+       "name": "Explanation Panel",
+       "count": 1,
+       "elastic": "1",
+       "anatomy": "Panel naming the biggest drop and its cause."
+      }
+     ],
+     "furniture": "Title at top, source line bottom-left.",
+     "density": "medium"
+    }
+   ]
+  },
+  {
+   "id": "numbered-category-columns",
+   "name": "Numbered Category Columns",
+   "archetypes": [
+    {
+     "id": "numbered-category-columns-01",
+     "name": "numbered-agenda-columns",
+     "purpose": "Lists the sections of a document as numbered columns.",
+     "directive": "Place four to six equal columns, each with a large section number, the section name and two or three sub-topics; mark the current section with the solid fill.",
+     "units": [
+      {
+       "name": "Section Column",
+       "count": 5,
+       "elastic": "3-6",
+       "anatomy": "Large number, bold name and grey sub-topics."
+      }
+     ],
+     "furniture": "Title at top, page number bottom-right.",
+     "density": "low"
+    },
+    {
+     "id": "numbered-category-columns-02",
+     "name": "three-levers-with-evidence",
+     "purpose": "Names the three levers behind a conclusion with the evidence for each.",
+     "directive": "Divide the body into three numbered columns with filled header tabs; each holds a bold claim, two supporting figures with small bars and a source note. Close with a takeaway strip.",
+     "units": [
+      {
+       "name": "Lever Column",
+       "count": 3,
+       "elastic": "2-4",
+       "anatomy": "Numbered header tab, claim, figures and a note."
+      },
+      {
+       "name": "Takeaway Strip",
+       "count": 1,
+       "elastic": "1",
+       "anatomy": "Light band with the combined effect."
+      }
+     ],
+     "furniture": "Title at top, source line bottom-left.",
+     "density": "medium"
+    }
+   ]
+  }
+ ]
+}
