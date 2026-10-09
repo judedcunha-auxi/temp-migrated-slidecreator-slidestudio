@@ -362,3 +362,178 @@ itself.
 - **Two replicas on staging.** This Phase 4 exit item needs hosting (D2).
 - **The local adapter is single-process.** It has one lock per process and lists by scanning
   directories. It is for development only.
+
+## The storyline (Phase 3)
+
+Darwin's and Slide Studio's deck planning, merged (decision D11): the intake chat, the storyline
+draft, its validation and repair. Ported from Darwin `netlify/functions/_shared/` (`anthropic.ts`,
+`storylineSchema.ts`, `intake.ts`, `frameworks.ts`, `frameworkGuard.ts`, `slideTypes.ts`,
+`dividers.ts`, `deckArchetypes.ts`, `rtlText.ts`) with `storyline.ts`, `storyline-background.ts`,
+`storyline-status.ts` and `intake.ts`, and from Slide Studio `server/storyline/*` and
+`server/routers/{storyline,intake}.py`. The `/api/storyline`, `/api/storyline-status` and
+`/api/intake` routes are not built yet (Phase 7a); the core produces exactly their bodies.
+
+```
+app/core/storyline/
+  vocabulary.py  slide types, modes, densities, languages; framework names + aliases (app/data)
+  archetypes.py  loader over app/data/archetypes.json: catalog, id check, directive (RTL-aware)
+  models.py      StorylineInputs, Storyline, StorylineSlide, IntakeBrief (camelCase on the wire)
+  validation.py  parse_standard (Darwin's zod schema), parse_dense (Slide Studio's salvage),
+                 check_storyline_request (the /api/storyline 400s)
+  repair.py      coerce_framework, repair, insert_dividers (frameworkGuard + dividers)
+  rtl.py         mirror_directional_text (rtlText.ts)
+  prompts.py     storyline + intake system prompts, user message, output schemas
+  ports.py       StorylineModel (the one model call), SlidePrompter, the model errors
+  service.py     draft_storyline, revalidate
+  intake.py      check_intake_request, sanitize_brief, run_intake_turn, save_intake_transcript
+  job.py         the `storyline` job handler, storyline_status / read_storyline_status
+app/core/jobs/registry.py   JobRegistry: job types + handlers, installed on a queue for Worker
+app/config/storyline.py     StorylineSettings (STORYLINE_*), check_storyline_config
+app/data/                   archetypes.json, frameworks.json: the one copy of each (README there)
+```
+
+### Modes and densities
+
+Two independent choices on `StorylineInputs`:
+
+| | Values | Source |
+|---|---|---|
+| `mode` (structure) | `auto` (default): the model places title, agenda and closing; the slide count is not clamped; dividers inserted. `deck` (6-30 slides), `collection` (3-20, body slides only), `single` (1): a structure line in the user message, the count clamped, dividers only for `deck`. | `auto` is Darwin; the others are Slide Studio's modes. |
+| `density` | `standard` (default): 3-4 bullets, about 110 words a slide, validated strictly, chart data only on a chart framework. `dense`: 3-6 bullets, no word cap, chart data on any body slide, `executiveSummary` (the ghost-deck test), salvage instead of rejection. | `standard` is Darwin (image mode); `dense` is Slide Studio (its ADR 0012, HTML-first composite slides). |
+
+Darwin's `/api/storyline` sends neither field, so it gets `auto` + `standard`: Darwin's behaviour.
+`STORYLINE_MAX_SLIDES` (default 0, no cap) can cap any mode.
+
+### The model port
+
+The storyline does not import a provider SDK. `ports.StorylineModel.structured(request)` is one
+model call whose answer must match a JSON schema: `StructuredRequest(purpose, model, system,
+messages, schema_name, schema, max_tokens, effort)` returns `StructuredReply(data, stop_reason,
+usage, model, text)`. Messages and content blocks are the Messages API's; the schema keeps to the
+structured-output subset (every object `additionalProperties: false`; no length or range
+constraints, which `validation.py` enforces after the call). Errors: `ModelUnavailable`
+(retryable) and `ModelRejected` (not); a refusal is a reply with `stop_reason == "refusal"`.
+
+**Why structured output, not a tool.** Darwin forced an `emit_storyline` tool call
+(`tool_choice: {type: "tool"}`). Sonnet 5.5 rejects forced tool choice with a 400, so the storyline
+asks for `output_config.format` (a JSON schema) instead, and the intake turn's `update_brief` tool
+became a `{message, brief}` answer.
+
+**The adapter onto `app/core/llm`** (built on another branch) is one class with one method, mapping
+the request straight onto a streamed Messages call:
+
+```python
+class LlmStorylineModel:   # app/core/storyline/llm_adapter.py, once app/core/llm lands
+    async def structured(self, request: StructuredRequest) -> StructuredReply:
+        # stream(model=request.model, max_tokens=request.max_tokens, system=request.system,
+        #        messages=request.messages,
+        #        output_config={"format": {"type": "json_schema", "schema": request.schema},
+        #                       "effort": request.effort})
+        # data = json.loads(the text block) unless stop_reason is "refusal" or "max_tokens";
+        # usage and cost from app/core/llm's pricing; SDK errors -> ModelUnavailable / ModelRejected.
+        ...
+```
+
+Stream it (64k `max_tokens` needs streaming). Thinking stays adaptive (the default on Sonnet 5.5;
+`effort` is the control). Enable the provider layer's server-side refusal fallback.
+`tests/fakes/storyline_model.py` (`ScriptedStorylineModel`) is the test double.
+
+### Validation and repair
+
+**Validation** (`validation.py`). `standard` is Darwin's `storylineSchema.ts`, rule for rule. A
+failure raises `StorylineValidationError`: `str()` is Darwin's message ("Claude returned an
+incomplete storyline — please try again or reduce the number of slides") and `.issues` lists every
+problem for the logs. The route layer maps it: the storyline job stores the message;
+`/api/generate` (a person's edited storyline, `service.revalidate`) answers 500 "Internal error",
+the contract quirk the Connector relies on. `dense` salvages like Slide Studio and raises only when
+no titled slide is left.
+
+**Repair** (`repair.py`, "coerce, don't reject"). Frameworks go through exact name or alias, the
+coercion table, a 3D/isometric strip, a fuzzy match, then the type default. Unknown archetype ids
+are dropped; Darwin-era ids are rewritten to the library id. Dividers are inserted at section
+boundaries (8+ slides, 2+ sections). Every change is a warning (`Slide N: ...`), returned in the
+job result.
+
+### frameworkGuard after OCR
+
+D0 retires the OCR backend. `frameworkGuard.ts` was reviewed for constraints that existed only for
+it:
+
+- **Dropped: the chart-ness oracle.** Darwin asked `slideContext.ts: FRAMEWORK_META[...].primary`,
+  the metadata for SlideForge's Gemini detection pass, whether a framework is a chart. That file
+  retires with OCR. The same seven names are now `vocabulary.CHART_FRAMEWORKS`.
+- **Dropped in dense mode: the chart-data strip.** Darwin removed `chartData` from any slide whose
+  framework is not a chart, so the data handed to SlideForge matched a chart it could detect. The
+  HTML engine draws a chart as one exhibit of several, so dense keeps chart data on any body slide.
+  Standard keeps the strip: Darwin's image prompt still turns chart data into a chart.
+- **Kept: the coercion table.** Its entries are native-PowerPoint limits of the HTML engine, not of
+  OCR: radar/spider (the engine has no native radar, `chart_model.PATH_A_UNSUPPORTED_PREFIXES`),
+  sankey, mind maps, word clouds, gauges, 3D. Pie/donut to 100% stacked bar is a library rule (the
+  library has no pie framework); the engine could emit a native doughnut, so that entry is one to
+  revisit with the design work, not an OCR leftover.
+- **Kept: unknown `archetypeId` dropped; furniture not coerced.**
+
+The image-prompt shape limits in Darwin's `style.ts` and framework hints (the SlideForge
+round-trip shape set) are not in the storyline; they belong to Darwin's image prompts (7a).
+
+### The intake turn and C14
+
+`run_intake_turn` makes **at most one model call** per turn (`IntakeTurn.model_calls`): none at the
+12-reply cap (wrap-up) or without a user message (the opener), otherwise one structured call whose
+schema requires `message` and `brief`. Darwin's second, text-only follow-up call (for a tool-only
+answer) is gone; an empty message gets Darwin's filler ("Noted — anything else before we draft?").
+
+The other half of C14 is the frontend: `streamIntake` expects SSE, `/api/intake` returns JSON, so
+the stream fails and `postIntake` calls again. When the route is built (7a), one of:
+
+1. **JSON only (recommended).** Keep the JSON `{message, brief}` and change the frontend to call
+   `postIntake` directly (drop `streamIntake`, or at least its fallback). One call per turn; the
+   contract as it really is today; openapi, postman and api.md corrected to JSON.
+2. **Real SSE.** Serve `text/event-stream` with the frames `streamIntake` parses (`delta` text, then
+   `brief`, then `done`; `error` on failure), so the fallback never fires. It needs a streaming
+   variant of the port (yielding the `message` text as it arrives, which means parsing a partial
+   JSON string), and only the frontend benefits (the Connector does not call this route). Worth it
+   only for the typing effect.
+
+Until the frontend changes, today's frontend still calls a JSON route twice per turn: the core fix
+removes the follow-up call, not the fallback.
+
+**The transcript** (`save_intake_transcript`) goes through the storage port
+(`TranscriptPort.upsert_intake`), as Darwin's `upsertIntakeTranscript` did: the inbound transcript
+with attachment bytes replaced by `[attachment]`, the sanitized inbound brief, the user-turn count
+and the text size. Fire-and-forget: failures are logged, never raised.
+
+### The `storyline` job
+
+`job.register(registry, model, settings=..., prompter=...)` adds the `storyline` type (expensive,
+`STORYLINE_JOB_MAX_ATTEMPTS`, `STORYLINE_JOB_TIMEOUT_S`) and its handler to a `JobRegistry`;
+`registry.install(queue)` registers the types and returns the handlers for `Worker`. No worker is
+started here.
+
+- **Enqueue** (7a): `queue.enqueue(ctx, "storyline", body)` with the body as posted, after
+  `check_storyline_request`; answer 202 `{jobId}`.
+- **Result**: `{presentationTitle, inputs (the body verbatim), slides, warnings}`, each slide
+  camelCase with unset optionals omitted. Each slide's `prompt` (Darwin's server-assembled image
+  prompt) comes from a `SlidePrompter` the route layer passes in; image-prompt assembly is
+  Darwin's `prompt.ts`, ported in 7a.
+- **Errors** stored on the record: Darwin's incomplete-storyline message (permanent), a refusal
+  message (permanent), "Storyline generation failed" for a rejected call (permanent), and for an
+  outage a retry, then "The model is busy — please try again in a moment." on the last attempt.
+- **Status**: `storyline_status(record)` and `read_storyline_status(storage, ctx, job_id)` give
+  `{status: "pending"}` (queued, running, or an unknown id), `{status: "done", result}` or
+  `{status: "error", error}`; someone else's job raises `NotYourJob` (403 "Not your job").
+
+### Behaviour changes against Darwin today
+
+- Model: Sonnet 4.6 to **Sonnet 5.5** (`STORYLINE_MODEL`, same variable name), with adaptive
+  thinking at `STORYLINE_EFFORT=high` (storyline) and `STORYLINE_INTAKE_EFFORT=low` (intake).
+- Structured output instead of a forced tool call (storyline) and the `update_brief` tool (intake).
+  The prompts' tool lines say so; the rest of Darwin's prompts is unchanged in standard mode.
+- Intake: one call per turn (no follow-up call); intake `max_tokens` 1024 to 4096 (thinking counts
+  against it).
+- Archetype ids are the de-identified library's (`<category>-<nn>`), not `<deck-slug>--pNNN`; old
+  ids still resolve and are rewritten to the new id.
+- For Arabic, the catalog's direction words are mirrored in the storyline prompt.
+- A missing `audience` or `style` becomes "Executive committee" or "Executive strategy" in the
+  prompt (Darwin printed `undefined`); a missing `numSlides` becomes 12.
+- Job errors are user-safe messages; Darwin stored raw exception text (SDK errors, missing env).
