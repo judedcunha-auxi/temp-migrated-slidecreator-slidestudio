@@ -26,7 +26,7 @@ from app.engine.verify.lint import lint
 from app.engine.verify.text_deck import text_report
 from app.engine.verify.text_layout import annotate_text_layout
 from app.engine.verify.torture import judge_family
-from tests.engine.helpers import extract_html
+from tests.engine.helpers import extract_html, require_faces
 from tests.engine.test_fixtures import FAMILIES
 
 #: Families whose run the repaired instruments found short of their expectations, with the finding.
@@ -60,12 +60,20 @@ def runs(tmp_path_factory) -> dict[str, dict[str, Any]]:
     return results
 
 
+#: Families whose expectations are about particular installed faces, not just any font: `weights`
+#: measures Calibri's own static faces at 300 (Calibri Light) to 700, and its expected lint findings
+#: and clip slack are those faces' numbers. Calibri and Calibri Light ship only with Windows/Office,
+#: so on Linux (Carlito has 400 and 700 only) the family is skipped with that reason.
+FACES_MEASURED: dict[str, tuple[str, ...]] = {"weights": ("Calibri", "Calibri Light")}
+
+
 @pytest.mark.parametrize("family", [
     pytest.param(family, marks=pytest.mark.xfail(reason=KNOWN_FINDINGS[family], strict=True))
     if family in KNOWN_FINDINGS else family
     for family in FAMILIES
 ])
 def test_family_meets_its_expectations(family: str, runs: dict[str, dict[str, Any]]) -> None:
+    require_faces(*FACES_MEASURED.get(family, ()))
     run = runs[family]
     problems = judge_family(run["context"], run["extracted"], run["ir"], run["deck"], run["fit"],
                             run["lint"], text=run["text"])
@@ -215,6 +223,7 @@ def test_weights_tight_card_reaches_its_clip_edge_unreported(runs: dict[str, dic
     """`weights`' card 3, 'Tight fit', ends its last line box within 4 px of its card's clip edge (G-2 review
     m2): `overflow:hidden` clips at the padding box, the card has no border, so the edge is the card's bottom.
     Nothing may be reported for it and the export must fit; card 2's hidden line is the only clip."""
+    require_faces(*FACES_MEASURED["weights"])
     run = runs["weights"]
     ir = run["extracted"]
     cards = sorted((e for e in ir.elements if e.kind == "shape" and abs(e.box.w - 360) < 0.5), key=lambda e: e.box.x)

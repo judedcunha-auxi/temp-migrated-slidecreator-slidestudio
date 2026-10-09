@@ -372,10 +372,19 @@ def test_lint_flags_a_weight_the_theme_fonts_lack(sample_manifest: Manifest, mas
     calibri = Manifest.load(masters_dir / "test-16x9.manifest.json")     # Calibri Light / Calibri
     assert "font-weight" in _rules(weight("300"), sample_manifest)          # Arial has no 300 face
     assert _levels(weight("300"), sample_manifest)["font-weight"] == "warn"
-    assert "font-weight" not in _rules(weight("300"), calibri)           # calibril.ttf is 300
-    assert "font-weight" in _rules(weight("600"), calibri)               # Calibri: 300, 400, 700
+    from tests.engine.helpers import installed
+
+    # Calibri's static faces are 300 (calibril.ttf), 400 and 700 where Calibri is installed; on Linux
+    # Calibri is measured in Carlito (400, 700) and Calibri Light is absent, so 300 has no face there.
+    if installed("Calibri") and installed("Calibri Light"):
+        assert "font-weight" not in _rules(weight("300"), calibri)       # calibril.ttf is 300
+    else:
+        assert "font-weight" in _rules(weight("300"), calibri)
+    assert "font-weight" in _rules(weight("600"), calibri)               # no 600 face either way
     message = next(f.message for f in lint(weight("600"), calibri).findings if f.rule == "font-weight")
-    assert "neither Calibri Light nor Calibri" in message and "(Calibri Bold)" in message
+    assert "neither Calibri Light nor Calibri" in message
+    if installed("Calibri"):
+        assert "(Calibri Bold)" in message
     for fine in ("400", "700", "bold", "normal", "lighter", "bolder"):
         assert "font-weight" not in _rules(weight(fine), sample_manifest), fine
     assert "font-weight" not in _rules(weight("300")), "no manifest, no guess"

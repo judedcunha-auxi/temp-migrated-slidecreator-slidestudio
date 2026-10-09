@@ -103,6 +103,30 @@ METRIC_ALIASES: dict[str, tuple[str, ...]] = {
     "courier new": ("Liberation Mono", "Cousine"),
 }
 
+#: Exact metric twins: faces designed to the same advance widths *and* vertical metrics as the family
+#: they stand in for (Carlito for Calibri, Caladea for Cambria, Liberation for Arial / Helvetica /
+#: Times New Roman / Courier New). Where the family itself is not installed but its twin is,
+#: `font_index` files the twin's faces under the family's name, so every measurement, the installed
+#: check (`extract.html.installed_families`) and the fit predictor treat the family as present: the
+#: browser draws the twin there too (fontconfig's metric aliases), and a line measured in it breaks
+#: where PowerPoint breaks it in the real face. `emitted_face` still names the family the slide asked
+#: for. Calibri Light has no twin (Carlito has no light face), so it stays reported as missing.
+METRIC_TWINS: dict[str, str] = {
+    "calibri": "Carlito",
+    "cambria": "Caladea",
+    "arial": "Liberation Sans",
+    "helvetica": "Liberation Sans",
+    "times new roman": "Liberation Serif",
+    "courier new": "Liberation Mono",
+}
+
+
+def twin_stands_in(face: Face | None, family: str) -> bool:
+    """Whether `face` is `family`'s metric twin (filed under its name because `family` is absent)."""
+    twin = METRIC_TWINS.get(family.strip().strip("'\"").strip().lower())
+    return bool(face is not None and twin and face.typographic_family.lower() == twin.lower())
+
+
 #: Substituted when a family (and its metric-compatible stand-in) is not installed. Everything
 #: downstream still measures *something* sane, and the substitution is reported rather than hidden.
 _FALLBACK_FAMILIES = ("Arial", "Helvetica", "Liberation Sans", "Segoe UI", "Calibri", "Carlito", "DejaVu Sans")
@@ -213,8 +237,16 @@ def _scan_font_dirs() -> dict[str, list[Face]]:
 
 @lru_cache(maxsize=1)
 def font_index() -> dict[str, list[Face]]:
-    """The installed-font index, built once per process (~0.3 s over the Windows font folder)."""
-    return _scan_font_dirs()
+    """The installed-font index, built once per process (~0.3 s over the Windows font folder).
+
+    A family that is not installed but whose exact metric twin is (`METRIC_TWINS`) is filed under the
+    twin's faces, so `face_for_exact("Calibri")` answers Carlito on a machine without Calibri.
+    """
+    index = _scan_font_dirs()
+    for family, twin in METRIC_TWINS.items():
+        if family not in index and twin.lower() in index:
+            index[family] = list(index[twin.lower()])
+    return index
 
 
 @lru_cache(maxsize=1024)
@@ -311,7 +343,9 @@ def emitted_face(run: dict[str, Any], ctx: EmitContext) -> EmittedFace:
     face = face_for_exact(requested, weight, italic) if requested else None
     if face is None or face.variable:
         return EmittedFace(named(requested), weight >= 600, italic, face)
-    legacy = face.legacy_family
+    # A metric twin standing in for the requested family is written as that family: the file is for
+    # PowerPoint on the client's machine, which has the real face.
+    legacy = requested if twin_stands_in(face, requested) else face.legacy_family
     bold = face.bold_member or (weight >= 600 and face.weight < 600)
     typeface = named(legacy) if legacy.lower() == requested.lower() else legacy
     return EmittedFace(typeface, bold, italic, face)

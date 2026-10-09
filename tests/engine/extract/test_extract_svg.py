@@ -324,7 +324,11 @@ def test_isolated_capture_contains_only_the_target_and_is_not_blank(shapes):
     rasters = [e for e in shapes["svg#3"].elements if e.kind == "raster"]
     for raster in rasters:
         with Image.open(raster.src) as image:
-            assert image.size == (round(raster.box.w), round(raster.box.h)), raster.reason
+            # Within a pixel of the box: the capture clip is snapped to whole device pixels, and a box
+            # whose extent comes from text (textPath) ends on a fraction that differs between FreeType
+            # (Linux) and DirectWrite (Windows) text rasterisation, so the snap can fall either way.
+            assert abs(image.size[0] - raster.box.w) < 1.0 and abs(image.size[1] - raster.box.h) < 1.0, (
+                raster.reason, image.size, raster.box)
             alpha = image.convert("RGBA").getchannel("A").histogram()
             inked = sum(alpha[9:])
         assert inked > 0, f"{raster.reason} captured a blank image"

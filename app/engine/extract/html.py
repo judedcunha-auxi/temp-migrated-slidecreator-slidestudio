@@ -451,7 +451,15 @@ def _scan_installed() -> frozenset[str]:
         except Exception:  # noqa: BLE001  # nosec B112
             # ^ a broken or exotic font file is not a run-stopper
             continue
-    return frozenset(present)
+    return with_metric_twins(frozenset(present))
+
+
+def with_metric_twins(present: frozenset[str]) -> frozenset[str]:
+    """`present` plus every family whose exact metric twin is in it: the browser draws the twin for
+    that family (fontconfig's metric aliases) with the same metrics (`emit.text.METRIC_TWINS`)."""
+    from app.engine.emit.text import METRIC_TWINS
+
+    return present | {family for family, twin in METRIC_TWINS.items() if twin.lower() in present}
 
 
 def installed_families(wanted: Sequence[str]) -> dict[str, bool]:

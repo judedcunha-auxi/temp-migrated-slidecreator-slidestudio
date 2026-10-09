@@ -23,7 +23,7 @@ from app.engine.extract import html as html_extract
 from app.engine.extract.html import COLOR_JS
 from app.engine.ir import IR, Canvas, Element
 from app.engine.verify.fixtures import context_for
-from tests.engine.helpers import expand_svg, extract_html
+from tests.engine.helpers import expand_svg, extract_html, without_platform_font_diagnostics
 
 #: The fidelity probes p03, p04 and p10 are the torture families `pseudo`, `colours` and `text-misc`
 #: since WP-G (G-2, plan 16 #16).
@@ -84,7 +84,9 @@ def _probe_ir(stem: str) -> IR:
     html = PROBES / f"{stem}.html"
     assert html.exists(), f"{html} is missing"
     context = context_for(html)
-    return extract_html(html, context.manifest, context.layout_id, context.assets_dir, slide_id=stem, title=stem)
+    # The test masters' Calibri Light has no Linux twin; that report is not what these tests are about.
+    return without_platform_font_diagnostics(
+        extract_html(html, context.manifest, context.layout_id, context.assets_dir, slide_id=stem, title=stem))
 
 
 def _named(ir: IR, name: str) -> list[Element]:
@@ -408,8 +410,9 @@ def _context_slide(tmp_path: Path, body: str, css: str = "", name: str = "slide"
 
 def _extract(html: Path) -> IR:
     context = context_for(html)
-    return extract_html(html, context.manifest, context.layout_id, context.assets_dir,
-                        slide_id=html.stem, title=html.stem)
+    # The test masters' Calibri Light has no Linux twin; that report is not what these tests are about.
+    return without_platform_font_diagnostics(extract_html(html, context.manifest, context.layout_id,
+                                                          context.assets_dir, slide_id=html.stem, title=html.stem))
 
 
 def _emit(ir: IR, html: Path, out: Path):

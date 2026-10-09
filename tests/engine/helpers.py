@@ -121,3 +121,29 @@ def measuring_face(family: str, weight: int = 400, italic: bool = False) -> Any:
         if face is not None:
             break
     return face
+
+
+#: Faces that ship only with Windows or Office (see `WINDOWS_ONLY_REASON`), lower-cased.
+WINDOWS_ONLY_FACES = frozenset({"calibri", "calibri light", "cambria", "segoe ui", "segoe ui semibold",
+                                "bahnschrift", "arial rounded mt bold"})
+
+
+def is_platform_font_diagnostic(diagnostic: Any) -> bool:
+    """A "theme font ... is not installed here" report about a Windows-only face this machine lacks.
+
+    True on Linux for the synthetic test masters' Calibri Light (no metric twin exists), never on a
+    machine that has the face. Tests about something else (pseudo-elements, paint) set it aside; the
+    tests about font substitution itself keep it.
+    """
+    import re
+
+    if getattr(diagnostic, "source", None) != "fonts":
+        return False
+    match = re.match(r"theme font '([^']+)' is not installed here", str(getattr(diagnostic, "message", "")))
+    return bool(match and match.group(1).lower() in WINDOWS_ONLY_FACES and not installed(match.group(1)))
+
+
+def without_platform_font_diagnostics(ir: IR) -> IR:
+    """`ir` with `is_platform_font_diagnostic` reports removed (in place; returned for chaining)."""
+    ir.diagnostics = [d for d in ir.diagnostics if not is_platform_font_diagnostic(d)]
+    return ir

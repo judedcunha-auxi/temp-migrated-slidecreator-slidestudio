@@ -83,3 +83,44 @@ def test_the_file_still_names_calibri(linux_fonts: Any):
 def test_the_alias_table_covers_the_container_fonts():
     assert text.METRIC_ALIASES["calibri"] == ("Carlito",)
     assert "Carlito" in text._FALLBACK_FAMILIES
+
+
+@pytest.fixture
+def scanned_linux_fonts(monkeypatch: pytest.MonkeyPatch) -> Any:
+    """Like `linux_fonts`, but through the real `font_index` (so the metric-twin filing runs)."""
+    index: dict[str, list[text.Face]] = {}
+    for family in ("Carlito", "Liberation Serif", "DejaVu Sans"):
+        for weight in (400, 700):
+            index.setdefault(family.lower(), []).append(_face(family, weight))
+    text.forget_fonts()
+    monkeypatch.setattr(text, "_scan_font_dirs", lambda: {k: list(v) for k, v in index.items()})
+    yield
+    text.forget_fonts()
+
+
+def test_a_missing_family_is_filed_under_its_exact_metric_twin(scanned_linux_fonts: Any):
+    face = text.face_for_exact("Calibri", 700, False)
+    assert face is not None and face.family == "Carlito" and face.weight == 700
+    assert text.twin_stands_in(face, "Calibri")
+    assert text.face_for_exact("Times New Roman").family == "Liberation Serif"  # type: ignore[union-attr]
+    # Calibri Light has no twin (Carlito has no light face): it stays missing for the exact lookup.
+    assert text.face_for_exact("Calibri Light", 300, False) is None
+
+
+def test_a_twin_is_written_as_the_family_the_slide_asked_for(scanned_linux_fonts: Any):
+    ctx = SimpleNamespace(theme_fonts={"minor": "Calibri"}, options=SimpleNamespace(theme_fonts=True))
+    plain = text.emitted_face({"font": "Calibri", "weight": 400, "italic": False}, ctx)  # type: ignore[arg-type]
+    assert plain.typeface == "+mn-lt" and plain.bold is False                  # the theme token, as on Windows
+    bold = text.emitted_face({"font": "Calibri", "weight": 700, "italic": False}, ctx)  # type: ignore[arg-type]
+    assert bold.bold is True and bold.face is not None and bold.face.family == "Carlito"
+    ctx.options.theme_fonts = False
+    assert text.emitted_face({"font": "Calibri", "weight": 400}, ctx).typeface == "Calibri"  # type: ignore[arg-type]
+
+
+def test_the_installed_check_counts_a_family_whose_twin_is_installed():
+    from app.engine.extract.html import with_metric_twins
+
+    present = with_metric_twins(frozenset({"carlito", "dejavu sans"}))
+    assert "calibri" in present and "carlito" in present
+    assert "calibri light" not in present                   # no twin: still reported as substituted
+    assert with_metric_twins(frozenset({"dejavu sans"})) == frozenset({"dejavu sans"})
