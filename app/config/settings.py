@@ -31,6 +31,8 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 PRODUCTION_ENVIRONMENTS = frozenset({"production", "prod", "staging"})
 NON_PRODUCTION_ENVIRONMENTS = frozenset({"development", "dev", "local", "test"})
 
+STORAGE_BACKENDS = ("fake", "local", "general")
+
 # An HTTP header name (RFC 9110 token), kept to the characters a gateway would use.
 _HEADER_NAME = re.compile(r"^[A-Za-z0-9-]{1,64}$")
 
@@ -75,7 +77,18 @@ class Settings(BaseSettings):
     # require it in production and so the scrubber knows it is a secret.
     applicationinsights_connection_string: str = ""
 
-    @field_validator("environment")
+    # Durable storage (Phase 4). "general" is the General service (the only
+    # backend allowed in production; its adapter is a stub until the repo exists,
+    # D5). "local" keeps data in files under SCRATCH_ROOT, "fake" in memory; both
+    # are for development and tests only.
+    storage_backend: str = "fake"
+    # The General service base URL. Required (https) when STORAGE_BACKEND=general.
+    general_service_url: str = ""
+    # Where job workspaces and the local storage adapter write. Nothing is written
+    # outside it. Empty: <system temp>/slideforge-scratch. Must be absolute if set.
+    scratch_root: str = ""
+
+    @field_validator("environment", "storage_backend")
     @classmethod
     def _normalise_environment(cls, value: str) -> str:
         return value.strip().lower()
@@ -108,6 +121,10 @@ def secret_values(s: Settings) -> list[str]:
     values: list[str] = []
     try:
         values.append(urlparse(s.redis_url).password or "")
+    except ValueError:
+        pass
+    try:
+        values.append(urlparse(s.general_service_url).password or "")
     except ValueError:
         pass
     conn = s.applicationinsights_connection_string
@@ -164,8 +181,29 @@ def check_config(s: Settings, engine: EngineSettings | None = None) -> list[str]
         if problem:
             problems.append(problem)
 
+    if s.storage_backend not in STORAGE_BACKENDS:
+        problems.append(f"STORAGE_BACKEND must be one of {list(STORAGE_BACKENDS)}.")
+    if s.storage_backend == "general":
+        # PLACEHOLDER until the General service repo exists (D5).
+        problems.append("STORAGE_BACKEND=general: the General service adapter is not written yet (D5).")
+        try:
+            gs = urlparse(s.general_service_url)
+        except ValueError:
+            gs = urlparse("")
+        if gs.scheme not in ("http", "https") or not gs.netloc:
+            problems.append("GENERAL_SERVICE_URL must be an http(s) URL when STORAGE_BACKEND=general.")
+        elif production and gs.scheme != "https":
+            problems.append("GENERAL_SERVICE_URL must use https in production.")
+    if s.scratch_root and not Path(s.scratch_root).is_absolute():
+        problems.append("SCRATCH_ROOT must be an absolute path.")
+
     # --- production only --------------------------------------------------------
     if production:
+        if s.storage_backend in ("fake", "local"):
+            problems.append(
+                f"STORAGE_BACKEND={s.storage_backend} is for development only; production "
+                "stores data through the General service (STORAGE_BACKEND=general)."
+            )
         if redis_scheme != "rediss":
             problems.append("REDIS_URL must use rediss:// (TLS) in production.")
         if not s.applicationinsights_connection_string:

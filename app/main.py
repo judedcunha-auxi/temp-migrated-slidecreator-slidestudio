@@ -14,7 +14,8 @@ matters and is fixed here:
    (outermost, so every response carries it);
 5. routers, one per area of the API.
 
-Tests call create_app() with their own Settings and a fakeredis-backed store.
+Tests call create_app() with their own Settings, a fakeredis-backed store and,
+when they need one, their own storage (tests/fakes/general_service.py).
 """
 
 from __future__ import annotations
@@ -37,6 +38,8 @@ from app.core import telemetry  # noqa: E402
 from app.core.errors import install_error_handlers  # noqa: E402
 from app.core.redis_client import RedisClient, RedisStore  # noqa: E402
 from app.core.request_id import RequestIdMiddleware  # noqa: E402
+from app.core.storage.factory import build_storage  # noqa: E402
+from app.core.storage.ports import Storage  # noqa: E402
 
 _log = logging.getLogger(__name__)
 
@@ -50,7 +53,19 @@ SERVICE_NAME = "slideforge-service"
 ROUTERS = (health.router,)
 
 
-def create_app(settings: Settings | None = None, redis: RedisStore | None = None) -> FastAPI:
+def _build_storage(s: Settings) -> Storage | None:
+    """The configured storage, or None (logged) when it cannot be built: /readyz
+    then answers 503 rather than the process failing to start."""
+    try:
+        return build_storage(s)
+    except Exception as exc:  # noqa: BLE001 - e.g. the General service stub (D5)
+        _log.error("storage: STORAGE_BACKEND=%s could not be built: %s", s.storage_backend, exc)
+        return None
+
+
+def create_app(
+    settings: Settings | None = None, redis: RedisStore | None = None, storage: Storage | None = None
+) -> FastAPI:
     s = settings or default_settings
     register_secret_values(secret_values(s))
     telemetry.configure_telemetry()
@@ -64,6 +79,9 @@ def create_app(settings: Settings | None = None, redis: RedisStore | None = None
         owns_redis = app.state.redis is None
         if owns_redis:
             app.state.redis = RedisClient.from_settings(s)
+        owns_storage = app.state.storage is None
+        if owns_storage:
+            app.state.storage = _build_storage(s)
         _log.info("startup: environment=%s production=%s config_problems=%d",
                   s.environment or "-", is_production(s), len(problems))
         try:
@@ -72,6 +90,8 @@ def create_app(settings: Settings | None = None, redis: RedisStore | None = None
             if owns_redis and app.state.redis is not None:
                 await app.state.redis.close()
                 app.state.redis = None
+            if owns_storage:
+                app.state.storage = None
 
     app = FastAPI(
         title="auxi SlideForge service",
@@ -85,6 +105,7 @@ def create_app(settings: Settings | None = None, redis: RedisStore | None = None
     )
     app.state.settings = s
     app.state.redis = redis
+    app.state.storage = storage
     app.state.config_problems = problems
 
     install_error_handlers(app)

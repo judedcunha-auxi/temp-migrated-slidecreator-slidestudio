@@ -31,8 +31,8 @@ instance, and whether to restart it.
   means "restart me". It also says **which commit is running**: when the deploy package is
   built, the commit's id is written into it, and `/healthz` reads it back. So "what is
   deployed?" is one request, not an investigation.
-- `GET /readyz` answers "can this instance do useful work?" It checks that Redis answers and,
-  in production, that the configuration is valid. If not, it answers 503 and the platform
+- `GET /readyz` answers "can this instance do useful work?" It checks that Redis answers, that
+  the storage backend answers, and, in production, that the configuration is valid. If not, it answers 503 and the platform
   keeps traffic away. It never says *why* in its answer (which host, which setting); the why is
   in the logs.
 
@@ -95,6 +95,21 @@ Arial in **Liberation Sans**, look-alike fonts with identical letter widths, and
 original font in the file. And two of the engine's files are derived from third-party code whose
 licence is not yet granted ([licensing.md](licensing.md)); they must not ship to production until
 that is settled. [architecture.md](architecture.md) has the details.
+
+**Storage, through one door.** Everything that must last goes through a single interface to the
+General service: users, brands, decks, slides and every version of them, files, job records,
+the cost ledger. The General service is not built yet, so for now the service runs against a
+stand-in that keeps data in memory, or in files on a developer's machine. A shared set of tests
+checks that the stand-ins behave as the real thing must: you only see your own decks, members of
+an organisation can use its brand but not change it, a retried request does not do the work
+twice, and a slide's old versions are never lost. The list of what the General service must do
+is in [general-service-requirements.md](general-service-requirements.md).
+
+**Background jobs.** Slow work (designing slides, exporting a deck) runs as a job. A job waits
+in a Redis queue; a worker takes it and holds it with a lease it keeps renewing. If the worker
+dies, the lease runs out and another worker picks the job up. Nobody runs more than three
+expensive jobs at once. What the user sees (queued, running, done) is kept with the General
+service, not in Redis. [architecture.md](architecture.md) has the design.
 
 ## 3. What happens to a request
 

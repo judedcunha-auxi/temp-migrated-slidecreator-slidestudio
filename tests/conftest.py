@@ -6,6 +6,8 @@
 - `fake_store` is the real RedisClient over fakeredis: the same code path as
   production, minus the server.
 - `make_app` / `client` build the app through create_app(), exactly as main.py does.
+  Storage defaults to STORAGE_BACKEND (fake); pass `storage=` for a
+  tests/fakes/general_service.FakeGeneralService you want to steer.
 """
 
 from __future__ import annotations
@@ -47,8 +49,8 @@ def fake_store() -> RedisStore:
 
 @pytest.fixture
 def make_app(fake_store: RedisStore) -> Callable[..., FastAPI]:
-    def _make(settings: Settings | None = None, redis: RedisStore | None = None) -> FastAPI:
-        return create_app(settings or build_settings(), redis if redis is not None else fake_store)
+    def _make(settings: Settings | None = None, redis: RedisStore | None = None, storage: Any = None) -> FastAPI:
+        return create_app(settings or build_settings(), redis if redis is not None else fake_store, storage)
 
     return _make
 

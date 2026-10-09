@@ -13,7 +13,10 @@ GOOD_PROD = {
     "redis_url": "rediss://:placeholder-password@cache.example:6380/0",
     "applicationinsights_connection_string": "InstrumentationKey=00000000-0000-0000-0000-000000000000",
     "cors_allowed_origins": "https://app.example.com",
+    "storage_backend": "general",
+    "general_service_url": "https://general.example",
 }
+GENERAL_SERVICE_PLACEHOLDER = "STORAGE_BACKEND=general: the General service adapter is not written yet (D5)."
 
 # What production needs of the engine settings (app/config/engine.py).
 GOOD_ENGINE_PROD = {"renderer_url": "https://render.example"}
@@ -28,8 +31,10 @@ def test_a_default_local_config_has_no_problems():
     assert check_config(build_settings()) == []
 
 
-def test_a_complete_production_config_has_no_problems():
-    assert check_config(build_settings(**GOOD_PROD), **GOOD_ENGINE_PROD) == []
+def test_a_complete_production_config_has_only_the_general_service_placeholder():
+    """Until the General service exists (D5), production cannot be fully configured:
+    the only remaining problem is the stub adapter, and it keeps /readyz at 503."""
+    assert check_config(build_settings(**GOOD_PROD), **GOOD_ENGINE_PROD) == [GENERAL_SERVICE_PLACEHOLDER]
 
 
 def test_production_requires_tls_redis_telemetry_and_a_cors_origin():
