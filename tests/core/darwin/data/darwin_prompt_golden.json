@@ -1,0 +1,1923 @@
+{
+ "source": "Slide-Creator netlify/functions/_shared (prompt.ts, refine.ts, layoutMatcher.ts, workzone.ts), dumped by bundling the TypeScript; inputs are synthetic",
+ "layouts": [
+  {
+   "name": "Title Slide",
+   "index": 0,
+   "placeholders": [
+    {
+     "type": "TITLE",
+     "left": 0.08,
+     "top": 0.3,
+     "width": 0.84,
+     "height": 0.2
+    },
+    {
+     "type": "SUBTITLE",
+     "left": 0.08,
+     "top": 0.55,
+     "width": 0.6,
+     "height": 0.1
+    },
+    {
+     "type": "DATE",
+     "left": 0.05,
+     "top": 0.9,
+     "width": 0.2,
+     "height": 0.05
+    }
+   ]
+  },
+  {
+   "name": "Title and Content",
+   "index": 1,
+   "placeholders": [
+    {
+     "type": "TITLE",
+     "role": "title",
+     "left": 0.05,
+     "top": 0.05,
+     "width": 0.9,
+     "height": 0.12
+    },
+    {
+     "type": "BODY",
+     "left": 0.05,
+     "top": 0.2,
+     "width": 0.9,
+     "height": 0.7
+    },
+    {
+     "type": "PICTURE",
+     "role": "unknown_role",
+     "left": 0.6,
+     "top": 0.65,
+     "width": 0.3,
+     "height": 0.1
+    }
+   ],
+   "decorations": [
+    {
+     "type": "PICTURE",
+     "role": "logo",
+     "left": 0.85,
+     "top": 0.02,
+     "width": 0.1,
+     "height": 0.06
+    },
+    {
+     "type": "AUTO_SHAPE",
+     "role": "background",
+     "left": 0,
+     "top": 0,
+     "width": 1,
+     "height": 1
+    },
+    {
+     "type": "AUTO_SHAPE",
+     "role": "decoration",
+     "left": 0.3,
+     "top": 0.4,
+     "width": 0.1,
+     "height": 0.1
+    }
+   ]
+  },
+  {
+   "name": "Section Header",
+   "index": 2,
+   "backgroundType": "solid",
+   "backgroundColor": "#112233",
+   "placeholders": [
+    {
+     "type": "TITLE",
+     "left": 0.1,
+     "top": 0.4,
+     "width": 0.8,
+     "height": 0.2
+    }
+   ]
+  },
+  {
+   "name": "Two Content",
+   "index": 3,
+   "placeholders": [
+    {
+     "type": "TITLE",
+     "left": 0.05,
+     "top": 0.05,
+     "width": 0.9,
+     "height": 0.1
+    },
+    {
+     "type": "OBJECT",
+     "left": 0.05,
+     "top": 0.2,
+     "width": 0.42,
+     "height": 0.7
+    },
+    {
+     "type": "OBJECT",
+     "left": 0.53,
+     "top": 0.2,
+     "width": 0.42,
+     "height": 0.7
+    }
+   ]
+  }
+ ],
+ "rawKits": {
+  "none": null,
+  "colours": {
+   "company": "Acme",
+   "primaryColor": "#123456",
+   "accentColor": "#abcdef",
+   "headingFont": "Georgia",
+   "bodyFont": "Inter",
+   "styleTemplate": "Use {primaryColor} and {accentColor} for {company}; headings {headingFont}, body {bodyFont}; keep {unknownToken}."
+  },
+  "extracted": {
+   "company": "Beta Corp",
+   "primaryColor": "#0A0A0A",
+   "accentColor": "#FF0000",
+   "typographyScale": {
+    "title": {
+     "sizePt": 28,
+     "bold": true,
+     "colorSchemeSlot": "tx1",
+     "colorHex": "#111111"
+    },
+    "body": {
+     "sizePt": 14,
+     "bold": false,
+     "colorSchemeSlot": "tx1",
+     "colorHex": ""
+    }
+   },
+   "allColors": [
+    {
+     "role": "accent1",
+     "hex": "#0a0a0a"
+    },
+    {
+     "role": "accent2",
+     "hex": "#00FF00"
+    },
+    {
+     "role": "lt1",
+     "hex": "#FFFFFF"
+    },
+    {
+     "role": "dk2",
+     "hex": "#222222"
+    },
+    {
+     "role": "accent3",
+     "hex": "bad"
+    },
+    {
+     "role": "accent4",
+     "hex": "#333333"
+    },
+    {
+     "role": "accent5",
+     "hex": "#444444"
+    },
+    {
+     "role": "accent6",
+     "hex": "#555555"
+    }
+   ],
+   "layouts": [
+    {
+     "name": "Title Slide",
+     "index": 0,
+     "placeholders": [
+      {
+       "type": "TITLE",
+       "left": 0.08,
+       "top": 0.3,
+       "width": 0.84,
+       "height": 0.2
+      },
+      {
+       "type": "SUBTITLE",
+       "left": 0.08,
+       "top": 0.55,
+       "width": 0.6,
+       "height": 0.1
+      },
+      {
+       "type": "DATE",
+       "left": 0.05,
+       "top": 0.9,
+       "width": 0.2,
+       "height": 0.05
+      }
+     ]
+    },
+    {
+     "name": "Title and Content",
+     "index": 1,
+     "placeholders": [
+      {
+       "type": "TITLE",
+       "role": "title",
+       "left": 0.05,
+       "top": 0.05,
+       "width": 0.9,
+       "height": 0.12
+      },
+      {
+       "type": "BODY",
+       "left": 0.05,
+       "top": 0.2,
+       "width": 0.9,
+       "height": 0.7
+      },
+      {
+       "type": "PICTURE",
+       "role": "unknown_role",
+       "left": 0.6,
+       "top": 0.65,
+       "width": 0.3,
+       "height": 0.1
+      }
+     ],
+     "decorations": [
+      {
+       "type": "PICTURE",
+       "role": "logo",
+       "left": 0.85,
+       "top": 0.02,
+       "width": 0.1,
+       "height": 0.06
+      },
+      {
+       "type": "AUTO_SHAPE",
+       "role": "background",
+       "left": 0,
+       "top": 0,
+       "width": 1,
+       "height": 1
+      },
+      {
+       "type": "AUTO_SHAPE",
+       "role": "decoration",
+       "left": 0.3,
+       "top": 0.4,
+       "width": 0.1,
+       "height": 0.1
+      }
+     ]
+    },
+    {
+     "name": "Section Header",
+     "index": 2,
+     "backgroundType": "solid",
+     "backgroundColor": "#112233",
+     "placeholders": [
+      {
+       "type": "TITLE",
+       "left": 0.1,
+       "top": 0.4,
+       "width": 0.8,
+       "height": 0.2
+      }
+     ]
+    },
+    {
+     "name": "Two Content",
+     "index": 3,
+     "placeholders": [
+      {
+       "type": "TITLE",
+       "left": 0.05,
+       "top": 0.05,
+       "width": 0.9,
+       "height": 0.1
+      },
+      {
+       "type": "OBJECT",
+       "left": 0.05,
+       "top": 0.2,
+       "width": 0.42,
+       "height": 0.7
+      },
+      {
+       "type": "OBJECT",
+       "left": 0.53,
+       "top": 0.2,
+       "width": 0.42,
+       "height": 0.7
+      }
+     ]
+    }
+   ],
+   "workzone": {
+    "left": 0.05,
+    "top": 0.2,
+    "right": 0.95,
+    "bottom": 0.9
+   },
+   "furnitureArchetypes": [
+    "content",
+    "bogus"
+   ]
+  },
+  "typoOnly": {
+   "typographyScale": {
+    "title": {
+     "sizePt": 0,
+     "bold": true,
+     "colorSchemeSlot": "",
+     "colorHex": "#000000"
+    },
+    "body": {
+     "sizePt": 11,
+     "bold": true,
+     "colorSchemeSlot": "",
+     "colorHex": "#333333"
+    }
+   }
+  },
+  "layoutsNoWz": {
+   "layouts": [
+    {
+     "name": "Title Slide",
+     "index": 0,
+     "placeholders": [
+      {
+       "type": "TITLE",
+       "left": 0.08,
+       "top": 0.3,
+       "width": 0.84,
+       "height": 0.2
+      },
+      {
+       "type": "SUBTITLE",
+       "left": 0.08,
+       "top": 0.55,
+       "width": 0.6,
+       "height": 0.1
+      },
+      {
+       "type": "DATE",
+       "left": 0.05,
+       "top": 0.9,
+       "width": 0.2,
+       "height": 0.05
+      }
+     ]
+    },
+    {
+     "name": "Title and Content",
+     "index": 1,
+     "placeholders": [
+      {
+       "type": "TITLE",
+       "role": "title",
+       "left": 0.05,
+       "top": 0.05,
+       "width": 0.9,
+       "height": 0.12
+      },
+      {
+       "type": "BODY",
+       "left": 0.05,
+       "top": 0.2,
+       "width": 0.9,
+       "height": 0.7
+      },
+      {
+       "type": "PICTURE",
+       "role": "unknown_role",
+       "left": 0.6,
+       "top": 0.65,
+       "width": 0.3,
+       "height": 0.1
+      }
+     ],
+     "decorations": [
+      {
+       "type": "PICTURE",
+       "role": "logo",
+       "left": 0.85,
+       "top": 0.02,
+       "width": 0.1,
+       "height": 0.06
+      },
+      {
+       "type": "AUTO_SHAPE",
+       "role": "background",
+       "left": 0,
+       "top": 0,
+       "width": 1,
+       "height": 1
+      },
+      {
+       "type": "AUTO_SHAPE",
+       "role": "decoration",
+       "left": 0.3,
+       "top": 0.4,
+       "width": 0.1,
+       "height": 0.1
+      }
+     ]
+    },
+    {
+     "name": "Section Header",
+     "index": 2,
+     "backgroundType": "solid",
+     "backgroundColor": "#112233",
+     "placeholders": [
+      {
+       "type": "TITLE",
+       "left": 0.1,
+       "top": 0.4,
+       "width": 0.8,
+       "height": 0.2
+      }
+     ]
+    },
+    {
+     "name": "Two Content",
+     "index": 3,
+     "placeholders": [
+      {
+       "type": "TITLE",
+       "left": 0.05,
+       "top": 0.05,
+       "width": 0.9,
+       "height": 0.1
+      },
+      {
+       "type": "OBJECT",
+       "left": 0.05,
+       "top": 0.2,
+       "width": 0.42,
+       "height": 0.7
+      },
+      {
+       "type": "OBJECT",
+       "left": 0.53,
+       "top": 0.2,
+       "width": 0.42,
+       "height": 0.7
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "slides": {
+  "content": {
+   "number": 2,
+   "title": "Margins grew 4 pts on pricing",
+   "type": "framework",
+   "framework": "value chain",
+   "description": "Pricing drove most of the gain. Costs were flat.",
+   "bullets": [
+    "Price +3%",
+    "Mix +1 pt",
+    "Costs flat"
+   ]
+  },
+  "chart": {
+   "number": 3,
+   "title": "Revenue up 12%",
+   "type": "data",
+   "framework": "waterfall chart",
+   "description": "Two drivers.",
+   "bullets": [
+    "A",
+    "B",
+    "C"
+   ],
+   "chartData": {
+    "categories": [
+     "Q1",
+     "Q2",
+     "Q3"
+    ],
+    "series": [
+     {
+      "name": "Rev",
+      "values": [
+       1,
+       2.5,
+       1e+21,
+       1e-05,
+       12,
+       -3
+      ],
+      "dataLabels": [
+       "$1M",
+       "$2.5M"
+      ]
+     },
+     {
+      "name": "Cost",
+      "values": [
+       0.1,
+       100,
+       123456789012
+      ]
+     }
+    ]
+   }
+  },
+  "unknownFw": {
+   "number": 4,
+   "title": "Odd one",
+   "type": "process",
+   "framework": "mystery diagram",
+   "description": "D.",
+   "bullets": [
+    "x",
+    "y",
+    "z"
+   ]
+  },
+  "emptyFw": {
+   "number": 5,
+   "title": "Blank fw",
+   "type": "kpi",
+   "framework": "   ",
+   "description": "D.",
+   "bullets": [
+    "x",
+    "y",
+    "z"
+   ]
+  },
+  "title": {
+   "number": 1,
+   "title": "Q3 Results",
+   "type": "title",
+   "framework": "title slide",
+   "description": "Opening",
+   "bullets": []
+  },
+  "divider": {
+   "number": 6,
+   "title": "Diagnosis",
+   "type": "divider",
+   "framework": "section divider",
+   "description": "Section",
+   "bullets": []
+  },
+  "noType": {
+   "number": 7,
+   "title": "No type",
+   "framework": "SWOT analysis",
+   "description": "D.",
+   "bullets": [
+    "a",
+    "b",
+    "c"
+   ]
+  },
+  "rtlWords": {
+   "number": 8,
+   "title": "Left to right",
+   "type": "timeline",
+   "framework": "phased roadmap",
+   "description": "Left rail, top-left.",
+   "bullets": [
+    "left",
+    "Right-hand",
+    "x"
+   ]
+  }
+ },
+ "prompts": [
+  {
+   "name": "content/none/en",
+   "slide": "content",
+   "kit": "none",
+   "sha256": "66a8c5e1fdda1b3e61bc59883c91168494c0ef7f35dd5f00a16e2be0162b8ef0"
+  },
+  {
+   "name": "content/none/ar",
+   "slide": "content",
+   "kit": "none",
+   "language": "ar",
+   "sha256": "469cb9d7e075973fa0e80ad860bc2db9215156063d51613964373b3f18764747"
+  },
+  {
+   "name": "content/colours/en",
+   "slide": "content",
+   "kit": "colours",
+   "sha256": "5eab77f2a968ea24940fe7972db0da8fddf90ab02caab302c5e3820be08ac582"
+  },
+  {
+   "name": "content/colours/ar",
+   "slide": "content",
+   "kit": "colours",
+   "language": "ar",
+   "sha256": "8a369b768187ec4dc4a463009eb36050bc95395df380e8c3ad9a97d10a21c90b"
+  },
+  {
+   "name": "content/extracted/en",
+   "slide": "content",
+   "kit": "extracted",
+   "sha256": "bb5a255fd1ff1be51514860a195eb09025d5f27bed39d2cc76556e4e54cc73cf",
+   "prompt": "Slide content to render:\nThe slide's headline reads: \"Margins grew 4 pts on pricing\"\nFraming: Pricing drove most of the gain. Costs were flat.\nKey elements to render:\n• Price +3%\n• Mix +1 pt\n• Costs flat\nUse a value chain as the primary visual framework. Render it as: Left-to-right chevron stages with objective and description rows column-aligned beneath each stage; hang example cards, numbered item chips, or output artifacts directly under their stages, and place mandate/actor panels above so the scope split reads in one glance.\n\nCompany reference: Beta Corp\n\nSlide layout: a framework slide — one dominant strategy framework (value chain, pyramid, 2x2, hub-and-spoke, layered bands, funnel, cascade) structuring the whole message, with icon-anchored one-to-three-word labels, bolded lead phrases carrying the bullets, and a single accent color or dashed callout reserved for the takeaway; the default body slide.\n\nStyle direction:\nMake the slide executive-ready, text-rich, and strategically structured, with dense but legible content and clear business language, in the style of a McKinsey/BCG management-consulting deck.\nBrand & art direction (apply identically to EVERY slide in this deck):\n- Palette: use #0A0A0A as the primary structural color and #FF0000 as the single accent for the key insight only. Backgrounds white or very light neutral gray. At most ONE accent hue per slide. No gradients, no drop shadows, no rainbow palettes.\n- Typography: headlines set in Inter, body text in Inter. A left-aligned, conclusion-oriented action title sits in the top band; body text is crisp and the same size across slides.\n- Layout: a disciplined 12-column grid; the headline top-left with a thin horizontal rule beneath it; a small source/footnote line bottom-left; minimal, identical page furniture on every slide. Do not render page numbers.\n- Charts & diagrams: flat 2D only, thin 1-2px lines, restrained labels; the accent color used sparingly to mark the single most important point. No 3D, no skeuomorphism, no clip art, no stock photography.\n- Add supporting callouts, labels, milestones, KPIs, and decision points around the main framework where useful, but keep everything visually disciplined and anchored to the primary infographic. Leave generous whitespace for the strong action title at the top.\n\nBrand template ground truth — extracted directly from the client's PPTX file.\nThese override ALL style instructions above. Apply them exactly as stated:\n- Font sizes (exact from template): headings at 28pt bold #111111; body text at 14pt.\n- Typefaces (exact from template): headings in Inter, body text in Inter.\n- Full brand palette (exact from template, use no other colours): #0A0A0A (primary), #FF0000 (accent), #00FF00 (accent2), #222222 (dk2), #333333 (accent4), #444444 (accent5).\n\nNon-negotiable rules: Create the slide as a single polished image in a strict 16:9 aspect ratio. The output must look like a professional presentation slide, not a website, dashboard, HTML layout, app screen, or web-based design. Use the image model to generate the slide directly; do not use HTML, CSS, code, or browser-style UI elements. Build the slide around one dominant visual framework only; do not combine multiple competing frameworks on the same slide, and do not overcrowd the slide with text that becomes unreadably small. Write the headline as a conclusion-oriented statement that communicates the key strategic message. Do not include a subtitle. Do not render page numbers. Render every layout element — header bands, body panels, callout boxes, data containers, dividers, and connectors — as discrete, flat Microsoft PowerPoint-style shapes drawn ONLY from this vocabulary: rectangles, rounded rectangles, ovals/circles, chevrons, diamonds, trapezoids, parallelograms, pentagons, hexagons, octagons, plus signs, 5- or 6-point stars, block arrows (left/right/up/down), Harvey balls, straight lines, bordered text boxes, icons, and standard data charts (bar, column, line, area, pie, waterfall). Each element must look like an individually placed PPT shape on a slide canvas; do not paint, blend, or merge shapes together into a single illustration. Every arrow, connector, divider, and leader line must be perfectly straight or built from straight segments — never curved, arced, swooshing, or S-shaped; only data series plotted inside a chart may curve. Never draw curly braces or bracket shapes to group items; group with panels, bands, column alignment, or labeled rails instead. Fill every shape with one flat solid color, or leave it unfilled with a plain solid or dashed outline — no gradient fills, no translucent or semi-transparent fills, no shadows, no glows. Render only flat, native-presentation visuals; ignore any instruction elsewhere in this prompt requesting 3D, isometric, photorealistic, or web-style visualizations, gradient or translucent fills, curved arrows or swooshes, or brace/bracket grouping shapes."
+  },
+  {
+   "name": "content/extracted/ar",
+   "slide": "content",
+   "kit": "extracted",
+   "language": "ar",
+   "sha256": "b2cf9cf0bfa293633c4d7ab163c7a0a102ac8e522869daf6733a58f3fa7d6c46"
+  },
+  {
+   "name": "content/typoOnly/en",
+   "slide": "content",
+   "kit": "typoOnly",
+   "sha256": "4c52223f986ec27ab60ad1949b61c8572b530a1627631487455aaf07d36d62bd"
+  },
+  {
+   "name": "content/typoOnly/ar",
+   "slide": "content",
+   "kit": "typoOnly",
+   "language": "ar",
+   "sha256": "fd9beca81f9f92ee9a5c73a3cb2d4ab97028f73eee388d349663ee6adca440c7"
+  },
+  {
+   "name": "content/layoutsNoWz/en",
+   "slide": "content",
+   "kit": "layoutsNoWz",
+   "sha256": "66a8c5e1fdda1b3e61bc59883c91168494c0ef7f35dd5f00a16e2be0162b8ef0"
+  },
+  {
+   "name": "content/layoutsNoWz/ar",
+   "slide": "content",
+   "kit": "layoutsNoWz",
+   "language": "ar",
+   "sha256": "469cb9d7e075973fa0e80ad860bc2db9215156063d51613964373b3f18764747"
+  },
+  {
+   "name": "content/contentOnly",
+   "slide": "content",
+   "kit": "extracted",
+   "contentOnly": true,
+   "sha256": "d5d68381fb7b384871516eb5e1b92ed841883199d6e6fde677a61bd0780931c0",
+   "prompt": "Slide BODY content to render (the title/headline is rendered separately by the template — do NOT draw it in this image):\nSlide topic (for context only, do not render as a heading): \"Margins grew 4 pts on pricing\"\nFraming: Pricing drove most of the gain. Costs were flat.\nKey elements to render:\n• Price +3%\n• Mix +1 pt\n• Costs flat\nUse a value chain as the primary visual framework. Render it as: Left-to-right chevron stages with objective and description rows column-aligned beneath each stage; hang example cards, numbered item chips, or output artifacts directly under their stages, and place mandate/actor panels above so the scope split reads in one glance.\n\nCompany reference: Beta Corp\n\nSlide layout: a framework slide — one dominant strategy framework (value chain, pyramid, 2x2, hub-and-spoke, layered bands, funnel, cascade) structuring the whole message, with icon-anchored one-to-three-word labels, bolded lead phrases carrying the bullets, and a single accent color or dashed callout reserved for the takeaway; the default body slide.\n\nStyle direction:\nMake the slide executive-ready, text-rich, and strategically structured, with dense but legible content and clear business language, in the style of a McKinsey/BCG management-consulting deck.\nBrand & art direction (apply identically to EVERY slide in this deck):\n- Palette: use #0A0A0A as the primary structural color and #FF0000 as the single accent for the key insight only. Backgrounds white or very light neutral gray. At most ONE accent hue per slide. No gradients, no drop shadows, no rainbow palettes.\n- Typography: headlines set in Inter, body text in Inter. A left-aligned, conclusion-oriented action title sits in the top band; body text is crisp and the same size across slides.\n- Layout: a disciplined 12-column grid; the headline top-left with a thin horizontal rule beneath it; a small source/footnote line bottom-left; minimal, identical page furniture on every slide. Do not render page numbers.\n- Charts & diagrams: flat 2D only, thin 1-2px lines, restrained labels; the accent color used sparingly to mark the single most important point. No 3D, no skeuomorphism, no clip art, no stock photography.\n- Add supporting callouts, labels, milestones, KPIs, and decision points around the main framework where useful, but keep everything visually disciplined and anchored to the primary infographic. Leave generous whitespace for the strong action title at the top.\n\nBrand template ground truth — extracted directly from the client's PPTX file.\nThese override ALL style instructions above. Apply them exactly as stated:\n- Font sizes (exact from template): headings at 28pt bold #111111; body text at 14pt.\n- Typefaces (exact from template): headings in Inter, body text in Inter.\n- Full brand palette (exact from template, use no other colours): #0A0A0A (primary), #FF0000 (accent), #00FF00 (accent2), #222222 (dk2), #333333 (accent4), #444444 (accent5).\n\nNon-negotiable rules: Render ONLY the slide BODY content — bullets, panels, callouts, charts, and supporting visuals — as a tile that will be composited onto a branded slide template. Do NOT render the slide title or headline anywhere in this image: the title is placed separately as native text in the template's title placeholder, so drawing it here would duplicate it. The background MUST be plain solid white: no other background color, gradient, pattern, or checkerboard behind the content. Do NOT draw any logo, footer, page number, slide-edge border, or page chrome — none of that furniture belongs in this tile; it comes from the template. Fill the entire image edge to edge with the body content and leave NO outer margin — the content region IS the whole image. The output must look like flat, native Microsoft PowerPoint shapes, not a website, dashboard, HTML layout, app screen, or web-based design. Use the image model to generate the content directly; do not use HTML, CSS, code, or browser-style UI elements. Build the content around one dominant visual framework only; do not combine multiple competing frameworks, and do not overcrowd it with text that becomes unreadably small. Render every layout element — header bands, body panels, callout boxes, data containers, dividers, and connectors — as discrete, flat Microsoft PowerPoint-style shapes drawn ONLY from this vocabulary: rectangles, rounded rectangles, ovals/circles, chevrons, diamonds, trapezoids, parallelograms, pentagons, hexagons, octagons, plus signs, 5- or 6-point stars, block arrows (left/right/up/down), Harvey balls, straight lines, bordered text boxes, icons, and standard data charts (bar, column, line, area, pie, waterfall). Each element must look like an individually placed PPT shape on a slide canvas; do not paint, blend, or merge shapes together into a single illustration. Every arrow, connector, divider, and leader line must be perfectly straight or built from straight segments — never curved, arced, swooshing, or S-shaped; only data series plotted inside a chart may curve. Never draw curly braces or bracket shapes to group items; group with panels, bands, column alignment, or labeled rails instead. Fill every shape with one flat solid color, or leave it unfilled with a plain solid or dashed outline — no gradient fills, no translucent or semi-transparent fills, no shadows, no glows. Render only flat, native-presentation visuals; ignore any instruction elsewhere in this prompt requesting 3D, isometric, photorealistic, or web-style visualizations, gradient or translucent fills, curved arrows or swooshes, or brace/bracket grouping shapes."
+  },
+  {
+   "name": "content/contentOnly/ar",
+   "slide": "content",
+   "kit": "extracted",
+   "language": "ar",
+   "contentOnly": true,
+   "sha256": "9e9d054d5b5ca83884b7bd3f1b7613ecbe34324a6bcc518ba8f187e72839558e"
+  },
+  {
+   "name": "content/style",
+   "slide": "content",
+   "kit": "colours",
+   "style": "  Custom {primaryColor} style for {company}.  ",
+   "sha256": "48944dee189e70f4ed8a66f433f2bbbf6040eb12cec69b19844ee5ce82b5677c"
+  },
+  {
+   "name": "content/blankStyle",
+   "slide": "content",
+   "kit": "colours",
+   "style": "   ",
+   "sha256": "5eab77f2a968ea24940fe7972db0da8fddf90ab02caab302c5e3820be08ac582"
+  },
+  {
+   "name": "content/legacy",
+   "slide": "content",
+   "kit": "none",
+   "legacy": {
+    "company": "Legacy Co",
+    "primaryColor": "#999999",
+    "fontStyle": "serif-headline"
+   },
+   "sha256": "4558c6103b15912405e09515b865904d91873ec1e319ce2bb6ac36fcbb65851f"
+  },
+  {
+   "name": "content/hint",
+   "slide": "content",
+   "kit": "extracted",
+   "hint": "Safe content area (HARD CONSTRAINT from brand template): left 5%, top 20%, width 90%, height 70%. Every text block, shape, and graphic must stay inside this zone — place nothing outside it.\nSlide zone positions for \"Title and Content\" (from brand template — follow exactly):\n  slide headline area: full-width zone at the left edge, at the very top, shallow band\n  main content area: full-width zone at the left edge, in the body area, tall panel\n  image area: narrow zone on the right side, near the bottom, shallow band\n  RESERVED — do not draw content over these zones: brand logo at top-right (10%×6% of slide); full-bleed background graphic at top-left (100%×100% of slide).\nThis spatial layout is a hard constraint from the brand template. Follow it exactly.",
+   "sha256": "10ce6de0c592a3ac33ad20d448e9957d39c9946c54bbeb30e3ac5ae55e1001cd"
+  },
+  {
+   "name": "chart/none/en",
+   "slide": "chart",
+   "kit": "none",
+   "sha256": "f1b1f48e7ef4cc5e5442adbcf99e0354aa0e96873efa4c18365082f9a43b173d"
+  },
+  {
+   "name": "chart/none/ar",
+   "slide": "chart",
+   "kit": "none",
+   "language": "ar",
+   "sha256": "2d499030cc2760fa2114e8999d57d58c73f93d40e89548d399dbf5981197d2ef"
+  },
+  {
+   "name": "chart/colours/en",
+   "slide": "chart",
+   "kit": "colours",
+   "sha256": "8ee66054bb21958bdd0fc1798b5e518a810d371bf92889e8ea8f24fb1988e812"
+  },
+  {
+   "name": "chart/colours/ar",
+   "slide": "chart",
+   "kit": "colours",
+   "language": "ar",
+   "sha256": "98119e9fa4a9e8882e70e9be7a01b687183acd16fddbe45d2fb991d0f6c3e737",
+   "prompt": "Slide content to render:\nThe slide's headline reads: \"Revenue up 12%\"\nFraming: Two drivers.\nKey elements to render:\n• A\n• B\n• C\nUse a waterfall chart as the primary visual framework. Render it as: One hero decomposition bar with %-range labels on every segment, circled callouts only on segments that matter, benchmark logos as evidence anchors, and a bolded one-line takeaway directly beneath the chart; keep a context rail to the side, never inside the plot. [RIGHT-TO-LEFT: the layout/framework just described is written for a left-to-right slide — MIRROR it for this Arabic slide: swap every left/right (sidebars, rails, columns, labels), order all sequences and steps from right (first) to left (last), and make every arrow, arrowhead, chevron, funnel, timeline, and flow point right-to-left.]\nChart data to render exactly:\nCategories: Q1 | Q2 | Q3\nRev: 1 ($1M) | 2.5 ($2.5M) | 1e+21 () | 0.00001 () | 12 () | -3 ()\nCost: 0.1 | 100 | 123456789012\n\nCompany reference: Acme\n\nSlide layout: a data slide — ONE hero chart (waterfall, 100% stacked bar, annotated line) with data labels on every mark and flags or logos anchoring the categories, the quantified takeaway stated in an action title or banner directly above the chart, and context or implications pushed to side rails so the plot stays clean. [RIGHT-TO-LEFT: the layout/framework just described is written for a left-to-right slide — MIRROR it for this Arabic slide: swap every left/right (sidebars, rails, columns, labels), order all sequences and steps from right (first) to left (last), and make every arrow, arrowhead, chevron, funnel, timeline, and flow point right-to-left.]\n\nStyle direction:\nUse #123456 and #abcdef for Acme; headings Georgia, body Cairo; keep {unknownToken}.\n\nARABIC / RIGHT-TO-LEFT SLIDE — these rules take ABSOLUTE PRECEDENCE over every layout, framework, and style instruction above. Any instruction above that says \"left\", \"right\", \"left-to-right\", \"leading\", \"first column\", \"sidebar\", or \"rail\" was written for a left-to-right slide; reinterpret each of them as its right-to-left MIRROR. The whole slide is mirrored horizontally: reading starts at the TOP-RIGHT and flows leftward and down. Right-align the action title, all body text, bullets, list markers, and any source/footnote line; indentation is on the right. Put primary sidebars, rails, category/row labels, and the FIRST item of any sequence on the RIGHT, with the sequence progressing toward the LEFT. EVERY directional element runs right-to-left: arrows and arrowheads point LEFT; process chevrons and step banners point LEFT and are ordered step 1 on the right to the last step on the left; funnels narrow toward the LEFT; timelines and Gantt bars run earliest on the RIGHT to latest on the LEFT; growth/trend lines rise toward the LEFT; connectors and \"leads-to\" arrows flow LEFT; and any result / outcome / \"therefore\" box sits at the far LEFT (the end of the flow). Do NOT merely reposition these shapes — ROTATE or FLIP the arrowheads and chevron points themselves so they physically face LEFT. Keep step and sequence numbers consecutive and correct (1, 2, 3, …) with number 1 on the RIGHT; never skip, drop, or reorder a number. Render Arabic as fully joined, flowing cursive script with correct contextual letterforms (isolated, initial, medial, final) and standard ligatures, and SPELL every word correctly; do not disconnect letters, do not add letter-spacing between Arabic letters, and do not render broken or placeholder (tofu) glyphs. Give Arabic generous line-height so ascenders and descenders do not collide. Mirror charts and tables: reverse the category (X) axis so it runs right-to-left AND reverse the series order to match (a time axis runs earliest on the right, latest on the left); order table columns right-to-left so the first/label column is on the right. Numbers and data labels stay left-to-right within their own box. Keep every number, percentage, currency amount, range, date, unit, and Latin brand or product name left-to-right and in its normal order — each is a left-to-right island inside the right-to-left text; never reverse or mirror them, and keep %, $, +, - and other symbols on their correct side. Use Western/Latin digits (0-9). Any embedded label, caption, axis title, legend, or placeholder text must be written in Arabic — do NOT leave English boilerplate (e.g. \"TIMELINE\", \"OVERVIEW\", \"Days\") inside an otherwise-Arabic slide. Reposition brand furniture to the mirrored side, but do NOT horizontally flip or mirror logos, photographs, portraits, or symmetric icons — flipping reverses embedded branding into gibberish. Mirror ONLY meaning-bearing directional graphics (arrows, chevrons, funnels, timelines, progress bars, trend lines, process flows).\n\nNon-negotiable rules: Create the slide as a single polished image in a strict 16:9 aspect ratio. The output must look like a professional presentation slide, not a website, dashboard, HTML layout, app screen, or web-based design. Use the image model to generate the slide directly; do not use HTML, CSS, code, or browser-style UI elements. Build the slide around one dominant visual framework only; do not combine multiple competing frameworks on the same slide, and do not overcrowd the slide with text that becomes unreadably small. Write the headline as a conclusion-oriented statement that communicates the key strategic message. Do not include a subtitle. Do not render page numbers. Render every layout element — header bands, body panels, callout boxes, data containers, dividers, and connectors — as discrete, flat Microsoft PowerPoint-style shapes drawn ONLY from this vocabulary: rectangles, rounded rectangles, ovals/circles, chevrons, diamonds, trapezoids, parallelograms, pentagons, hexagons, octagons, plus signs, 5- or 6-point stars, block arrows (left/right/up/down), Harvey balls, straight lines, bordered text boxes, icons, and standard data charts (bar, column, line, area, pie, waterfall). Each element must look like an individually placed PPT shape on a slide canvas; do not paint, blend, or merge shapes together into a single illustration. Every arrow, connector, divider, and leader line must be perfectly straight or built from straight segments — never curved, arced, swooshing, or S-shaped; only data series plotted inside a chart may curve. Never draw curly braces or bracket shapes to group items; group with panels, bands, column alignment, or labeled rails instead. Fill every shape with one flat solid color, or leave it unfilled with a plain solid or dashed outline — no gradient fills, no translucent or semi-transparent fills, no shadows, no glows. Render only flat, native-presentation visuals; ignore any instruction elsewhere in this prompt requesting 3D, isometric, photorealistic, or web-style visualizations, gradient or translucent fills, curved arrows or swooshes, or brace/bracket grouping shapes."
+  },
+  {
+   "name": "chart/extracted/en",
+   "slide": "chart",
+   "kit": "extracted",
+   "sha256": "d310a2db431c60553c94a6b8c2c85b3f9c9d980d80ba772e04fc076629b761dd"
+  },
+  {
+   "name": "chart/extracted/ar",
+   "slide": "chart",
+   "kit": "extracted",
+   "language": "ar",
+   "sha256": "74010026020789708cb68c154cf6d885b7dfda14d07e22076f25d01d6f07fc29"
+  },
+  {
+   "name": "chart/typoOnly/en",
+   "slide": "chart",
+   "kit": "typoOnly",
+   "sha256": "d1586673fa44e84ca1c283203a0ce7c6fb8f0ad73c22ca11e12c9cdb62cb1304"
+  },
+  {
+   "name": "chart/typoOnly/ar",
+   "slide": "chart",
+   "kit": "typoOnly",
+   "language": "ar",
+   "sha256": "24f3b138d9255a063115b0ccae639e19bd95aa803c96ca6364ba3febd84bb998"
+  },
+  {
+   "name": "chart/layoutsNoWz/en",
+   "slide": "chart",
+   "kit": "layoutsNoWz",
+   "sha256": "f1b1f48e7ef4cc5e5442adbcf99e0354aa0e96873efa4c18365082f9a43b173d"
+  },
+  {
+   "name": "chart/layoutsNoWz/ar",
+   "slide": "chart",
+   "kit": "layoutsNoWz",
+   "language": "ar",
+   "sha256": "2d499030cc2760fa2114e8999d57d58c73f93d40e89548d399dbf5981197d2ef"
+  },
+  {
+   "name": "chart/contentOnly",
+   "slide": "chart",
+   "kit": "extracted",
+   "contentOnly": true,
+   "sha256": "cdc265a92d0c9725b1d6df857079641709eed0904b19063115082572c9e8a006"
+  },
+  {
+   "name": "chart/contentOnly/ar",
+   "slide": "chart",
+   "kit": "extracted",
+   "language": "ar",
+   "contentOnly": true,
+   "sha256": "891a6d5f4317e04e133537135f6400bf3374a66775c6e97369a8a23a05b8e268"
+  },
+  {
+   "name": "chart/style",
+   "slide": "chart",
+   "kit": "colours",
+   "style": "  Custom {primaryColor} style for {company}.  ",
+   "sha256": "15c115b7d3ee84e75a0edd4f6ae35f786b7c245d9e6bdd6a4838fd3ad9237e95"
+  },
+  {
+   "name": "chart/blankStyle",
+   "slide": "chart",
+   "kit": "colours",
+   "style": "   ",
+   "sha256": "8ee66054bb21958bdd0fc1798b5e518a810d371bf92889e8ea8f24fb1988e812"
+  },
+  {
+   "name": "chart/legacy",
+   "slide": "chart",
+   "kit": "none",
+   "legacy": {
+    "company": "Legacy Co",
+    "primaryColor": "#999999",
+    "fontStyle": "serif-headline"
+   },
+   "sha256": "4807d0385da8b206cf1116c0f72ad4ffb0a92890b247e8e45a67549c12717363"
+  },
+  {
+   "name": "chart/hint",
+   "slide": "chart",
+   "kit": "extracted",
+   "hint": "Safe content area (HARD CONSTRAINT from brand template): left 5%, top 20%, width 90%, height 70%. Every text block, shape, and graphic must stay inside this zone — place nothing outside it.\nSlide zone positions for \"Title and Content\" (from brand template — follow exactly):\n  slide headline area: full-width zone at the left edge, at the very top, shallow band\n  main content area: full-width zone at the left edge, in the body area, tall panel\n  image area: narrow zone on the right side, near the bottom, shallow band\n  RESERVED — do not draw content over these zones: brand logo at top-right (10%×6% of slide); full-bleed background graphic at top-left (100%×100% of slide).\nThis spatial layout is a hard constraint from the brand template. Follow it exactly.",
+   "sha256": "6a5b5a9c1afe6dfe0762c5c5c541e91cb3a7cc2016b2274fb230cccff9d8706b"
+  },
+  {
+   "name": "unknownFw/none/en",
+   "slide": "unknownFw",
+   "kit": "none",
+   "sha256": "0498f0cb749d5ea31b989ed32e67b9328b38dea3b0ee200f6e6dad50207c7ed1"
+  },
+  {
+   "name": "unknownFw/none/ar",
+   "slide": "unknownFw",
+   "kit": "none",
+   "language": "ar",
+   "sha256": "f16b017e4c168309658324b8127aa6d1469dc7b11aa743d203353338e223e042"
+  },
+  {
+   "name": "unknownFw/colours/en",
+   "slide": "unknownFw",
+   "kit": "colours",
+   "sha256": "73a0e97d23d36d6098bd01bfc879a9c2adafcc24bfbc1bf85b45c62dfb711c83"
+  },
+  {
+   "name": "unknownFw/colours/ar",
+   "slide": "unknownFw",
+   "kit": "colours",
+   "language": "ar",
+   "sha256": "4a85f84f1f54eaa16d3bc9cd2dc347d8ab2a3b5229d80d041c83293b154484f0"
+  },
+  {
+   "name": "unknownFw/extracted/en",
+   "slide": "unknownFw",
+   "kit": "extracted",
+   "sha256": "b13a86e6a479a78baa977653f8907ad510cfffcfc91c50eb138938e36e99ccc7"
+  },
+  {
+   "name": "unknownFw/extracted/ar",
+   "slide": "unknownFw",
+   "kit": "extracted",
+   "language": "ar",
+   "sha256": "9631897ededeb7964a30d372910897e3d884ad929b36fc883cfc6bb8f0eccb2b"
+  },
+  {
+   "name": "unknownFw/typoOnly/en",
+   "slide": "unknownFw",
+   "kit": "typoOnly",
+   "sha256": "2ed6cc4113bc035df3d26f0053970129bff8b294e16a03a4e56ff86722e631bb"
+  },
+  {
+   "name": "unknownFw/typoOnly/ar",
+   "slide": "unknownFw",
+   "kit": "typoOnly",
+   "language": "ar",
+   "sha256": "df46ae023cd68815465968c0e8188caa2745ae887eaa85783e90bf4b217883cb"
+  },
+  {
+   "name": "unknownFw/layoutsNoWz/en",
+   "slide": "unknownFw",
+   "kit": "layoutsNoWz",
+   "sha256": "0498f0cb749d5ea31b989ed32e67b9328b38dea3b0ee200f6e6dad50207c7ed1"
+  },
+  {
+   "name": "unknownFw/layoutsNoWz/ar",
+   "slide": "unknownFw",
+   "kit": "layoutsNoWz",
+   "language": "ar",
+   "sha256": "f16b017e4c168309658324b8127aa6d1469dc7b11aa743d203353338e223e042"
+  },
+  {
+   "name": "unknownFw/contentOnly",
+   "slide": "unknownFw",
+   "kit": "extracted",
+   "contentOnly": true,
+   "sha256": "fc46339d661fcd2f291869e6c795c291dcbe5caef9f430bcf07a893e3345c03a"
+  },
+  {
+   "name": "unknownFw/contentOnly/ar",
+   "slide": "unknownFw",
+   "kit": "extracted",
+   "language": "ar",
+   "contentOnly": true,
+   "sha256": "bb7aeef714a47747c37a1982b665599356f74cc7183f42a8dbb34a43740a44a2"
+  },
+  {
+   "name": "unknownFw/style",
+   "slide": "unknownFw",
+   "kit": "colours",
+   "style": "  Custom {primaryColor} style for {company}.  ",
+   "sha256": "5c779f4385ccf83f857607aa7d01c368dfd710af5677d3b7bedc688348930a8f"
+  },
+  {
+   "name": "unknownFw/blankStyle",
+   "slide": "unknownFw",
+   "kit": "colours",
+   "style": "   ",
+   "sha256": "73a0e97d23d36d6098bd01bfc879a9c2adafcc24bfbc1bf85b45c62dfb711c83"
+  },
+  {
+   "name": "unknownFw/legacy",
+   "slide": "unknownFw",
+   "kit": "none",
+   "legacy": {
+    "company": "Legacy Co",
+    "primaryColor": "#999999",
+    "fontStyle": "serif-headline"
+   },
+   "sha256": "a165edd4d8f47183f695202f5261de262a79ded4c5b7483a69fe4e92fe43f070"
+  },
+  {
+   "name": "unknownFw/hint",
+   "slide": "unknownFw",
+   "kit": "extracted",
+   "hint": "Safe content area (HARD CONSTRAINT from brand template): left 5%, top 20%, width 90%, height 70%. Every text block, shape, and graphic must stay inside this zone — place nothing outside it.\nSlide zone positions for \"Title and Content\" (from brand template — follow exactly):\n  slide headline area: full-width zone at the left edge, at the very top, shallow band\n  main content area: full-width zone at the left edge, in the body area, tall panel\n  image area: narrow zone on the right side, near the bottom, shallow band\n  RESERVED — do not draw content over these zones: brand logo at top-right (10%×6% of slide); full-bleed background graphic at top-left (100%×100% of slide).\nThis spatial layout is a hard constraint from the brand template. Follow it exactly.",
+   "sha256": "ed128d2be440f324f5f4d6032dd99baf01ff4ea93e59ac2186bfb26f8b310920"
+  },
+  {
+   "name": "emptyFw/none/en",
+   "slide": "emptyFw",
+   "kit": "none",
+   "sha256": "9812d6375d087b0a48fea1b691b21eff69129789d14830394bb5d91b3498a824"
+  },
+  {
+   "name": "emptyFw/none/ar",
+   "slide": "emptyFw",
+   "kit": "none",
+   "language": "ar",
+   "sha256": "a46e4e3c77a0a08a3e0297a544f03dc6af4b0410cfe10593ed095bddc07de262"
+  },
+  {
+   "name": "emptyFw/colours/en",
+   "slide": "emptyFw",
+   "kit": "colours",
+   "sha256": "74b52501ffe156c480430a5eaf38f8efb05e13f65a8bcfc177716a2f2969594b"
+  },
+  {
+   "name": "emptyFw/colours/ar",
+   "slide": "emptyFw",
+   "kit": "colours",
+   "language": "ar",
+   "sha256": "26ff96c2fb5b6ee01b5c24a64cc91a48ea0ac72cb254ab128c2c4664705c9f62"
+  },
+  {
+   "name": "emptyFw/extracted/en",
+   "slide": "emptyFw",
+   "kit": "extracted",
+   "sha256": "f625b7cef5650704e91ae9ae667798c8393eb466a79d83789e0e0468cbe1526b"
+  },
+  {
+   "name": "emptyFw/extracted/ar",
+   "slide": "emptyFw",
+   "kit": "extracted",
+   "language": "ar",
+   "sha256": "1c36757fe33a18fb14359ebee73aae32c08eeda6f42c772bf93c16fd2aeb4ea4"
+  },
+  {
+   "name": "emptyFw/typoOnly/en",
+   "slide": "emptyFw",
+   "kit": "typoOnly",
+   "sha256": "74f5fe9ce8ec56a6fd356b9a51f9dd5001f0223ab6544af16ff9a9da728705da"
+  },
+  {
+   "name": "emptyFw/typoOnly/ar",
+   "slide": "emptyFw",
+   "kit": "typoOnly",
+   "language": "ar",
+   "sha256": "77f4f81c93a87ba12a979fbcfe5f8cb15c26d019da8388b4182344c29ffecd78"
+  },
+  {
+   "name": "emptyFw/layoutsNoWz/en",
+   "slide": "emptyFw",
+   "kit": "layoutsNoWz",
+   "sha256": "9812d6375d087b0a48fea1b691b21eff69129789d14830394bb5d91b3498a824"
+  },
+  {
+   "name": "emptyFw/layoutsNoWz/ar",
+   "slide": "emptyFw",
+   "kit": "layoutsNoWz",
+   "language": "ar",
+   "sha256": "a46e4e3c77a0a08a3e0297a544f03dc6af4b0410cfe10593ed095bddc07de262"
+  },
+  {
+   "name": "emptyFw/contentOnly",
+   "slide": "emptyFw",
+   "kit": "extracted",
+   "contentOnly": true,
+   "sha256": "38bb219bf6ccd1658ae19a491b3385b0033f4dd916b67c88e7c3752700c776a4"
+  },
+  {
+   "name": "emptyFw/contentOnly/ar",
+   "slide": "emptyFw",
+   "kit": "extracted",
+   "language": "ar",
+   "contentOnly": true,
+   "sha256": "ab7a7f9b08e04c406ee61771e805c23dce4d8d7566c15919234cdc728d574141"
+  },
+  {
+   "name": "emptyFw/style",
+   "slide": "emptyFw",
+   "kit": "colours",
+   "style": "  Custom {primaryColor} style for {company}.  ",
+   "sha256": "5e91ddd99ed2c64cde2b3999a0e70a7f3f86ccbf43cfbd85eb084e2d52b808bd"
+  },
+  {
+   "name": "emptyFw/blankStyle",
+   "slide": "emptyFw",
+   "kit": "colours",
+   "style": "   ",
+   "sha256": "74b52501ffe156c480430a5eaf38f8efb05e13f65a8bcfc177716a2f2969594b"
+  },
+  {
+   "name": "emptyFw/legacy",
+   "slide": "emptyFw",
+   "kit": "none",
+   "legacy": {
+    "company": "Legacy Co",
+    "primaryColor": "#999999",
+    "fontStyle": "serif-headline"
+   },
+   "sha256": "8bfaf731b5611e541ed79856e9e43eaff119cb5282f041ab7346c5b5681e2d05"
+  },
+  {
+   "name": "emptyFw/hint",
+   "slide": "emptyFw",
+   "kit": "extracted",
+   "hint": "Safe content area (HARD CONSTRAINT from brand template): left 5%, top 20%, width 90%, height 70%. Every text block, shape, and graphic must stay inside this zone — place nothing outside it.\nSlide zone positions for \"Title and Content\" (from brand template — follow exactly):\n  slide headline area: full-width zone at the left edge, at the very top, shallow band\n  main content area: full-width zone at the left edge, in the body area, tall panel\n  image area: narrow zone on the right side, near the bottom, shallow band\n  RESERVED — do not draw content over these zones: brand logo at top-right (10%×6% of slide); full-bleed background graphic at top-left (100%×100% of slide).\nThis spatial layout is a hard constraint from the brand template. Follow it exactly.",
+   "sha256": "6c2010e4f9ff66c7e2714d4826d2f1797b187fdebf8ea34e9723f615501b249b"
+  },
+  {
+   "name": "title/none/en",
+   "slide": "title",
+   "kit": "none",
+   "sha256": "dc1002b21d75e323566be7a1f74cf4c2390d9a3e5be3d5546f46b5a0c2d4fb71"
+  },
+  {
+   "name": "title/none/ar",
+   "slide": "title",
+   "kit": "none",
+   "language": "ar",
+   "sha256": "1763baa8a24f6bae15e0fd7d29715ba1f4da8fc5edb0be4beefd533ac051479d"
+  },
+  {
+   "name": "title/colours/en",
+   "slide": "title",
+   "kit": "colours",
+   "sha256": "9e9736a97efa39a63806244cb2dcd183d1d642c1781bde63856937972c9e7bcb"
+  },
+  {
+   "name": "title/colours/ar",
+   "slide": "title",
+   "kit": "colours",
+   "language": "ar",
+   "sha256": "c959d058974cd5cbfed3d6cbf43ccea18c9fd924760505e23a1a535c0a4e03d9"
+  },
+  {
+   "name": "title/extracted/en",
+   "slide": "title",
+   "kit": "extracted",
+   "sha256": "8449c7c2a753ef7b2604118f2f86d7cf99646d849db4516640672de737575d3c"
+  },
+  {
+   "name": "title/extracted/ar",
+   "slide": "title",
+   "kit": "extracted",
+   "language": "ar",
+   "sha256": "a33018ab33e7759ef62c3e21ac9f732aad8329fbe8758c9b59daa89e8158f767",
+   "prompt": "This is the deck's COVER slide. It is nearly empty by design — brand furniture plus a single heading.\nRender ONLY the presentation title, exactly: \"Q3 Results\", placed in the title text zone of the layout. If the layout has a date/subtitle zone you may add a short date line there; otherwise leave it empty.\nDo NOT render any bullet points, body paragraphs, framing text, charts, tables, icons, or extra shapes. Everything other than the heading must stay clean empty space that matches the master layout exactly.\n\nCompany reference: Beta Corp\n\nSlide layout: a title slide — full-bleed cover (brand field or dimmed photo) with one large right-aligned headline block of client name, bold deliverable title, accent-underlined subtitle, and date, with logo co-branding pinned to a corner; generous whitespace and nothing else competing. [RIGHT-TO-LEFT: the layout/framework just described is written for a left-to-right slide — MIRROR it for this Arabic slide: swap every left/right (sidebars, rails, columns, labels), order all sequences and steps from right (first) to left (last), and make every arrow, arrowhead, chevron, funnel, timeline, and flow point right-to-left.]\n\nStyle direction:\nMake the slide executive-ready, text-rich, and strategically structured, with dense but legible content and clear business language, in the style of a McKinsey/BCG management-consulting deck.\nBrand & art direction (apply identically to EVERY slide in this deck):\n- Palette: use #0A0A0A as the primary structural color and #FF0000 as the single accent for the key insight only. Backgrounds white or very light neutral gray. At most ONE accent hue per slide. No gradients, no drop shadows, no rainbow palettes.\n- Typography: headlines set in Cairo, body text in Cairo. A left-aligned, conclusion-oriented action title sits in the top band; body text is crisp and the same size across slides.\n- Layout: a disciplined 12-column grid; the headline top-left with a thin horizontal rule beneath it; a small source/footnote line bottom-left; minimal, identical page furniture on every slide. Do not render page numbers.\n- Charts & diagrams: flat 2D only, thin 1-2px lines, restrained labels; the accent color used sparingly to mark the single most important point. No 3D, no skeuomorphism, no clip art, no stock photography.\n- Add supporting callouts, labels, milestones, KPIs, and decision points around the main framework where useful, but keep everything visually disciplined and anchored to the primary infographic. Leave generous whitespace for the strong action title at the top.\n\nBrand template ground truth — extracted directly from the client's PPTX file.\nThese override ALL style instructions above. Apply them exactly as stated:\n- Font sizes (exact from template): headings at 28pt bold #111111; body text at 14pt.\n- Typefaces (exact from template): headings in Cairo, body text in Cairo.\n- Full brand palette (exact from template, use no other colours): #0A0A0A (primary), #FF0000 (accent), #00FF00 (accent2), #222222 (dk2), #333333 (accent4), #444444 (accent5).\n\nARABIC / RIGHT-TO-LEFT SLIDE — these rules take ABSOLUTE PRECEDENCE over every layout, framework, and style instruction above. Any instruction above that says \"left\", \"right\", \"left-to-right\", \"leading\", \"first column\", \"sidebar\", or \"rail\" was written for a left-to-right slide; reinterpret each of them as its right-to-left MIRROR. The whole slide is mirrored horizontally: reading starts at the TOP-RIGHT and flows leftward and down. Right-align the action title, all body text, bullets, list markers, and any source/footnote line; indentation is on the right. Put primary sidebars, rails, category/row labels, and the FIRST item of any sequence on the RIGHT, with the sequence progressing toward the LEFT. EVERY directional element runs right-to-left: arrows and arrowheads point LEFT; process chevrons and step banners point LEFT and are ordered step 1 on the right to the last step on the left; funnels narrow toward the LEFT; timelines and Gantt bars run earliest on the RIGHT to latest on the LEFT; growth/trend lines rise toward the LEFT; connectors and \"leads-to\" arrows flow LEFT; and any result / outcome / \"therefore\" box sits at the far LEFT (the end of the flow). Do NOT merely reposition these shapes — ROTATE or FLIP the arrowheads and chevron points themselves so they physically face LEFT. Keep step and sequence numbers consecutive and correct (1, 2, 3, …) with number 1 on the RIGHT; never skip, drop, or reorder a number. Render Arabic as fully joined, flowing cursive script with correct contextual letterforms (isolated, initial, medial, final) and standard ligatures, and SPELL every word correctly; do not disconnect letters, do not add letter-spacing between Arabic letters, and do not render broken or placeholder (tofu) glyphs. Give Arabic generous line-height so ascenders and descenders do not collide. Mirror charts and tables: reverse the category (X) axis so it runs right-to-left AND reverse the series order to match (a time axis runs earliest on the right, latest on the left); order table columns right-to-left so the first/label column is on the right. Numbers and data labels stay left-to-right within their own box. Keep every number, percentage, currency amount, range, date, unit, and Latin brand or product name left-to-right and in its normal order — each is a left-to-right island inside the right-to-left text; never reverse or mirror them, and keep %, $, +, - and other symbols on their correct side. Use Western/Latin digits (0-9). Any embedded label, caption, axis title, legend, or placeholder text must be written in Arabic — do NOT leave English boilerplate (e.g. \"TIMELINE\", \"OVERVIEW\", \"Days\") inside an otherwise-Arabic slide. Reposition brand furniture to the mirrored side, but do NOT horizontally flip or mirror logos, photographs, portraits, or symmetric icons — flipping reverses embedded branding into gibberish. Mirror ONLY meaning-bearing directional graphics (arrows, chevrons, funnels, timelines, progress bars, trend lines, process flows).\n\nNon-negotiable rules: Create the slide as a single polished image in a strict 16:9 aspect ratio. The output must look like a professional presentation slide, not a website, dashboard, HTML layout, app screen, or web-based design. Use the image model to generate the slide directly; do not use HTML, CSS, code, or browser-style UI elements. Build the slide around one dominant visual framework only; do not combine multiple competing frameworks on the same slide, and do not overcrowd the slide with text that becomes unreadably small. Write the headline as a conclusion-oriented statement that communicates the key strategic message. Do not include a subtitle. Do not render page numbers. Render every layout element — header bands, body panels, callout boxes, data containers, dividers, and connectors — as discrete, flat Microsoft PowerPoint-style shapes drawn ONLY from this vocabulary: rectangles, rounded rectangles, ovals/circles, chevrons, diamonds, trapezoids, parallelograms, pentagons, hexagons, octagons, plus signs, 5- or 6-point stars, block arrows (left/right/up/down), Harvey balls, straight lines, bordered text boxes, icons, and standard data charts (bar, column, line, area, pie, waterfall). Each element must look like an individually placed PPT shape on a slide canvas; do not paint, blend, or merge shapes together into a single illustration. Every arrow, connector, divider, and leader line must be perfectly straight or built from straight segments — never curved, arced, swooshing, or S-shaped; only data series plotted inside a chart may curve. Never draw curly braces or bracket shapes to group items; group with panels, bands, column alignment, or labeled rails instead. Fill every shape with one flat solid color, or leave it unfilled with a plain solid or dashed outline — no gradient fills, no translucent or semi-transparent fills, no shadows, no glows. Render only flat, native-presentation visuals; ignore any instruction elsewhere in this prompt requesting 3D, isometric, photorealistic, or web-style visualizations, gradient or translucent fills, curved arrows or swooshes, or brace/bracket grouping shapes."
+  },
+  {
+   "name": "title/typoOnly/en",
+   "slide": "title",
+   "kit": "typoOnly",
+   "sha256": "9cca39ecdbe3e544b833c99eb44dc6765876ab79726cdfa840d9bbfc7af932e3"
+  },
+  {
+   "name": "title/typoOnly/ar",
+   "slide": "title",
+   "kit": "typoOnly",
+   "language": "ar",
+   "sha256": "728fd8ed11d4975624945b6e8df12cf9f319c85e8d5fea4edfc2f0e6cd9902fc"
+  },
+  {
+   "name": "title/layoutsNoWz/en",
+   "slide": "title",
+   "kit": "layoutsNoWz",
+   "sha256": "dc1002b21d75e323566be7a1f74cf4c2390d9a3e5be3d5546f46b5a0c2d4fb71"
+  },
+  {
+   "name": "title/layoutsNoWz/ar",
+   "slide": "title",
+   "kit": "layoutsNoWz",
+   "language": "ar",
+   "sha256": "1763baa8a24f6bae15e0fd7d29715ba1f4da8fc5edb0be4beefd533ac051479d"
+  },
+  {
+   "name": "title/contentOnly",
+   "slide": "title",
+   "kit": "extracted",
+   "contentOnly": true,
+   "sha256": "8449c7c2a753ef7b2604118f2f86d7cf99646d849db4516640672de737575d3c"
+  },
+  {
+   "name": "title/contentOnly/ar",
+   "slide": "title",
+   "kit": "extracted",
+   "language": "ar",
+   "contentOnly": true,
+   "sha256": "a33018ab33e7759ef62c3e21ac9f732aad8329fbe8758c9b59daa89e8158f767"
+  },
+  {
+   "name": "title/style",
+   "slide": "title",
+   "kit": "colours",
+   "style": "  Custom {primaryColor} style for {company}.  ",
+   "sha256": "e831db66fb64b670ef6360f0adad5fed5a06b9ef72b04fd46f57ae89e7a96024"
+  },
+  {
+   "name": "title/blankStyle",
+   "slide": "title",
+   "kit": "colours",
+   "style": "   ",
+   "sha256": "9e9736a97efa39a63806244cb2dcd183d1d642c1781bde63856937972c9e7bcb"
+  },
+  {
+   "name": "title/legacy",
+   "slide": "title",
+   "kit": "none",
+   "legacy": {
+    "company": "Legacy Co",
+    "primaryColor": "#999999",
+    "fontStyle": "serif-headline"
+   },
+   "sha256": "6dae65f10a3b55490e0d5acba49ab96dfb945f63c17a8f2a9a41d67adcf7527b"
+  },
+  {
+   "name": "title/hint",
+   "slide": "title",
+   "kit": "extracted",
+   "hint": "Safe content area (HARD CONSTRAINT from brand template): left 5%, top 20%, width 90%, height 70%. Every text block, shape, and graphic must stay inside this zone — place nothing outside it.\nSlide zone positions for \"Title Slide\" (from brand template — follow exactly):\n  slide headline area: full-width zone at the left edge, in the body area\n  subtitle area: wide zone at the left edge, in the body area, shallow band\nThis spatial layout is a hard constraint from the brand template. Follow it exactly.",
+   "sha256": "1d8bbd37b69852365d77fba833cbe046036b1746bf0834648addd5ceaf1b75da"
+  },
+  {
+   "name": "divider/none/en",
+   "slide": "divider",
+   "kit": "none",
+   "sha256": "010c4c800755119b0748a91e39e333f76e6d2119f5c95efd807a81fa08b8a665"
+  },
+  {
+   "name": "divider/none/ar",
+   "slide": "divider",
+   "kit": "none",
+   "language": "ar",
+   "sha256": "59baecdebda2e2b890a35fb97f3601f6b586c5b3eca5ed5b60fa8fcd8dd42d34"
+  },
+  {
+   "name": "divider/colours/en",
+   "slide": "divider",
+   "kit": "colours",
+   "sha256": "17447f9b6376f51eda31c4ae46d984aeba3bbbbce92c7872047c368b3606cc3b"
+  },
+  {
+   "name": "divider/colours/ar",
+   "slide": "divider",
+   "kit": "colours",
+   "language": "ar",
+   "sha256": "46a18bd7d98edf686f7e3c050221886bbc93a6684070d44ea0ef7215bb2086d5"
+  },
+  {
+   "name": "divider/extracted/en",
+   "slide": "divider",
+   "kit": "extracted",
+   "sha256": "45993a700d1013c6704b9c81fecc3fa77fb1a0481e9495266e5e90e0ac4ed0a9"
+  },
+  {
+   "name": "divider/extracted/ar",
+   "slide": "divider",
+   "kit": "extracted",
+   "language": "ar",
+   "sha256": "bc6f75c30d3c3fa16440b885fa908ddef8f86bb193cff2f29e59e29f055abff2"
+  },
+  {
+   "name": "divider/typoOnly/en",
+   "slide": "divider",
+   "kit": "typoOnly",
+   "sha256": "7aa5672bc6670a12630f7dea4ec10256398665d05b80e2796cbfba1265df32fa"
+  },
+  {
+   "name": "divider/typoOnly/ar",
+   "slide": "divider",
+   "kit": "typoOnly",
+   "language": "ar",
+   "sha256": "6b656b734118fc21b7b72084047f7c69f4c2aeb94971e8380de4832345a2b29b"
+  },
+  {
+   "name": "divider/layoutsNoWz/en",
+   "slide": "divider",
+   "kit": "layoutsNoWz",
+   "sha256": "010c4c800755119b0748a91e39e333f76e6d2119f5c95efd807a81fa08b8a665"
+  },
+  {
+   "name": "divider/layoutsNoWz/ar",
+   "slide": "divider",
+   "kit": "layoutsNoWz",
+   "language": "ar",
+   "sha256": "59baecdebda2e2b890a35fb97f3601f6b586c5b3eca5ed5b60fa8fcd8dd42d34"
+  },
+  {
+   "name": "divider/contentOnly",
+   "slide": "divider",
+   "kit": "extracted",
+   "contentOnly": true,
+   "sha256": "45993a700d1013c6704b9c81fecc3fa77fb1a0481e9495266e5e90e0ac4ed0a9"
+  },
+  {
+   "name": "divider/contentOnly/ar",
+   "slide": "divider",
+   "kit": "extracted",
+   "language": "ar",
+   "contentOnly": true,
+   "sha256": "bc6f75c30d3c3fa16440b885fa908ddef8f86bb193cff2f29e59e29f055abff2"
+  },
+  {
+   "name": "divider/style",
+   "slide": "divider",
+   "kit": "colours",
+   "style": "  Custom {primaryColor} style for {company}.  ",
+   "sha256": "124d5208507ea80cfbae07ae14de2c2bb41df54d519605351ec52260334c11eb"
+  },
+  {
+   "name": "divider/blankStyle",
+   "slide": "divider",
+   "kit": "colours",
+   "style": "   ",
+   "sha256": "17447f9b6376f51eda31c4ae46d984aeba3bbbbce92c7872047c368b3606cc3b"
+  },
+  {
+   "name": "divider/legacy",
+   "slide": "divider",
+   "kit": "none",
+   "legacy": {
+    "company": "Legacy Co",
+    "primaryColor": "#999999",
+    "fontStyle": "serif-headline"
+   },
+   "sha256": "ce374862f1be81abcc0417f906ffcbaded02b6b149b9731c53600d5d781c7f6b"
+  },
+  {
+   "name": "divider/hint",
+   "slide": "divider",
+   "kit": "extracted",
+   "hint": "Safe content area (HARD CONSTRAINT from brand template): left 5%, top 20%, width 90%, height 70%. Every text block, shape, and graphic must stay inside this zone — place nothing outside it.\nSlide zone positions for \"Section Header\" (from brand template — follow exactly):\n  slide headline area: full-width zone spanning the center, in the body area\nThis spatial layout is a hard constraint from the brand template. Follow it exactly.",
+   "sha256": "c44ad91522af00e06084369986f5935034e3008afcfdfd6e262905146de2f0a7"
+  },
+  {
+   "name": "noType/none/en",
+   "slide": "noType",
+   "kit": "none",
+   "sha256": "7b35490811daedd840b2ce00493ea1e2e291a148a86c3afc081d2e996eac607b"
+  },
+  {
+   "name": "noType/none/ar",
+   "slide": "noType",
+   "kit": "none",
+   "language": "ar",
+   "sha256": "0b6560299740d067bb6201de8ab0c0a7c2fd70612f58812b3516c9f1fdf4cf6e"
+  },
+  {
+   "name": "noType/colours/en",
+   "slide": "noType",
+   "kit": "colours",
+   "sha256": "ab7788516aded255286751d4e64ea94a7203c3c39d4fb79f7f3c0247c31ce253"
+  },
+  {
+   "name": "noType/colours/ar",
+   "slide": "noType",
+   "kit": "colours",
+   "language": "ar",
+   "sha256": "8405a6d48df573ccf26aacaeda2504f2b15ec45f27e93d8e51f51c2f7093b3c9"
+  },
+  {
+   "name": "noType/extracted/en",
+   "slide": "noType",
+   "kit": "extracted",
+   "sha256": "32ac1b30281dc302d67a0693359e7c439b56aa69dca5cf445c63c896772948d7"
+  },
+  {
+   "name": "noType/extracted/ar",
+   "slide": "noType",
+   "kit": "extracted",
+   "language": "ar",
+   "sha256": "3dc91e18177833350031ca5561b844f65498bcfe9cd2184a7e3a69c594cefb54"
+  },
+  {
+   "name": "noType/typoOnly/en",
+   "slide": "noType",
+   "kit": "typoOnly",
+   "sha256": "ed3143354fc1e8564d63362c3059ba361f0a489f83edff1d321e70108304a919"
+  },
+  {
+   "name": "noType/typoOnly/ar",
+   "slide": "noType",
+   "kit": "typoOnly",
+   "language": "ar",
+   "sha256": "02cf49825efce58412314f6c20346f1c891abfe121174f7a1a2451cd989d7091"
+  },
+  {
+   "name": "noType/layoutsNoWz/en",
+   "slide": "noType",
+   "kit": "layoutsNoWz",
+   "sha256": "7b35490811daedd840b2ce00493ea1e2e291a148a86c3afc081d2e996eac607b"
+  },
+  {
+   "name": "noType/layoutsNoWz/ar",
+   "slide": "noType",
+   "kit": "layoutsNoWz",
+   "language": "ar",
+   "sha256": "0b6560299740d067bb6201de8ab0c0a7c2fd70612f58812b3516c9f1fdf4cf6e"
+  },
+  {
+   "name": "noType/contentOnly",
+   "slide": "noType",
+   "kit": "extracted",
+   "contentOnly": true,
+   "sha256": "643350790125e1b6a5c6fe2a9ce71b3b4f2146e4e58b6ac4ddd33e390c43bebb"
+  },
+  {
+   "name": "noType/contentOnly/ar",
+   "slide": "noType",
+   "kit": "extracted",
+   "language": "ar",
+   "contentOnly": true,
+   "sha256": "4fb185a141f6999e82073aab4566b0b660b94ebeb01b140b82dae87a1cf0c4e9"
+  },
+  {
+   "name": "noType/style",
+   "slide": "noType",
+   "kit": "colours",
+   "style": "  Custom {primaryColor} style for {company}.  ",
+   "sha256": "0cfa9c70dd888e9c598d9763e0bd8440192f49d4940fe66dc8d7c35913b7eb46"
+  },
+  {
+   "name": "noType/blankStyle",
+   "slide": "noType",
+   "kit": "colours",
+   "style": "   ",
+   "sha256": "ab7788516aded255286751d4e64ea94a7203c3c39d4fb79f7f3c0247c31ce253"
+  },
+  {
+   "name": "noType/legacy",
+   "slide": "noType",
+   "kit": "none",
+   "legacy": {
+    "company": "Legacy Co",
+    "primaryColor": "#999999",
+    "fontStyle": "serif-headline"
+   },
+   "sha256": "f6c5983513c25669b5e89c3a03ca867585d5e946c18d9fcc09f8110c376d80f7"
+  },
+  {
+   "name": "noType/hint",
+   "slide": "noType",
+   "kit": "extracted",
+   "hint": "Safe content area (HARD CONSTRAINT from brand template): left 5%, top 20%, width 90%, height 70%. Every text block, shape, and graphic must stay inside this zone — place nothing outside it.\nSlide zone positions for \"Title and Content\" (from brand template — follow exactly):\n  slide headline area: full-width zone at the left edge, at the very top, shallow band\n  main content area: full-width zone at the left edge, in the body area, tall panel\n  image area: narrow zone on the right side, near the bottom, shallow band\n  RESERVED — do not draw content over these zones: brand logo at top-right (10%×6% of slide); full-bleed background graphic at top-left (100%×100% of slide).\nThis spatial layout is a hard constraint from the brand template. Follow it exactly.",
+   "sha256": "010d21842904b79d8f184057e4da61cf5ea0718a7666e9475bdbb9d47ed17f56"
+  },
+  {
+   "name": "rtlWords/none/en",
+   "slide": "rtlWords",
+   "kit": "none",
+   "sha256": "bf245a350c91e595c598bae35ff069c7ddf1165390b1d71584f71bb5fb05ec4d"
+  },
+  {
+   "name": "rtlWords/none/ar",
+   "slide": "rtlWords",
+   "kit": "none",
+   "language": "ar",
+   "sha256": "dc74eb0fcc59e89f54c667cc66bc227211fc5c19dfa539efa0f503bc1f2ee9fe"
+  },
+  {
+   "name": "rtlWords/colours/en",
+   "slide": "rtlWords",
+   "kit": "colours",
+   "sha256": "7923ab9584eb702ba639f6ac1d232f15376a6c9fc595b9c4868dd8657f4a2739"
+  },
+  {
+   "name": "rtlWords/colours/ar",
+   "slide": "rtlWords",
+   "kit": "colours",
+   "language": "ar",
+   "sha256": "87709ad075ad5006242f010063ad514f32919494f473803855b311840a11add8"
+  },
+  {
+   "name": "rtlWords/extracted/en",
+   "slide": "rtlWords",
+   "kit": "extracted",
+   "sha256": "706a5bdf5ea640fcd3822002676bd0c17f994ad09c3955fcb6ebe3f5c4db9708"
+  },
+  {
+   "name": "rtlWords/extracted/ar",
+   "slide": "rtlWords",
+   "kit": "extracted",
+   "language": "ar",
+   "sha256": "7e216776ff892df9ab74eddea6666a03a8bf95640571ec56203438c9bb6240c6"
+  },
+  {
+   "name": "rtlWords/typoOnly/en",
+   "slide": "rtlWords",
+   "kit": "typoOnly",
+   "sha256": "ecbd497f1083c7be21c6061f9170c219cc4257450e59ba587eeff072c8f979fd"
+  },
+  {
+   "name": "rtlWords/typoOnly/ar",
+   "slide": "rtlWords",
+   "kit": "typoOnly",
+   "language": "ar",
+   "sha256": "395e73774e9985200291003dba739ea269ab414958073ef51abaedd2c5ba3cab"
+  },
+  {
+   "name": "rtlWords/layoutsNoWz/en",
+   "slide": "rtlWords",
+   "kit": "layoutsNoWz",
+   "sha256": "bf245a350c91e595c598bae35ff069c7ddf1165390b1d71584f71bb5fb05ec4d"
+  },
+  {
+   "name": "rtlWords/layoutsNoWz/ar",
+   "slide": "rtlWords",
+   "kit": "layoutsNoWz",
+   "language": "ar",
+   "sha256": "dc74eb0fcc59e89f54c667cc66bc227211fc5c19dfa539efa0f503bc1f2ee9fe"
+  },
+  {
+   "name": "rtlWords/contentOnly",
+   "slide": "rtlWords",
+   "kit": "extracted",
+   "contentOnly": true,
+   "sha256": "fe8a42232d8dd38c0d2970bc25fbc4a4fa2289a20411bdf94c11163751b930dd"
+  },
+  {
+   "name": "rtlWords/contentOnly/ar",
+   "slide": "rtlWords",
+   "kit": "extracted",
+   "language": "ar",
+   "contentOnly": true,
+   "sha256": "49284a177e0bff1255e66003ccf1689a96d1415dfe2f9ddadf1a12f35c4ce99e"
+  },
+  {
+   "name": "rtlWords/style",
+   "slide": "rtlWords",
+   "kit": "colours",
+   "style": "  Custom {primaryColor} style for {company}.  ",
+   "sha256": "5ff751e7a41bb2a27cccadbaebaa118517fab3a5ec281d33629e0c457dc0bed9"
+  },
+  {
+   "name": "rtlWords/blankStyle",
+   "slide": "rtlWords",
+   "kit": "colours",
+   "style": "   ",
+   "sha256": "7923ab9584eb702ba639f6ac1d232f15376a6c9fc595b9c4868dd8657f4a2739"
+  },
+  {
+   "name": "rtlWords/legacy",
+   "slide": "rtlWords",
+   "kit": "none",
+   "legacy": {
+    "company": "Legacy Co",
+    "primaryColor": "#999999",
+    "fontStyle": "serif-headline"
+   },
+   "sha256": "ace27693a3990b20c260f0b41cbb4902c5af91ff9c820f23899000ed5e77da96"
+  },
+  {
+   "name": "rtlWords/hint",
+   "slide": "rtlWords",
+   "kit": "extracted",
+   "hint": "Safe content area (HARD CONSTRAINT from brand template): left 5%, top 20%, width 90%, height 70%. Every text block, shape, and graphic must stay inside this zone — place nothing outside it.\nSlide zone positions for \"Title and Content\" (from brand template — follow exactly):\n  slide headline area: full-width zone at the left edge, at the very top, shallow band\n  main content area: full-width zone at the left edge, in the body area, tall panel\n  image area: narrow zone on the right side, near the bottom, shallow band\n  RESERVED — do not draw content over these zones: brand logo at top-right (10%×6% of slide); full-bleed background graphic at top-left (100%×100% of slide).\nThis spatial layout is a hard constraint from the brand template. Follow it exactly.",
+   "sha256": "568eb5551b5d951da093e25b5895ac67aa662efae4c9f6dd3d8603d364b7f07c",
+   "prompt": "Slide content to render:\nThe slide's headline reads: \"Left to right\"\nFraming: Left rail, top-left.\nKey elements to render:\n• left\n• Right-hand\n• x\nUse a phased roadmap as the primary visual framework. Render it as: Lettered phase columns in a deepening color ramp under one arrow header band, or a single rising arrow on impact-vs-time axes with only 2-3 annotation callouts and end-state icons; add duration ribbons (5/10/30 days) under the relevant spans and let the straight rising arrow persuade instead of text.\n\nCompany reference: Beta Corp\n\nSlide layout: a timeline slide — milestones on a horizontal calendar-time axis: either a gantt with a left activity rail, alternating month shading, and every bar terminating in a labeled milestone diamond naming the concrete deliverable, or dated milestone callouts alternating above and below a single arrow.\n\nStyle direction:\nMake the slide executive-ready, text-rich, and strategically structured, with dense but legible content and clear business language, in the style of a McKinsey/BCG management-consulting deck.\nBrand & art direction (apply identically to EVERY slide in this deck):\n- Palette: use #0A0A0A as the primary structural color and #FF0000 as the single accent for the key insight only. Backgrounds white or very light neutral gray. At most ONE accent hue per slide. No gradients, no drop shadows, no rainbow palettes.\n- Typography: headlines set in Inter, body text in Inter. A left-aligned, conclusion-oriented action title sits in the top band; body text is crisp and the same size across slides.\n- Layout: a disciplined 12-column grid; the headline top-left with a thin horizontal rule beneath it; a small source/footnote line bottom-left; minimal, identical page furniture on every slide. Do not render page numbers.\n- Charts & diagrams: flat 2D only, thin 1-2px lines, restrained labels; the accent color used sparingly to mark the single most important point. No 3D, no skeuomorphism, no clip art, no stock photography.\n- Add supporting callouts, labels, milestones, KPIs, and decision points around the main framework where useful, but keep everything visually disciplined and anchored to the primary infographic. Leave generous whitespace for the strong action title at the top.\n\nSafe content area (HARD CONSTRAINT from brand template): left 5%, top 20%, width 90%, height 70%. Every text block, shape, and graphic must stay inside this zone — place nothing outside it.\nSlide zone positions for \"Title and Content\" (from brand template — follow exactly):\n  slide headline area: full-width zone at the left edge, at the very top, shallow band\n  main content area: full-width zone at the left edge, in the body area, tall panel\n  image area: narrow zone on the right side, near the bottom, shallow band\n  RESERVED — do not draw content over these zones: brand logo at top-right (10%×6% of slide); full-bleed background graphic at top-left (100%×100% of slide).\nThis spatial layout is a hard constraint from the brand template. Follow it exactly.\n\nBrand template ground truth — extracted directly from the client's PPTX file.\nThese override ALL style instructions above. Apply them exactly as stated:\n- Font sizes (exact from template): headings at 28pt bold #111111; body text at 14pt.\n- Typefaces (exact from template): headings in Inter, body text in Inter.\n- Full brand palette (exact from template, use no other colours): #0A0A0A (primary), #FF0000 (accent), #00FF00 (accent2), #222222 (dk2), #333333 (accent4), #444444 (accent5).\n\nNon-negotiable rules: Create the slide as a single polished image in a strict 16:9 aspect ratio. The output must look like a professional presentation slide, not a website, dashboard, HTML layout, app screen, or web-based design. Use the image model to generate the slide directly; do not use HTML, CSS, code, or browser-style UI elements. Build the slide around one dominant visual framework only; do not combine multiple competing frameworks on the same slide, and do not overcrowd the slide with text that becomes unreadably small. Write the headline as a conclusion-oriented statement that communicates the key strategic message. Do not include a subtitle. Do not render page numbers. Render every layout element — header bands, body panels, callout boxes, data containers, dividers, and connectors — as discrete, flat Microsoft PowerPoint-style shapes drawn ONLY from this vocabulary: rectangles, rounded rectangles, ovals/circles, chevrons, diamonds, trapezoids, parallelograms, pentagons, hexagons, octagons, plus signs, 5- or 6-point stars, block arrows (left/right/up/down), Harvey balls, straight lines, bordered text boxes, icons, and standard data charts (bar, column, line, area, pie, waterfall). Each element must look like an individually placed PPT shape on a slide canvas; do not paint, blend, or merge shapes together into a single illustration. Every arrow, connector, divider, and leader line must be perfectly straight or built from straight segments — never curved, arced, swooshing, or S-shaped; only data series plotted inside a chart may curve. Never draw curly braces or bracket shapes to group items; group with panels, bands, column alignment, or labeled rails instead. Fill every shape with one flat solid color, or leave it unfilled with a plain solid or dashed outline — no gradient fills, no translucent or semi-transparent fills, no shadows, no glows. Render only flat, native-presentation visuals; ignore any instruction elsewhere in this prompt requesting 3D, isometric, photorealistic, or web-style visualizations, gradient or translucent fills, curved arrows or swooshes, or brace/bracket grouping shapes."
+  }
+ ],
+ "steered": [
+  {
+   "base": "Base prompt.",
+   "instr": "Make it \"bolder\" please  ",
+   "prompt": "Base prompt.\n\nRefinement requested by the user: \"Make it bolder please\". Apply ONLY this change while keeping the slide on-grid, on-brand, and obeying every non-negotiable rule stated above. The non-negotiable rules remain absolute and must not be relaxed by this refinement."
+  },
+  {
+   "base": "",
+   "instr": "  x ",
+   "prompt": "\n\nRefinement requested by the user: \"x\". Apply ONLY this change while keeping the slide on-grid, on-brand, and obeying every non-negotiable rule stated above. The non-negotiable rules remain absolute and must not be relaxed by this refinement."
+  },
+  {
+   "base": "P",
+   "instr": "say \"a\" and \"b\"",
+   "prompt": "P\n\nRefinement requested by the user: \"say a and b\". Apply ONLY this change while keeping the slide on-grid, on-brand, and obeying every non-negotiable rule stated above. The non-negotiable rules remain absolute and must not be relaxed by this refinement."
+  }
+ ],
+ "matches": [
+  {
+   "type": "title",
+   "framework": "two-column comparison",
+   "index": 0
+  },
+  {
+   "type": "title",
+   "framework": "table",
+   "index": 0
+  },
+  {
+   "type": "title",
+   "framework": "full bleed photo",
+   "index": 0
+  },
+  {
+   "type": "title",
+   "framework": "value chain",
+   "index": 0
+  },
+  {
+   "type": "title",
+   "framework": null,
+   "index": 0
+  },
+  {
+   "type": "divider",
+   "framework": "two-column comparison",
+   "index": 2
+  },
+  {
+   "type": "divider",
+   "framework": "table",
+   "index": 2
+  },
+  {
+   "type": "divider",
+   "framework": "full bleed photo",
+   "index": 2
+  },
+  {
+   "type": "divider",
+   "framework": "value chain",
+   "index": 2
+  },
+  {
+   "type": "divider",
+   "framework": null,
+   "index": 2
+  },
+  {
+   "type": "agenda",
+   "framework": "two-column comparison",
+   "index": 3
+  },
+  {
+   "type": "agenda",
+   "framework": "table",
+   "index": 1
+  },
+  {
+   "type": "agenda",
+   "framework": "full bleed photo",
+   "index": 1
+  },
+  {
+   "type": "agenda",
+   "framework": "value chain",
+   "index": 1
+  },
+  {
+   "type": "agenda",
+   "framework": null,
+   "index": 1
+  },
+  {
+   "type": "kpi",
+   "framework": "two-column comparison",
+   "index": 3
+  },
+  {
+   "type": "kpi",
+   "framework": "table",
+   "index": 1
+  },
+  {
+   "type": "kpi",
+   "framework": "full bleed photo",
+   "index": 1
+  },
+  {
+   "type": "kpi",
+   "framework": "value chain",
+   "index": 1
+  },
+  {
+   "type": "kpi",
+   "framework": null,
+   "index": 1
+  },
+  {
+   "type": "data",
+   "framework": "two-column comparison",
+   "index": 3
+  },
+  {
+   "type": "data",
+   "framework": "table",
+   "index": 1
+  },
+  {
+   "type": "data",
+   "framework": "full bleed photo",
+   "index": 1
+  },
+  {
+   "type": "data",
+   "framework": "value chain",
+   "index": 1
+  },
+  {
+   "type": "data",
+   "framework": null,
+   "index": 1
+  },
+  {
+   "type": "framework",
+   "framework": "two-column comparison",
+   "index": 3
+  },
+  {
+   "type": "framework",
+   "framework": "table",
+   "index": 1
+  },
+  {
+   "type": "framework",
+   "framework": "full bleed photo",
+   "index": 1
+  },
+  {
+   "type": "framework",
+   "framework": "value chain",
+   "index": 1
+  },
+  {
+   "type": "framework",
+   "framework": null,
+   "index": 1
+  },
+  {
+   "type": null,
+   "framework": "two-column comparison",
+   "index": 3
+  },
+  {
+   "type": null,
+   "framework": "table",
+   "index": 1
+  },
+  {
+   "type": null,
+   "framework": "full bleed photo",
+   "index": 1
+  },
+  {
+   "type": null,
+   "framework": "value chain",
+   "index": 1
+  },
+  {
+   "type": null,
+   "framework": null,
+   "index": 1
+  },
+  {
+   "type": "process",
+   "framework": "two-column comparison",
+   "index": 3
+  },
+  {
+   "type": "process",
+   "framework": "table",
+   "index": 1
+  },
+  {
+   "type": "process",
+   "framework": "full bleed photo",
+   "index": 1
+  },
+  {
+   "type": "process",
+   "framework": "value chain",
+   "index": 1
+  },
+  {
+   "type": "process",
+   "framework": null,
+   "index": 1
+  },
+  {
+   "type": "divider",
+   "framework": null,
+   "index": 1,
+   "subset": [
+    0,
+    1
+   ]
+  }
+ ],
+ "hints": [
+  {
+   "index": 0,
+   "workzone": null,
+   "text": "Slide zone positions for \"Title Slide\" (from brand template — follow exactly):\n  slide headline area: full-width zone at the left edge, in the body area\n  subtitle area: wide zone at the left edge, in the body area, shallow band\nThis spatial layout is a hard constraint from the brand template. Follow it exactly."
+  },
+  {
+   "index": 0,
+   "workzone": {
+    "left": 0.051,
+    "top": 0.2,
+    "width": 0.9,
+    "height": 0.705
+   },
+   "text": "Safe content area (HARD CONSTRAINT from brand template): left 5%, top 20%, width 90%, height 71%. Every text block, shape, and graphic must stay inside this zone — place nothing outside it.\nSlide zone positions for \"Title Slide\" (from brand template — follow exactly):\n  slide headline area: full-width zone at the left edge, in the body area\n  subtitle area: wide zone at the left edge, in the body area, shallow band\nThis spatial layout is a hard constraint from the brand template. Follow it exactly."
+  },
+  {
+   "index": 1,
+   "workzone": null,
+   "text": "Slide zone positions for \"Title and Content\" (from brand template — follow exactly):\n  slide headline area: full-width zone at the left edge, at the very top, shallow band\n  main content area: full-width zone at the left edge, in the body area, tall panel\n  image area: narrow zone on the right side, near the bottom, shallow band\n  RESERVED — do not draw content over these zones: brand logo at top-right (10%×6% of slide); full-bleed background graphic at top-left (100%×100% of slide).\nThis spatial layout is a hard constraint from the brand template. Follow it exactly."
+  },
+  {
+   "index": 1,
+   "workzone": {
+    "left": 0.051,
+    "top": 0.2,
+    "width": 0.9,
+    "height": 0.705
+   },
+   "text": "Safe content area (HARD CONSTRAINT from brand template): left 5%, top 20%, width 90%, height 71%. Every text block, shape, and graphic must stay inside this zone — place nothing outside it.\nSlide zone positions for \"Title and Content\" (from brand template — follow exactly):\n  slide headline area: full-width zone at the left edge, at the very top, shallow band\n  main content area: full-width zone at the left edge, in the body area, tall panel\n  image area: narrow zone on the right side, near the bottom, shallow band\n  RESERVED — do not draw content over these zones: brand logo at top-right (10%×6% of slide); full-bleed background graphic at top-left (100%×100% of slide).\nThis spatial layout is a hard constraint from the brand template. Follow it exactly."
+  },
+  {
+   "index": 2,
+   "workzone": null,
+   "text": "Slide zone positions for \"Section Header\" (from brand template — follow exactly):\n  slide headline area: full-width zone spanning the center, in the body area\nThis spatial layout is a hard constraint from the brand template. Follow it exactly."
+  },
+  {
+   "index": 2,
+   "workzone": {
+    "left": 0.051,
+    "top": 0.2,
+    "width": 0.9,
+    "height": 0.705
+   },
+   "text": "Safe content area (HARD CONSTRAINT from brand template): left 5%, top 20%, width 90%, height 71%. Every text block, shape, and graphic must stay inside this zone — place nothing outside it.\nSlide zone positions for \"Section Header\" (from brand template — follow exactly):\n  slide headline area: full-width zone spanning the center, in the body area\nThis spatial layout is a hard constraint from the brand template. Follow it exactly."
+  },
+  {
+   "index": 3,
+   "workzone": null,
+   "text": "Slide zone positions for \"Two Content\" (from brand template — follow exactly):\n  slide headline area: full-width zone at the left edge, at the very top, shallow band\n  content area: narrow zone at the left edge, in the body area, tall panel\n  content area: narrow zone on the right side, in the body area, tall panel\nThis spatial layout is a hard constraint from the brand template. Follow it exactly."
+  },
+  {
+   "index": 3,
+   "workzone": {
+    "left": 0.051,
+    "top": 0.2,
+    "width": 0.9,
+    "height": 0.705
+   },
+   "text": "Safe content area (HARD CONSTRAINT from brand template): left 5%, top 20%, width 90%, height 71%. Every text block, shape, and graphic must stay inside this zone — place nothing outside it.\nSlide zone positions for \"Two Content\" (from brand template — follow exactly):\n  slide headline area: full-width zone at the left edge, at the very top, shallow band\n  content area: narrow zone at the left edge, in the body area, tall panel\n  content area: narrow zone on the right side, in the body area, tall panel\nThis spatial layout is a hard constraint from the brand template. Follow it exactly."
+  }
+ ],
+ "sizes": [
+  {
+   "workzone": {
+    "left": 0.05,
+    "top": 0.2,
+    "width": 0.9,
+    "height": 0.7
+   },
+   "size": {
+    "width": 2304,
+    "height": 1008,
+    "padded": false
+   }
+  },
+  {
+   "workzone": {
+    "left": 0,
+    "top": 0,
+    "width": 1,
+    "height": 1
+   },
+   "size": {
+    "width": 2560,
+    "height": 1440,
+    "padded": false
+   }
+  },
+  {
+   "workzone": {
+    "left": 0.1,
+    "top": 0.1,
+    "width": 0.2,
+    "height": 0.8
+   },
+   "size": {
+    "width": 560,
+    "height": 1232,
+    "padded": false
+   }
+  },
+  {
+   "workzone": {
+    "left": 0,
+    "top": 0,
+    "width": 0.98,
+    "height": 0.12
+   },
+   "size": {
+    "width": 2512,
+    "height": 848,
+    "padded": true
+   }
+  },
+  {
+   "workzone": {
+    "left": 0.3,
+    "top": 0.3,
+    "width": 0.17,
+    "height": 0.2
+   },
+   "size": {
+    "width": 1008,
+    "height": 672,
+    "padded": false
+   }
+  },
+  {
+   "workzone": {
+    "left": 0,
+    "top": 0,
+    "width": 0.02,
+    "height": 0.9
+   },
+   "size": {
+    "width": 480,
+    "height": 1424,
+    "padded": true
+   }
+  }
+ ],
+ "tiles": [
+  {
+   "workzone": {
+    "left": 0.05,
+    "top": 0.2,
+    "width": 0.9,
+    "height": 0.7
+   },
+   "content": true
+  },
+  {
+   "workzone": {
+    "left": 0,
+    "top": 0,
+    "width": 1,
+    "height": 1
+   },
+   "content": true
+  },
+  {
+   "workzone": {
+    "left": 0.1,
+    "top": 0.1,
+    "width": 0.2,
+    "height": 0.8
+   },
+   "content": true
+  },
+  {
+   "workzone": {
+    "left": 0,
+    "top": 0,
+    "width": 0.98,
+    "height": 0.12
+   },
+   "content": false
+  },
+  {
+   "workzone": {
+    "left": 0.3,
+    "top": 0.3,
+    "width": 0.17,
+    "height": 0.2
+   },
+   "content": true
+  },
+  {
+   "workzone": {
+    "left": 0,
+    "top": 0,
+    "width": 0.02,
+    "height": 0.9
+   },
+   "content": false
+  }
+ ]
+}

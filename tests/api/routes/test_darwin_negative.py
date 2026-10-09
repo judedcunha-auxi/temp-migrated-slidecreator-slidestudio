@@ -100,6 +100,83 @@ ROUTES = [
           lambda env, h: env.client.post("/api/image-to-slide", json={"file": "x"}, headers=h),
           (400, 'Send the image as multipart/form-data with a "file" field'), None),
 ]
+
+
+# --- the generation batch (Phase 7a): decks, generate/retry/status, refine/revert/slide-transcript, media, quick
+def _alice_quick_job(env: DarwinEnv, *, done: bool = False) -> str:
+    from tests.fakes.darwin_decks import storyline_reply
+
+    env.user("alice")
+    if done:
+        env.model.steps.append(storyline_reply(1))
+    job = str(env.client.post("/api/quick-generate", json={"topic": "x"}, headers=env.auth("alice")).json()["jobId"])
+    if done:
+        env.run_jobs()
+    return job
+
+
+def _bob_posts(path: str, body: Callable[[str], dict[str, Any]]) -> Callable[[DarwinEnv], Any]:
+    return lambda env: env.client.post(path, json=body(env.seed_deck("alice")), headers=env.auth("bob"))
+
+
+def _bob_gets(template: str) -> Callable[[DarwinEnv], Any]:
+    return lambda env: env.client.get(template.format(deck=env.seed_deck("alice")), headers=env.auth("bob"))
+
+
+ROUTES += [
+    Route("/api/decks", lambda env, h: env.client.get("/api/decks", headers=h),
+          lambda env, h: env.client.delete("/api/decks", headers=h), (400, "id required"),
+          _bob_gets("/api/decks?id={deck}"), (404, "Deck not found")),
+    Route("/api/generate", lambda env, h: env.client.post("/api/generate", json={"slides": []}, headers=h),
+          lambda env, h: env.client.post("/api/generate", json={"presentationTitle": "T", "slides": []}, headers=h),
+          (500, "Internal error"), None),  # quirk 3: validation failures are a 500
+    Route("/api/retry", lambda env, h: env.client.post("/api/retry", json={"deckId": UNKNOWN, "retryOnly": [1]},
+                                                       headers=h),
+          lambda env, h: env.client.post("/api/retry", json={"deckId": UNKNOWN}, headers=h),
+          (400, "deckId and retryOnly required"),
+          _bob_posts("/api/retry", lambda d: {"deckId": d, "retryOnly": [1]}), (403, "Not your deck")),
+    Route("/api/status", lambda env, h: env.client.get(f"/api/status?deckId={UNKNOWN}", headers=h),
+          lambda env, h: env.client.get("/api/status", headers=h), (400, "deckId is required"),
+          _bob_gets("/api/status?deckId={deck}"), (403, "Not your deck")),
+    Route("/api/refine", lambda env, h: env.client.post("/api/refine", json={"deckId": UNKNOWN, "number": 1,
+                                                                             "instruction": "x"}, headers=h),
+          lambda env, h: env.client.post("/api/refine", json={"deckId": UNKNOWN, "number": 1, "instruction": " "},
+                                         headers=h), (400, "instruction is required"),
+          _bob_posts("/api/refine", lambda d: {"deckId": d, "number": 1, "instruction": "x"}), (403, "Not your deck")),
+    Route("/api/revert", lambda env, h: env.client.post("/api/revert", json={"deckId": UNKNOWN, "number": 1,
+                                                                             "version": 1}, headers=h),
+          lambda env, h: env.client.post("/api/revert", json={"deckId": UNKNOWN, "number": 1}, headers=h),
+          (400, "deckId, number, version required"),
+          _bob_posts("/api/revert", lambda d: {"deckId": d, "number": 1, "version": 1}), (403, "Not your deck")),
+    Route("/api/slide-transcript",
+          lambda env, h: env.client.post("/api/slide-transcript", json={"deckId": UNKNOWN, "slideNumber": 1,
+                                                                        "messages": []}, headers=h),
+          lambda env, h: env.client.post("/api/slide-transcript", json={"deckId": UNKNOWN}, headers=h),
+          (400, "Missing deckId, slideNumber, or messages"),
+          _bob_posts("/api/slide-transcript", lambda d: {"deckId": d, "slideNumber": 1, "messages": []}),
+          (403, "Not your deck")),
+    Route("/api/image", lambda env, h: env.client.get(f"/api/image?deckId={UNKNOWN}&slide=1", headers=h),
+          lambda env, h: env.client.get(f"/api/image?deckId={UNKNOWN}&slide=0", headers=h), (400, "Bad params"),
+          _bob_gets("/api/image?deckId={deck}&slide=1"), (403, "Not your deck")),
+    Route("/api/pdf", lambda env, h: env.client.get(f"/api/pdf?deckId={UNKNOWN}&slide=1", headers=h),
+          lambda env, h: env.client.get("/api/pdf?slide=1", headers=h), (400, "Bad params"),
+          _bob_gets("/api/pdf?deckId={deck}&slide=1"), (403, "Not your deck")),
+    Route("/api/pdf-deck", lambda env, h: env.client.get(f"/api/pdf-deck?deckId={UNKNOWN}", headers=h),
+          lambda env, h: env.client.get("/api/pdf-deck", headers=h), (400, "Missing deckId"),
+          _bob_gets("/api/pdf-deck?deckId={deck}"), (403, "Not your deck")),
+    Route("/api/quick-generate", lambda env, h: env.client.post("/api/quick-generate", json={"topic": "x"}, headers=h),
+          lambda env, h: env.client.post("/api/quick-generate", json={"topic": ""}, headers=h),
+          (400, "Topic is required"), None),
+    Route("/api/quick-status", lambda env, h: env.client.get(f"/api/quick-status?jobId={UNKNOWN}", headers=h),
+          lambda env, h: env.client.get("/api/quick-status", headers=h), (400, "jobId is required"),
+          lambda env: env.client.get(f"/api/quick-status?jobId={_alice_quick_job(env)}", headers=env.auth("bob")),
+          (403, "Not your job")),
+    Route("/api/quick-image", lambda env, h: env.client.get(f"/api/quick-image?jobId={UNKNOWN}&slide=1", headers=h),
+          lambda env, h: env.client.get(f"/api/quick-image?jobId={UNKNOWN}&slide=x", headers=h), (400, "Bad params"),
+          lambda env: env.client.get(f"/api/quick-image?jobId={_alice_quick_job(env, done=True)}&slide=1",
+                                     headers=env.auth("bob")), (403, "Not your job")),
+]
+# --- end of the generation batch ---
 IDS = [r.path for r in ROUTES]
 
 

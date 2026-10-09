@@ -37,11 +37,11 @@ class NewBody(BaseModel):
 def _routers() -> list[APIRouter]:
     legacy = legacy_router(prefix="/api", tags=["darwin"])
 
-    @legacy.get("/decks")
+    @legacy.get("/legacy-auth")  # not a served path (the real /api/decks is)
     async def decks() -> dict[str, str]:
         raise ApiError(401, "Missing bearer token")
 
-    @legacy.post("/refine")
+    @legacy.post("/legacy-validate")  # not a served path (the real /api/refine is)
     async def refine(body: NewBody) -> dict[str, str]:
         return {"ok": "yes"}
 
@@ -96,14 +96,14 @@ def api(make_app: Callable[..., FastAPI]) -> Iterator[TestClient]:
 # ---- legacy format ---------------------------------------------------------------
 
 def test_legacy_route_keeps_the_darwin_error_body(api: TestClient):
-    r = api.get("/api/decks")
+    r = api.get("/api/legacy-auth")
     assert r.status_code == 401
     assert r.json() == {"error": "Missing bearer token"}
     assert r.headers["content-type"].startswith("application/json")
 
 
 def test_legacy_route_validation_failure_is_a_400_error_body(api: TestClient):
-    r = api.post("/api/refine", json={"language": "far-too-long", "slides": [1]})
+    r = api.post("/api/legacy-validate", json={"language": "far-too-long", "slides": [1]})
     assert r.status_code == 400
     assert r.json() == {"error": LEGACY_VALIDATION_MESSAGE}
 
@@ -127,7 +127,7 @@ def test_the_tag_marker_also_selects_the_legacy_body(api: TestClient):
 
 
 def test_legacy_errors_still_carry_the_request_id_header(api: TestClient):
-    r = api.get("/api/decks", headers={"X-Request-ID": "gw-123"})
+    r = api.get("/api/legacy-auth", headers={"X-Request-ID": "gw-123"})
     assert r.headers["x-request-id"] == "gw-123"
 
 

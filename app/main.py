@@ -37,7 +37,7 @@ from app.core.logging_config import configure_logging, register_secret_values
 configure_logging()
 
 from app.api.legacy import install_legacy_handlers  # noqa: E402 - logging must be configured first
-from app.api.routes import exports, health, storyline  # noqa: E402
+from app.api.routes import decks, exports, generate, health, media, quick, refine, storyline  # noqa: E402
 from app.config.settings import Settings, check_config, is_production, secret_values  # noqa: E402
 from app.config.settings import settings as default_settings  # noqa: E402
 from app.core import telemetry  # noqa: E402
@@ -56,7 +56,11 @@ SERVICE_NAME = "slideforge-service"
 # Convention (tests/test_main.py holds it): a router sets its own prefix and tags
 # in its APIRouter(...) constructor, and is included with no prefix or tags, so a
 # route's path and feature tag are the same on the route object and on the wire.
-ROUTERS = (health.router, storyline.router, exports.router)
+ROUTERS = (
+    health.router, storyline.router, exports.router,
+    # the generation batch (Phase 7a): decks, generate/retry/status, refine/revert/slide-transcript, media, quick
+    decks.router, generate.router, refine.router, media.router, quick.router,
+)
 
 
 def _build_storage(s: Settings) -> Storage | None:

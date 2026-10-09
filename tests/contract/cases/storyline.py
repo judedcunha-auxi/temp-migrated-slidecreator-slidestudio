@@ -108,6 +108,10 @@ def _done_check(_env: DarwinEnv, response: Any) -> None:
     assert result["inputs"] == {"topic": "Q3", "numSlides": 3}
     assert result["presentationTitle"] == "Q3 2026 Financial Results"
     assert result["slides"][0]["title"] == "Q3 beat plan by 12%"
+    # Each slide carries Darwin's server-assembled image prompt (app/core/darwin/prompt.py, the prompter).
+    for slide in result["slides"]:
+        assert isinstance(slide["prompt"], str) and "Non-negotiable rules: " in slide["prompt"]
+    assert 'Render ONLY the presentation title, exactly: "Q3 beat plan by 12%"' in result["slides"][0]["prompt"]
 
 
 status.add("R2", Probe("done", poll_after(_done), _done_check))

@@ -27,6 +27,7 @@ that is not served yet is reported as xfail "not yet ported".
 from __future__ import annotations
 
 import json
+import re
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from functools import cache
@@ -119,11 +120,27 @@ def _type_word(desc: str) -> str:
     return desc.strip().split(" ", 1)[0].split("(", 1)[0].lower()
 
 
+#: A key whose description says it may be left out ("key omitted when undefined", "present only when set")
+#: is optional, as if it were written `key?` (api-status.json writes optionality in prose).
+_OPTIONAL_PROSE = re.compile(r"\b(omitted|present only)\b", re.IGNORECASE)
+
+
+def _optional(key: str, sub: Any) -> bool:
+    return key.endswith("?") or (isinstance(sub, str) and bool(_OPTIONAL_PROSE.search(sub)))
+
+
 def check_shape(actual: Any, shape: Any, path: str = "body") -> None:
     """`actual` against a contract `bodyShape` (see the module docstring)."""
+    if isinstance(shape, dict) and len(shape) == 1:
+        (only, sub), = shape.items()
+        if only.startswith("<") and only.endswith(">"):  # a map, e.g. "<slideNumber as string key>": {...}
+            assert isinstance(actual, dict), f"{path}: expected an object, got {actual!r}"
+            for key, value in actual.items():
+                check_shape(value, sub, f"{path}.{key}")
+            return
     if isinstance(shape, dict):
         assert isinstance(actual, dict), f"{path}: expected an object, got {actual!r}"
-        required = {k for k in shape if not k.endswith("?")}
+        required = {k for k, sub in shape.items() if not _optional(k, sub)}
         allowed = {k.rstrip("?") for k in shape}
         assert required <= set(actual), f"{path}: missing {sorted(required - set(actual))}"
         assert set(actual) <= allowed, f"{path}: undocumented keys {sorted(set(actual) - allowed)}"
@@ -135,7 +152,12 @@ def check_shape(actual: Any, shape: Any, path: str = "body") -> None:
         return
     text = shape.strip()
     if len(text) >= 2 and text[0] == "'" and text.endswith("'") and text.count("'") == 2:
-        assert actual == text[1:-1], f"{path}: expected {text}, got {actual!r}"
+        literal = text[1:-1]
+        if re.search(r"\{\w+\}", literal):  # a template, e.g. 'Generated {doneCount} of {totalSlides} slides…'
+            pattern = re.sub(r"\\{\w+\\}", ".+?", re.escape(literal))
+            assert isinstance(actual, str) and re.fullmatch(pattern, actual), f"{path}: expected {text}, got {actual!r}"
+            return
+        assert actual == literal, f"{path}: expected {text}, got {actual!r}"
         return
     word = _type_word(text)
     if word == "string":
@@ -162,6 +184,11 @@ def check_entry(entry: Entry, response: httpx.Response) -> None:
         return
     assert content_type == spec.get("contentType"), f"{entry.route} {entry.id}: content-type {content_type!r}"
     for name, value in (spec.get("headers") or {}).items():
-        assert response.headers.get(name) == value, f"{entry.route} {entry.id}: header {name}"
+        got = response.headers.get(name)
+        if re.search(r"<\w+>", value):  # a template, e.g. 'attachment; filename="slide_<slide>.pdf"'
+            pattern = re.sub(r"<\w+>", ".+", re.escape(value).replace("\\<", "<").replace("\\>", ">"))
+            assert got is not None and re.fullmatch(pattern, got), f"{entry.route} {entry.id}: header {name} {got!r}"
+            continue
+        assert got == value, f"{entry.route} {entry.id}: header {name}"
     if spec.get("contentType") == JSON_CT:
         check_shape(response.json(), spec.get("bodyShape"))

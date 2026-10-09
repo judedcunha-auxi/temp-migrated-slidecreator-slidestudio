@@ -12,6 +12,12 @@ Job types registered here:
 | `slides.design_and_export` | `/api/pptx-submit`, `/api/image-to-slide` | `app/core/slides/jobs.py` |
 | `exports.stitch_deck`, `brand.extract`, `masters.render_layouts` | (not yet by a Darwin route) | `app/core/slides/jobs.py` |
 | `darwin.pptx_deck` | `/api/pptx-deck-submit` | `app/core/darwin/exports.py` |
+| `darwin.generate` | `/api/generate`, `/api/retry` (was `generate-background`) | `app/core/darwin/generate.py` |
+| `darwin.refine` | `/api/refine` (was `refine-background`) | `app/core/darwin/refine.py` |
+| `darwin.quick_generate` | `/api/quick-generate` (was `quick-generate-background`) | `app/core/darwin/quick.py` |
+
+The storyline job's `prompter` defaults to `DarwinSlidePrompter` (`app/core/darwin/prompt.py`): each slide of
+a storyline result carries Darwin's image prompt, as `storyline-background.ts` built it.
 
 Every type is registered NOT expensive: Darwin had no per-user in-flight limit, and the queue's limit
 of 3 would add a 429 to its routes. TODO-P5 in-flight: Phase 5 turns it on, with the rate limits.
@@ -35,7 +41,11 @@ from app.config.engine import EngineSettings, engine_settings
 from app.config.settings import Settings
 from app.config.storyline import StorylineSettings, storyline_settings
 from app.core.darwin import exports as darwin_exports
+from app.core.darwin import generate as darwin_generate
+from app.core.darwin import quick as darwin_quick
+from app.core.darwin import refine as darwin_refine
 from app.core.darwin.image_gen import ImageGenerator, OpenAIImageGenerator
+from app.core.darwin.prompt import DarwinSlidePrompter
 from app.core.darwin.usage import KIND_DESIGN, KIND_STORYLINE, record_usage_quietly
 from app.core.design.context import DesignServices
 from app.core.jobs.queue import JobQueue
@@ -151,6 +161,8 @@ def build_runtime(
 
         resolve = resolver(ai)
     model = storyline_model if storyline_model is not None else LlmStorylineModel(resolve, ai)
+    prompter = prompter if prompter is not None else DarwinSlidePrompter(storage)
+    image_gen = images if images is not None else OpenAIImageGenerator(darwin)
 
     registry = JobRegistry()
     # TODO-P5 in-flight: the storyline type is "expensive" in its own module; Darwin had no limit.
@@ -165,8 +177,18 @@ def build_runtime(
     registry.handlers[design] = ledgered(registry.handlers[design], storage, kind=KIND_DESIGN,
                                          model=ai.llm_design_model)
 
+    # --- the generation batch (Phase 7a): generate/retry, refine, quick-generate ----------------------
+    # The `-background` functions as internal jobs (D31), run as the job's owner. TODO-P5 in-flight: each is
+    # registered NOT expensive (Darwin had no in-flight limit) and runs once (a re-run would pay again).
+    generation = darwin_generate.GenerationDeps(storage=storage, redis=redis, images=image_gen, darwin=darwin)
+    registry.add(darwin_generate.JOB_TYPE, darwin_generate.generation_handler(generation))
+    registry.add(darwin_refine.JOB_TYPE, darwin_refine.refine_handler(generation))
+    registry.add(darwin_quick.JOB_TYPE, darwin_quick.quick_handler(
+        darwin_quick.QuickDeps(generation=generation, model=model, storyline=storyline)))
+    # --- end of the generation batch -----------------------------------------------------------------
+
     queue = JobQueue(redis, storage)
     handlers = registry.install(queue)
     return DarwinRuntime(queue=queue, registry=registry, handlers=handlers, storyline_model=model,
-                         images=images if images is not None else OpenAIImageGenerator(darwin),
+                         images=image_gen,
                          darwin=darwin, storyline=storyline)
