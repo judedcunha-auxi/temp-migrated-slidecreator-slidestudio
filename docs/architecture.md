@@ -10,9 +10,12 @@ Add a section rather than editing another area's. The plain-English tour is
 app/
   main.py          the FastAPI app: middleware, error handlers, the ROUTERS registry
   api/routes/      one router per area of the API (health today)
-  config/          settings.py (service settings, check_config), engine.py (engine settings)
+  config/          settings.py (service settings, check_config), engine.py (engine settings),
+                   ai.py (models, keys, cost, fan-out)
   core/            logging, telemetry, errors, request ids, Redis, storage/ (the General
-                   service port), jobs/ (the Redis queue), the browser pool
+                   service port), jobs/ (the Redis queue), the browser pool; the AI features:
+                   llm/ (models, cost), design/ (the design loop), design_refs/, brand/,
+                   slides/ (design_and_export), masters, exports, preview
   engine/          the export engine: slide HTML -> an editable .pptx
 ```
 
@@ -146,9 +149,10 @@ to production until D3 is resolved. See [licensing.md](licensing.md).
 
 Slide Studio targeted 3.12. The engine has no 3.12-only syntax or APIs: every module under `app/`
 and `tests/` parses with the 3.11 grammar and the suite runs on 3.11. One 3.12-only construct is
-known on the Phase 3 side: Slide Studio's `server/design_refs/design_lint.py` (around line 1347)
-has a backslash inside an f-string expression (PEP 701); move the `re.sub` into a helper when that
-module is ported.
+known on the Phase 3 side, Slide Studio's `server/design_refs/design_lint.py` (around line 1347: a
+backslash inside an f-string expression, PEP 701), is fixed in the port
+(`app/core/design_refs/design_lint.py: _unsigned`), and a test parses every design_refs module with
+the 3.11 grammar.
 
 ### Port map (Slide Studio `engine/` -> `app/engine/`)
 
@@ -175,6 +179,125 @@ K = kept, R = rewritten, D = dropped (migration plan §4.2).
 | `verify/compare.py`, `tools/*`, `fixtures/fidelity/*`, `vendor/stageflow/*` | none | D | Dev-only tools and the reference-only StageFlow copy. |
 | `fixtures/eyp/`, `fixtures/deck10/`, `tests/overlap/*` | none | D | Client material (R6). Replaced by the synthetic sample project. |
 | `tests/*` | `tests/engine/**` | K/R | Re-baselined on synthetic fixtures. |
+
+## The AI design core (Phase 3)
+
+Slide Studio's design loop, its model layer and its brand and master handling, moved behind
+internal calls (migration plan §2.1, §4.1). There are no HTTP routes yet (Phase 5/7): Slide
+Studio's `/v1` hops become function calls and job handlers.
+
+```
+app/core/llm/            the model layer: providers, the turn loop, cost (docs/models-and-cost.md)
+app/core/design/         the design loop: deck, tools, critic, brief, the turn, parallel Generate
+app/core/design_refs/    reference material + the design lint (incl. workzone/header band)
+app/core/brand/          brand extraction, master synthesis, the workzone
+app/core/preview.py      a slide's picture and measured design review (the preview browser pool)
+app/core/engine_service.py   the door into app/engine: export, master import, readiness
+app/core/masters.py      the brand master (branded/debranded/plain), uploaded masters, persistence
+app/core/render_layouts.py   layout previews through the Renderer port (PptxRender)
+app/core/exports.py      stitch_deck, a design deck's export
+app/core/slides/         design_and_export (spec or image -> HTML -> PPTX), its instructions, its jobs
+app/config/ai.py         AISettings: keys, models, effort, limits, cost overrides, fan-out
+app/data/                the shared archetype library and framework aliases (one copy; storyline too)
+```
+
+### Internal calls instead of `/v1`
+
+| Slide Studio hop | Here |
+|---|---|
+| `POST /v1/jobs` (`compat/orchestrate.run_job`) | `app.core.slides.pipeline.design_and_export(request, work_dir, ...)`; job `slides.design_and_export` |
+| `POST /v1/decks` (`run_deck`) | `app.core.exports.stitch_deck(parts, work_dir)`; job `exports.stitch_deck` |
+| `POST /v1/brand-extract` | `app.core.brand.extract.extract(data)`; job `brand.extract` |
+| `POST /render-layouts` (proxy) | `app.core.render_layouts.render_layouts(data, renderer=...)`; job `masters.render_layouts` |
+
+The jobs join the shared `JobRegistry` (`app/core/jobs/registry.py`) through
+`app.core.slides.jobs.register(registry, deps)`; nothing starts a worker. Each attempt runs in a job
+workspace: inputs come in through the storage port, outputs (`slide.pptx`, `deck.zip`,
+`deck.pptx`, ...) leave through it, and the directory is removed.
+
+### A design deck
+
+`app.core.design.deck.DesignDeck` replaces Slide Studio's on-disk project: one directory inside the
+job workspace, laid out exactly as `app.engine.pipeline.load_project` reads it (`project.json`,
+`manifest.json`, `master.pptx`, `layouts/`, `assets/`, `slides/<id>/vNNN.html`), plus the design
+chat's `history.json` and `transcript.json`. Every write goes there and nowhere else; writes to
+`project.json` are locked and atomic (parallel Generate writes from several threads). A deck that must
+outlive its job is packed into `deck.zip` (`design/bundle.py`) and stored through the port;
+unpacking refuses unsafe paths and unexpected files.
+
+### The design turn and the critic loop
+
+`design_turn.chat_turn(ctx, text, files, selected)` runs one turn over the provider-agnostic loop
+(`app/core/llm/loop.py`), with `dispatch_tool` answering the tools: `save_slide`, `edit_slide`,
+`read_slide`, `preview_slide`, `write_brief`, `plan_exhibit`, `find_layout_reference`,
+`get_component`, `get_exemplars` (offered only when exemplar pictures are installed). A bad call is an
+answer (`is_error`), never a crash. Everything the turn touches comes from a `DesignContext`: the
+deck, `AISettings`, a provider resolver (the real factory, or a fake), and the measuring services:
+
+* `lint`: the engine's static linter plus the last export's measured diagnostics (warn only);
+* `review`: the design lint measured in a browser, with the workzone and header-band rules when the
+  deck carries a workzone;
+* `render`: the slide over its layout as a PNG, the engine's own gate reference
+  (`render_reference`), from the preview pool (`DESIGN_PREVIEW_BROWSERS`).
+
+**The critic loop.** `preview_slide` returns the picture, the lint, the design review and an
+independent review: a separate, fresh-context call on `LLM_CRITIC_MODEL` with only the picture and
+the measured findings, answering a YES/NO checklist and at most five fixes. The designer applies the
+[must] fixes with `edit_slide` and previews again; a second review compares against the first
+picture. At most two reviews per slide per turn (three when composition or canvas still fails). The
+critic's cost is added to the turn's.
+
+**The brief.** With `DESIGN_BRIEF_ENABLED`, a body slide is planned with `write_brief` first: the
+brief is validated against the person's own material (one repair allowed), waits for the slide it
+plans, is recorded on it, and after the save the grounding check lists any figure that is neither a
+brief fact nor in the material. PDF attachments are read with `pypdf` for that.
+
+**Parallel Generate.** `generate.generate(ctx, slides, deck)` designs storyline slides into one deck,
+each on its own empty branch of model memory, at most `DESIGN_GENERATE_FANOUT` at once (bounded:
+every turn is a paid call with previews). A slide that starts after a content slide is designed is
+told to keep its look; a failed slide is reported and the rest carry on; slides end in storyline
+order. The storyline types it needs are a minimal interface (`slides/spec.StorylineSlide`), not
+`app/core/storyline`.
+
+### design_and_export
+
+1. **Master.** `masters.prepare_brand_master` synthesises the brand's master from captured furniture
+   and imports it (layout backgrounds through the `Renderer` port). Darwin's switches, ignored by
+   Slide Studio's adapter, are honoured: `apply_brand_layout=false` (debrand) keeps only the heading
+   geometry, with no theme, furniture or background; `layout_template` with `apply_template_bg`
+   paints the brand's master PNG as the archetype layout's background (never in debrand mode).
+2. **Design.** One design turn: spec mode (the storyline slide is the brief; exact chart data and a
+   pre-filled brief are handed over) or image mode (rebuild the attached picture natively; in debrand
+   mode, leave its baked-in chrome out).
+3. **Workzone.** When the brand has a workzone, the saved slide is checked (measured, or from its
+   declared boxes without a browser); content outside the workzone or over the header band gets one
+   repair turn.
+4. **Export.** The engine rebuilds the slide; `element_count` (what was built) and
+   `review_flag_count` (lint, measured diagnostics and open design findings) are filled, never null.
+
+`DESIGN_STUB=true` replaces step 2 with a hand-authored slide ($0; refused in production).
+
+### Port map (Slide Studio `server/*` -> here)
+
+K = kept, R = rewritten, D = dropped (migration plan §4.1).
+
+| Slide Studio | Here | | Notes |
+|---|---|---|---|
+| `llm/registry.py` | `app/core/llm/registry.py`, `pricing.py` | K/R | Opus 5.x, Sonnet 5.x, Fable 5.1, Haiku 4.5; overrides by setting. |
+| `llm/base.py`, `anthropic_client.py`, `gemini_client.py` | `app/core/llm/ports.py`, `anthropic_provider.py`, `gemini_provider.py`, `loop.py` | R | A provider port; one loop with `max_tokens` continuation and per-round pricing; Gemini behind a flag; no sandbox or Files API. |
+| `llm/history.py` | `app/core/llm/history.py` | K/R | Attachments inline from the workspace. |
+| `chat/*` | `app/core/design/*` | K/R | `DesignContext` instead of globals; writes into the deck in the job workspace. |
+| `critic.py`, `prompts.py` | `app/core/design/critic.py`, `prompts.py` | K | Through the provider port; no client names. |
+| `design_refs/*` | `app/core/design_refs/*` | K | 3.11 fix; store-free design lint; workzone lint added; data from `app/data`. |
+| `slide_preview.py` | `app/core/preview.py` | K/R | On a `BrowserPool`. |
+| `brand/*` | `app/core/brand/*` | K | `extract` without FastAPI; role annotation through an injected callable. |
+| `engine_bridge.py` | `app/core/engine_service.py` | R | Export, import, readiness; counts for the pipeline. |
+| `services/master_import.py` | `app/core/masters.py` | R | Upload checks, restore on failure, re-homing, persistence through `MasterPort`. |
+| `services/slides.py` | `engine_service.rehome_slides` | R | The rest is UI-only. |
+| `services/slide_html.py` | none | D | Serving slides to a browser frame: the routes' job (Phase 5/7). |
+| `compat/orchestrate.py` | `app/core/slides/pipeline.py`, `spec.py`, `app/core/exports.py` | R | Debrand, template, workzone, counts. |
+| `compat/render.py` | `app/core/render_layouts.py` | R | No route. |
+| `storyline/service.generate` | `app/core/design/generate.py` | K/R | Bounded fan-out. |
 
 ## Storage and jobs (Phase 4)
 

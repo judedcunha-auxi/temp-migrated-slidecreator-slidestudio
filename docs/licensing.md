@@ -38,4 +38,12 @@ includes these modules to production.
   so no terms are needed.
 - **Client material.** No client master, deck or slide is in this repository (risk R6): every
   test fixture is synthetic (`tests/engine/fixtures/`, `tests/engine/sample_project.py`).
-- **Exemplar slides** for the AI design features are Phase 3 and are also gated by D3.
+- **Exemplar slides** for the AI design features (Slide Studio's `server/design_refs/exemplars/`,
+  539 pictures from 15 reference decks) are gated by D3 and none ship. Even the set labelled as
+  auxi's own (`d15`) is a proposal deck that names a client and its RFI reference, so it is out too.
+  `get_exemplars` is offered only when pictures are installed beside the deploy
+  (`DESIGN_EXEMPLARS_DIR`), and the tests build synthetic ones.
+- **The archetype library** (`app/data/archetypes.json`) is de-identified: neutral ids, a one-way
+  digest of the original id, no deck names, page numbers or pictures (`app/data/README.md`).
+- **The Gemini replay fixtures** (`tests/fixtures/llm/gemini/`) are recorded API turns on synthetic
+  prompts ("Market outlook 2027").

@@ -8,7 +8,7 @@ everything else readable. Then pick by what you are trying to do.
 | Doc | |
 |---|---|
 | [how-it-works.md](how-it-works.md) | **Start here.** What the service is for, what happens to a request, and what is still to come. |
-| [architecture.md](architecture.md) | The design, one section per area: the export engine, storage through the General service port, and the Redis job queue. |
+| [architecture.md](architecture.md) | The design, one section per area: the export engine, the AI design core (models, the design loop, design_and_export), storage through the General service port, and the Redis job queue. |
 | [models-and-cost.md](models-and-cost.md) | The AI models the service calls, what each call costs, per-turn cost accounting, `max_tokens` continuation, and the settings for all of it. |
 | [licensing.md](licensing.md) | Third-party code that is licence-gated (StageFlow, decision D3), and what is kept out on purpose. |
 | [route-controls.md](route-controls.md) | Every route, who may call it and what protects it. Generated from a table the tests hold to the code. |

@@ -16,8 +16,8 @@ place, written in Python and run on Azure:
   today (`/api/decks`, `/api/status`, and so on) keeps working exactly as it does now, just
   answered by this service instead of Netlify.
 
-The frame (Phase 1) and the export engine (Phase 2) are here; the design features and Darwin's
-routes come next.
+The frame (Phase 1), the export engine (Phase 2) and the AI design core (Phase 3) are here;
+Darwin's routes come next.
 
 ## 2. What is here today
 
@@ -96,6 +96,33 @@ original font in the file. And two of the engine's files are derived from third-
 licence is not yet granted ([licensing.md](licensing.md)); they must not ship to production until
 that is settled. [architecture.md](architecture.md) has the details.
 
+**The AI design core** (Phase 3). This is where slides get designed. A slide starts either as a
+line in the deck's plan (its conclusion, its kind of chart, its bullets) or as a finished picture,
+and ends as an editable PowerPoint slide on the customer's own template:
+
+1. **The template.** The brand's look (colours, fonts, logo, header band) was read from the
+   customer's PowerPoint once, at brand setup. For each slide it is rebuilt as a real PowerPoint
+   template. If the person turned branding off, the template keeps only where the title goes.
+2. **The design.** An AI model (Claude) writes the slide as a small web page, using a set of tools:
+   save the slide, edit part of it, look at a picture of it, plan the main exhibit, look up layout
+   recipes and ready-made exhibit snippets. After saving, the code checks the slide (will PowerPoint
+   be able to rebuild it? is anything overlapping, too small, off the grid?) and tells the model.
+3. **A second pair of eyes.** When the model looks at its slide, a **separate** AI call, which has
+   not seen any of the reasoning, judges the picture against a strict checklist and lists at most
+   five fixes. The model fixes them and looks again. This happens at most twice or three times a
+   slide, so it cannot loop.
+4. **The brand's safe area.** Many templates reserve a header band and a footer. If the slide's
+   content strays outside the brand's safe area (the "workzone"), the slide gets one more round to
+   move it back.
+5. **The PowerPoint.** The export engine above rebuilds it. The result says how many shapes were
+   built, how many things a person may want to look at, and what the AI calls cost.
+
+A whole deck can be designed several slides at a time, with a limit on how many at once, and
+finished slides are put together into one deck. Every AI call's cost is worked out from the tokens
+it used and added up per slide ([models-and-cost.md](models-and-cost.md)). If an answer is cut off
+because it was too long, the model is asked to carry on rather than the slide failing. No test ever
+calls a paid AI service: the tests use a scripted stand-in.
+
 **Storage, through one door.** Everything that must last goes through a single interface to the
 General service: users, brands, decks, slides and every version of them, files, job records,
 the cost ledger. The General service is not built yet, so for now the service runs against a
@@ -139,8 +166,8 @@ caller ─► request id (read or made) ─► CORS check ─► route ─► re
 
 ## 5. What comes next
 
-The migration plan's phases, in short: the AI design features, wired to the engine (Phase 3),
-storage through the General service and background jobs (Phase 4), sign-in and per-route
+The migration plan's phases, in short: the AI design features (Phase 3, here; paid runs on staging
+still to be approved), storage through the General service and background jobs (Phase 4), sign-in and per-route
 protection (Phase 5), then Darwin's routes and data moving over (Phase 7). It will run as a
 container on Azure App Service (decision D2), because the engine needs a headless browser and
 fonts.

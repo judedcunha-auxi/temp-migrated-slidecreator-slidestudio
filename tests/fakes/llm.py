@@ -159,3 +159,69 @@ def saved_slide_id(request: RoundRequest) -> str:
                 if found:
                     return found.group(1)
     raise AssertionError("no saved slide in the history yet")
+
+
+class ReactiveProvider:
+    """A fake provider that answers every round with `respond(request)`: for turns that run in
+    parallel (Generate), where one shared script queue would interleave. Thread-safe; it records
+    every request and the peak number of rounds in flight at once."""
+
+    def __init__(self, respond: Callable[[RoundRequest], Round], *, completions: list[Step] | None = None,
+                 name: str = "fake-reactive", delay_s: float = 0.0) -> None:
+        import threading
+
+        self.name = name
+        self.respond = respond
+        self.completions: list[Step] = list(completions or [])
+        self.requests: list[RoundRequest] = []
+        self.completion_requests: list[RoundRequest] = []
+        self.delay_s = delay_s
+        self._lock = threading.Lock()
+        self._in_flight = 0
+        self.peak_in_flight = 0
+
+    def stream_round(self, request: RoundRequest) -> Generator[Event, None, RoundResult]:
+        import time
+
+        with self._lock:
+            self.requests.append(ScriptedProvider._snapshot(request))
+            self._in_flight += 1
+            self.peak_in_flight = max(self.peak_in_flight, self._in_flight)
+        try:
+            if self.delay_s:
+                time.sleep(self.delay_s)
+            result = self.respond(request).result(request)
+        finally:
+            with self._lock:
+                self._in_flight -= 1
+        for block in result.content:
+            if block.get("type") == "text":
+                yield {"type": "text_start"}
+                yield {"type": "text", "text": block.get("text", "")}
+                yield {"type": "text_end"}
+        return result
+
+    def complete(self, request: RoundRequest) -> RoundResult:
+        with self._lock:
+            self.completion_requests.append(ScriptedProvider._snapshot(request))
+            if not self.completions:
+                raise ScriptExhausted("no scripted completion left")
+            step = self.completions.pop(0)
+        scripted = step(request) if callable(step) else step
+        return scripted.result(request)
+
+
+def first_user_text(request: RoundRequest) -> str:
+    """All the text of the request's user turns (where a turn's instruction lives)."""
+    parts: list[str] = []
+    for message in request.messages:
+        if message.get("role") != "user":
+            continue
+        content = message.get("content")
+        if isinstance(content, str):
+            parts.append(content)
+            continue
+        for block in content or []:
+            if isinstance(block, dict) and block.get("type") == "text":
+                parts.append(str(block.get("text") or ""))
+    return "\n".join(parts)
