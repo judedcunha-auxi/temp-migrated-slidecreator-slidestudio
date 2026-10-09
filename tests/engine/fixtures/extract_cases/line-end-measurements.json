@@ -1,0 +1,2512 @@
+{
+ "what": "fidelity r1b, 2026-09-25: what PowerPoint (COM, one render) and PptxRender (app.engine.renderer) draw for every DrawingML line end, and for the space characters the extractor now keeps",
+ "method": "A probe script emitted one deck through app.engine.emit on test-16x9: slides 1-5 one per line-end type, columns = stroke 0.75/1/1.5/2/3/4/6 px, rows = (w, len) sm/sm, med/med, lg/lg, sm/lg, lg/sm on a horizontal black line (tailEnd); rendered at 5120 px wide (4x). wPx = the head's largest vertical ink extent; lenPx = from the first column whose extent exceeds the shaft by 0.25 px to the last ink column (PowerPoint shortens the shaft under the head) or to the last such column (PptxRender, whose shaft runs on to the endpoint). The column threshold under-reads narrow ovals and diamonds (their ends are thinner than the shaft) and PowerPoint's open 'arrow' adds its stroke.",
+ "model": "head = {sm: 2, med: 3, lg: 5} x max(stroke px, 2.65) on each axis; w sets the width only, len the length only (app/engine/extract/svg.py LINE_END_SIZES, LINE_END_FLOOR_PX)",
+ "lineEnds": [
+  {
+   "type": "triangle",
+   "strokePx": 0.75,
+   "w": "sm",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 5.25,
+    "lenPx": 5.25
+   },
+   "pptxrender": {
+    "wPx": 5.0,
+    "lenPx": 4.0
+   }
+  },
+  {
+   "type": "triangle",
+   "strokePx": 0.75,
+   "w": "med",
+   "len": "med",
+   "powerpoint": {
+    "wPx": 7.75,
+    "lenPx": 8.0
+   },
+   "pptxrender": {
+    "wPx": 8.0,
+    "lenPx": 6.75
+   }
+  },
+  {
+   "type": "triangle",
+   "strokePx": 0.75,
+   "w": "lg",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 13.25,
+    "lenPx": 13.25
+   },
+   "pptxrender": {
+    "wPx": 13.0,
+    "lenPx": 12.0
+   }
+  },
+  {
+   "type": "triangle",
+   "strokePx": 0.75,
+   "w": "sm",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 5.25,
+    "lenPx": 13.0
+   },
+   "pptxrender": {
+    "wPx": 5.5,
+    "lenPx": 10.25
+   }
+  },
+  {
+   "type": "triangle",
+   "strokePx": 0.75,
+   "w": "lg",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 13.0,
+    "lenPx": 5.25
+   },
+   "pptxrender": {
+    "wPx": 13.0,
+    "lenPx": 4.75
+   }
+  },
+  {
+   "type": "triangle",
+   "strokePx": 1.0,
+   "w": "sm",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 5.0,
+    "lenPx": 5.0
+   },
+   "pptxrender": {
+    "wPx": 5.0,
+    "lenPx": 4.0
+   }
+  },
+  {
+   "type": "triangle",
+   "strokePx": 1.0,
+   "w": "med",
+   "len": "med",
+   "powerpoint": {
+    "wPx": 8.0,
+    "lenPx": 7.75
+   },
+   "pptxrender": {
+    "wPx": 8.0,
+    "lenPx": 6.75
+   }
+  },
+  {
+   "type": "triangle",
+   "strokePx": 1.0,
+   "w": "lg",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 13.0,
+    "lenPx": 13.0
+   },
+   "pptxrender": {
+    "wPx": 13.0,
+    "lenPx": 12.0
+   }
+  },
+  {
+   "type": "triangle",
+   "strokePx": 1.0,
+   "w": "sm",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 5.25,
+    "lenPx": 12.75
+   },
+   "pptxrender": {
+    "wPx": 5.5,
+    "lenPx": 10.25
+   }
+  },
+  {
+   "type": "triangle",
+   "strokePx": 1.0,
+   "w": "lg",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 13.0,
+    "lenPx": 5.25
+   },
+   "pptxrender": {
+    "wPx": 13.0,
+    "lenPx": 4.75
+   }
+  },
+  {
+   "type": "triangle",
+   "strokePx": 1.5,
+   "w": "sm",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 5.0,
+    "lenPx": 5.0
+   },
+   "pptxrender": {
+    "wPx": 5.0,
+    "lenPx": 3.5
+   }
+  },
+  {
+   "type": "triangle",
+   "strokePx": 1.5,
+   "w": "med",
+   "len": "med",
+   "powerpoint": {
+    "wPx": 8.0,
+    "lenPx": 7.75
+   },
+   "pptxrender": {
+    "wPx": 8.0,
+    "lenPx": 6.25
+   }
+  },
+  {
+   "type": "triangle",
+   "strokePx": 1.5,
+   "w": "lg",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 13.0,
+    "lenPx": 13.0
+   },
+   "pptxrender": {
+    "wPx": 13.0,
+    "lenPx": 11.5
+   }
+  },
+  {
+   "type": "triangle",
+   "strokePx": 1.5,
+   "w": "sm",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 5.25,
+    "lenPx": 12.75
+   },
+   "pptxrender": {
+    "wPx": 5.5,
+    "lenPx": 9.0
+   }
+  },
+  {
+   "type": "triangle",
+   "strokePx": 1.5,
+   "w": "lg",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 13.0,
+    "lenPx": 5.25
+   },
+   "pptxrender": {
+    "wPx": 13.0,
+    "lenPx": 4.5
+   }
+  },
+  {
+   "type": "triangle",
+   "strokePx": 2.0,
+   "w": "sm",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 5.0,
+    "lenPx": 5.0
+   },
+   "pptxrender": {
+    "wPx": 5.0,
+    "lenPx": 3.0
+   }
+  },
+  {
+   "type": "triangle",
+   "strokePx": 2.0,
+   "w": "med",
+   "len": "med",
+   "powerpoint": {
+    "wPx": 8.0,
+    "lenPx": 7.75
+   },
+   "pptxrender": {
+    "wPx": 8.0,
+    "lenPx": 5.75
+   }
+  },
+  {
+   "type": "triangle",
+   "strokePx": 2.0,
+   "w": "lg",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 13.0,
+    "lenPx": 13.0
+   },
+   "pptxrender": {
+    "wPx": 13.0,
+    "lenPx": 11.0
+   }
+  },
+  {
+   "type": "triangle",
+   "strokePx": 2.0,
+   "w": "sm",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 5.25,
+    "lenPx": 12.75
+   },
+   "pptxrender": {
+    "wPx": 5.5,
+    "lenPx": 7.75
+   }
+  },
+  {
+   "type": "triangle",
+   "strokePx": 2.0,
+   "w": "lg",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 13.0,
+    "lenPx": 5.25
+   },
+   "pptxrender": {
+    "wPx": 13.0,
+    "lenPx": 4.25
+   }
+  },
+  {
+   "type": "triangle",
+   "strokePx": 3.0,
+   "w": "sm",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 6.0,
+    "lenPx": 5.75
+   },
+   "pptxrender": {
+    "wPx": 6.0,
+    "lenPx": 2.75
+   }
+  },
+  {
+   "type": "triangle",
+   "strokePx": 3.0,
+   "w": "med",
+   "len": "med",
+   "powerpoint": {
+    "wPx": 9.0,
+    "lenPx": 8.75
+   },
+   "pptxrender": {
+    "wPx": 9.0,
+    "lenPx": 5.75
+   }
+  },
+  {
+   "type": "triangle",
+   "strokePx": 3.0,
+   "w": "lg",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 15.0,
+    "lenPx": 14.75
+   },
+   "pptxrender": {
+    "wPx": 15.0,
+    "lenPx": 11.75
+   }
+  },
+  {
+   "type": "triangle",
+   "strokePx": 3.0,
+   "w": "sm",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 6.0,
+    "lenPx": 14.5
+   },
+   "pptxrender": {
+    "wPx": 6.0,
+    "lenPx": 7.0
+   }
+  },
+  {
+   "type": "triangle",
+   "strokePx": 3.0,
+   "w": "lg",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 14.75,
+    "lenPx": 6.0
+   },
+   "pptxrender": {
+    "wPx": 14.5,
+    "lenPx": 4.75
+   }
+  },
+  {
+   "type": "triangle",
+   "strokePx": 4.0,
+   "w": "sm",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 8.0,
+    "lenPx": 7.75
+   },
+   "pptxrender": {
+    "wPx": 8.0,
+    "lenPx": 3.75
+   }
+  },
+  {
+   "type": "triangle",
+   "strokePx": 4.0,
+   "w": "med",
+   "len": "med",
+   "powerpoint": {
+    "wPx": 12.0,
+    "lenPx": 11.75
+   },
+   "pptxrender": {
+    "wPx": 12.0,
+    "lenPx": 7.75
+   }
+  },
+  {
+   "type": "triangle",
+   "strokePx": 4.0,
+   "w": "lg",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 20.0,
+    "lenPx": 19.75
+   },
+   "pptxrender": {
+    "wPx": 20.0,
+    "lenPx": 15.75
+   }
+  },
+  {
+   "type": "triangle",
+   "strokePx": 4.0,
+   "w": "sm",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 8.0,
+    "lenPx": 19.5
+   },
+   "pptxrender": {
+    "wPx": 8.0,
+    "lenPx": 9.5
+   }
+  },
+  {
+   "type": "triangle",
+   "strokePx": 4.0,
+   "w": "lg",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 19.75,
+    "lenPx": 8.0
+   },
+   "pptxrender": {
+    "wPx": 19.5,
+    "lenPx": 6.25
+   }
+  },
+  {
+   "type": "triangle",
+   "strokePx": 6.0,
+   "w": "sm",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 12.0,
+    "lenPx": 11.75
+   },
+   "pptxrender": {
+    "wPx": 12.0,
+    "lenPx": 5.75
+   }
+  },
+  {
+   "type": "triangle",
+   "strokePx": 6.0,
+   "w": "med",
+   "len": "med",
+   "powerpoint": {
+    "wPx": 18.0,
+    "lenPx": 17.75
+   },
+   "pptxrender": {
+    "wPx": 18.0,
+    "lenPx": 11.75
+   }
+  },
+  {
+   "type": "triangle",
+   "strokePx": 6.0,
+   "w": "lg",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 30.0,
+    "lenPx": 29.75
+   },
+   "pptxrender": {
+    "wPx": 30.0,
+    "lenPx": 23.75
+   }
+  },
+  {
+   "type": "triangle",
+   "strokePx": 6.0,
+   "w": "sm",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 12.0,
+    "lenPx": 29.5
+   },
+   "pptxrender": {
+    "wPx": 12.0,
+    "lenPx": 14.5
+   }
+  },
+  {
+   "type": "triangle",
+   "strokePx": 6.0,
+   "w": "lg",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 29.75,
+    "lenPx": 12.0
+   },
+   "pptxrender": {
+    "wPx": 29.5,
+    "lenPx": 9.5
+   }
+  },
+  {
+   "type": "oval",
+   "strokePx": 0.75,
+   "w": "sm",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 5.25,
+    "lenPx": 5.25
+   },
+   "pptxrender": {
+    "wPx": 5.5,
+    "lenPx": 5.0
+   }
+  },
+  {
+   "type": "oval",
+   "strokePx": 0.75,
+   "w": "med",
+   "len": "med",
+   "powerpoint": {
+    "wPx": 8.0,
+    "lenPx": 8.0
+   },
+   "pptxrender": {
+    "wPx": 8.0,
+    "lenPx": 8.0
+   }
+  },
+  {
+   "type": "oval",
+   "strokePx": 0.75,
+   "w": "lg",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 13.25,
+    "lenPx": 13.25
+   },
+   "pptxrender": {
+    "wPx": 13.5,
+    "lenPx": 13.0
+   }
+  },
+  {
+   "type": "oval",
+   "strokePx": 0.75,
+   "w": "sm",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 5.25,
+    "lenPx": 13.0
+   },
+   "pptxrender": {
+    "wPx": 5.5,
+    "lenPx": 13.0
+   }
+  },
+  {
+   "type": "oval",
+   "strokePx": 0.75,
+   "w": "lg",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 13.25,
+    "lenPx": 5.25
+   },
+   "pptxrender": {
+    "wPx": 13.5,
+    "lenPx": 5.5
+   }
+  },
+  {
+   "type": "oval",
+   "strokePx": 1.0,
+   "w": "sm",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 5.5,
+    "lenPx": 5.25
+   },
+   "pptxrender": {
+    "wPx": 5.5,
+    "lenPx": 5.0
+   }
+  },
+  {
+   "type": "oval",
+   "strokePx": 1.0,
+   "w": "med",
+   "len": "med",
+   "powerpoint": {
+    "wPx": 8.0,
+    "lenPx": 8.0
+   },
+   "pptxrender": {
+    "wPx": 8.0,
+    "lenPx": 8.0
+   }
+  },
+  {
+   "type": "oval",
+   "strokePx": 1.0,
+   "w": "lg",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 13.5,
+    "lenPx": 13.25
+   },
+   "pptxrender": {
+    "wPx": 13.5,
+    "lenPx": 13.0
+   }
+  },
+  {
+   "type": "oval",
+   "strokePx": 1.0,
+   "w": "sm",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 5.5,
+    "lenPx": 13.25
+   },
+   "pptxrender": {
+    "wPx": 5.5,
+    "lenPx": 13.0
+   }
+  },
+  {
+   "type": "oval",
+   "strokePx": 1.0,
+   "w": "lg",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 13.25,
+    "lenPx": 5.5
+   },
+   "pptxrender": {
+    "wPx": 13.5,
+    "lenPx": 5.5
+   }
+  },
+  {
+   "type": "oval",
+   "strokePx": 1.5,
+   "w": "sm",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 5.5,
+    "lenPx": 5.25
+   },
+   "pptxrender": {
+    "wPx": 5.5,
+    "lenPx": 5.0
+   }
+  },
+  {
+   "type": "oval",
+   "strokePx": 1.5,
+   "w": "med",
+   "len": "med",
+   "powerpoint": {
+    "wPx": 8.0,
+    "lenPx": 8.0
+   },
+   "pptxrender": {
+    "wPx": 8.0,
+    "lenPx": 8.0
+   }
+  },
+  {
+   "type": "oval",
+   "strokePx": 1.5,
+   "w": "lg",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 13.5,
+    "lenPx": 13.25
+   },
+   "pptxrender": {
+    "wPx": 13.5,
+    "lenPx": 13.0
+   }
+  },
+  {
+   "type": "oval",
+   "strokePx": 1.5,
+   "w": "sm",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 5.5,
+    "lenPx": 13.0
+   },
+   "pptxrender": {
+    "wPx": 5.5,
+    "lenPx": 12.5
+   }
+  },
+  {
+   "type": "oval",
+   "strokePx": 1.5,
+   "w": "lg",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 13.25,
+    "lenPx": 5.25
+   },
+   "pptxrender": {
+    "wPx": 13.5,
+    "lenPx": 5.5
+   }
+  },
+  {
+   "type": "oval",
+   "strokePx": 2.0,
+   "w": "sm",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 5.5,
+    "lenPx": 5.0
+   },
+   "pptxrender": {
+    "wPx": 5.5,
+    "lenPx": 5.0
+   }
+  },
+  {
+   "type": "oval",
+   "strokePx": 2.0,
+   "w": "med",
+   "len": "med",
+   "powerpoint": {
+    "wPx": 8.0,
+    "lenPx": 7.75
+   },
+   "pptxrender": {
+    "wPx": 8.0,
+    "lenPx": 7.5
+   }
+  },
+  {
+   "type": "oval",
+   "strokePx": 2.0,
+   "w": "lg",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 13.5,
+    "lenPx": 13.25
+   },
+   "pptxrender": {
+    "wPx": 13.5,
+    "lenPx": 13.0
+   }
+  },
+  {
+   "type": "oval",
+   "strokePx": 2.0,
+   "w": "sm",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 5.5,
+    "lenPx": 12.75
+   },
+   "pptxrender": {
+    "wPx": 5.5,
+    "lenPx": 12.0
+   }
+  },
+  {
+   "type": "oval",
+   "strokePx": 2.0,
+   "w": "lg",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 13.25,
+    "lenPx": 5.25
+   },
+   "pptxrender": {
+    "wPx": 13.5,
+    "lenPx": 5.25
+   }
+  },
+  {
+   "type": "oval",
+   "strokePx": 3.0,
+   "w": "sm",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 6.0,
+    "lenPx": 5.5
+   },
+   "pptxrender": {
+    "wPx": 6.0,
+    "lenPx": 5.0
+   }
+  },
+  {
+   "type": "oval",
+   "strokePx": 3.0,
+   "w": "med",
+   "len": "med",
+   "powerpoint": {
+    "wPx": 9.0,
+    "lenPx": 8.75
+   },
+   "pptxrender": {
+    "wPx": 9.0,
+    "lenPx": 8.5
+   }
+  },
+  {
+   "type": "oval",
+   "strokePx": 3.0,
+   "w": "lg",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 15.0,
+    "lenPx": 14.75
+   },
+   "pptxrender": {
+    "wPx": 15.0,
+    "lenPx": 14.5
+   }
+  },
+  {
+   "type": "oval",
+   "strokePx": 3.0,
+   "w": "sm",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 6.0,
+    "lenPx": 13.75
+   },
+   "pptxrender": {
+    "wPx": 6.0,
+    "lenPx": 12.5
+   }
+  },
+  {
+   "type": "oval",
+   "strokePx": 3.0,
+   "w": "lg",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 15.0,
+    "lenPx": 6.0
+   },
+   "pptxrender": {
+    "wPx": 15.0,
+    "lenPx": 6.0
+   }
+  },
+  {
+   "type": "oval",
+   "strokePx": 4.0,
+   "w": "sm",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 8.0,
+    "lenPx": 7.25
+   },
+   "pptxrender": {
+    "wPx": 8.0,
+    "lenPx": 6.5
+   }
+  },
+  {
+   "type": "oval",
+   "strokePx": 4.0,
+   "w": "med",
+   "len": "med",
+   "powerpoint": {
+    "wPx": 12.0,
+    "lenPx": 11.5
+   },
+   "pptxrender": {
+    "wPx": 12.0,
+    "lenPx": 11.0
+   }
+  },
+  {
+   "type": "oval",
+   "strokePx": 4.0,
+   "w": "lg",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 20.0,
+    "lenPx": 19.75
+   },
+   "pptxrender": {
+    "wPx": 20.0,
+    "lenPx": 19.5
+   }
+  },
+  {
+   "type": "oval",
+   "strokePx": 4.0,
+   "w": "sm",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 8.0,
+    "lenPx": 18.5
+   },
+   "pptxrender": {
+    "wPx": 8.0,
+    "lenPx": 17.0
+   }
+  },
+  {
+   "type": "oval",
+   "strokePx": 4.0,
+   "w": "lg",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 20.0,
+    "lenPx": 8.0
+   },
+   "pptxrender": {
+    "wPx": 20.0,
+    "lenPx": 8.0
+   }
+  },
+  {
+   "type": "oval",
+   "strokePx": 6.0,
+   "w": "sm",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 12.0,
+    "lenPx": 11.0
+   },
+   "pptxrender": {
+    "wPx": 12.0,
+    "lenPx": 10.0
+   }
+  },
+  {
+   "type": "oval",
+   "strokePx": 6.0,
+   "w": "med",
+   "len": "med",
+   "powerpoint": {
+    "wPx": 18.0,
+    "lenPx": 17.5
+   },
+   "pptxrender": {
+    "wPx": 18.0,
+    "lenPx": 17.0
+   }
+  },
+  {
+   "type": "oval",
+   "strokePx": 6.0,
+   "w": "lg",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 30.0,
+    "lenPx": 29.75
+   },
+   "pptxrender": {
+    "wPx": 30.0,
+    "lenPx": 29.5
+   }
+  },
+  {
+   "type": "oval",
+   "strokePx": 6.0,
+   "w": "sm",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 12.0,
+    "lenPx": 27.75
+   },
+   "pptxrender": {
+    "wPx": 12.0,
+    "lenPx": 25.5
+   }
+  },
+  {
+   "type": "oval",
+   "strokePx": 6.0,
+   "w": "lg",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 30.0,
+    "lenPx": 11.75
+   },
+   "pptxrender": {
+    "wPx": 30.0,
+    "lenPx": 11.5
+   }
+  },
+  {
+   "type": "arrow",
+   "strokePx": 0.75,
+   "w": "sm",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 7.25,
+    "lenPx": 6.25
+   },
+   "pptxrender": {
+    "wPx": 5.0,
+    "lenPx": 4.0
+   }
+  },
+  {
+   "type": "arrow",
+   "strokePx": 0.75,
+   "w": "med",
+   "len": "med",
+   "powerpoint": {
+    "wPx": 10.0,
+    "lenPx": 9.0
+   },
+   "pptxrender": {
+    "wPx": 8.0,
+    "lenPx": 6.75
+   }
+  },
+  {
+   "type": "arrow",
+   "strokePx": 0.75,
+   "w": "lg",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 14.0,
+    "lenPx": 13.0
+   },
+   "pptxrender": {
+    "wPx": 13.0,
+    "lenPx": 12.0
+   }
+  },
+  {
+   "type": "arrow",
+   "strokePx": 0.75,
+   "w": "sm",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 7.25,
+    "lenPx": 13.5
+   },
+   "pptxrender": {
+    "wPx": 5.5,
+    "lenPx": 10.25
+   }
+  },
+  {
+   "type": "arrow",
+   "strokePx": 0.75,
+   "w": "lg",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 14.0,
+    "lenPx": 6.0
+   },
+   "pptxrender": {
+    "wPx": 13.0,
+    "lenPx": 4.75
+   }
+  },
+  {
+   "type": "arrow",
+   "strokePx": 1.0,
+   "w": "sm",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 7.5,
+    "lenPx": 6.75
+   },
+   "pptxrender": {
+    "wPx": 5.0,
+    "lenPx": 4.0
+   }
+  },
+  {
+   "type": "arrow",
+   "strokePx": 1.0,
+   "w": "med",
+   "len": "med",
+   "powerpoint": {
+    "wPx": 10.25,
+    "lenPx": 9.5
+   },
+   "pptxrender": {
+    "wPx": 8.0,
+    "lenPx": 6.75
+   }
+  },
+  {
+   "type": "arrow",
+   "strokePx": 1.0,
+   "w": "lg",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 14.25,
+    "lenPx": 13.25
+   },
+   "pptxrender": {
+    "wPx": 13.0,
+    "lenPx": 12.0
+   }
+  },
+  {
+   "type": "arrow",
+   "strokePx": 1.0,
+   "w": "sm",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 7.5,
+    "lenPx": 14.0
+   },
+   "pptxrender": {
+    "wPx": 5.5,
+    "lenPx": 10.25
+   }
+  },
+  {
+   "type": "arrow",
+   "strokePx": 1.0,
+   "w": "lg",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 14.25,
+    "lenPx": 6.5
+   },
+   "pptxrender": {
+    "wPx": 13.0,
+    "lenPx": 4.75
+   }
+  },
+  {
+   "type": "arrow",
+   "strokePx": 1.5,
+   "w": "sm",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 8.0,
+    "lenPx": 7.5
+   },
+   "pptxrender": {
+    "wPx": 5.0,
+    "lenPx": 3.5
+   }
+  },
+  {
+   "type": "arrow",
+   "strokePx": 1.5,
+   "w": "med",
+   "len": "med",
+   "powerpoint": {
+    "wPx": 10.75,
+    "lenPx": 10.25
+   },
+   "pptxrender": {
+    "wPx": 8.0,
+    "lenPx": 6.25
+   }
+  },
+  {
+   "type": "arrow",
+   "strokePx": 1.5,
+   "w": "lg",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 15.0,
+    "lenPx": 14.0
+   },
+   "pptxrender": {
+    "wPx": 13.0,
+    "lenPx": 11.5
+   }
+  },
+  {
+   "type": "arrow",
+   "strokePx": 1.5,
+   "w": "sm",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 8.0,
+    "lenPx": 15.25
+   },
+   "pptxrender": {
+    "wPx": 5.5,
+    "lenPx": 9.0
+   }
+  },
+  {
+   "type": "arrow",
+   "strokePx": 1.5,
+   "w": "lg",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 14.75,
+    "lenPx": 7.0
+   },
+   "pptxrender": {
+    "wPx": 13.0,
+    "lenPx": 4.5
+   }
+  },
+  {
+   "type": "arrow",
+   "strokePx": 2.0,
+   "w": "sm",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 8.75,
+    "lenPx": 8.25
+   },
+   "pptxrender": {
+    "wPx": 5.0,
+    "lenPx": 3.0
+   }
+  },
+  {
+   "type": "arrow",
+   "strokePx": 2.0,
+   "w": "med",
+   "len": "med",
+   "powerpoint": {
+    "wPx": 11.25,
+    "lenPx": 11.0
+   },
+   "pptxrender": {
+    "wPx": 8.0,
+    "lenPx": 5.75
+   }
+  },
+  {
+   "type": "arrow",
+   "strokePx": 2.0,
+   "w": "lg",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 15.25,
+    "lenPx": 14.75
+   },
+   "pptxrender": {
+    "wPx": 13.0,
+    "lenPx": 11.0
+   }
+  },
+  {
+   "type": "arrow",
+   "strokePx": 2.0,
+   "w": "sm",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 8.5,
+    "lenPx": 16.5
+   },
+   "pptxrender": {
+    "wPx": 5.5,
+    "lenPx": 7.75
+   }
+  },
+  {
+   "type": "arrow",
+   "strokePx": 2.0,
+   "w": "lg",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 15.5,
+    "lenPx": 7.5
+   },
+   "pptxrender": {
+    "wPx": 13.0,
+    "lenPx": 4.25
+   }
+  },
+  {
+   "type": "arrow",
+   "strokePx": 3.0,
+   "w": "sm",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 10.5,
+    "lenPx": 10.25
+   },
+   "pptxrender": {
+    "wPx": 6.0,
+    "lenPx": 2.75
+   }
+  },
+  {
+   "type": "arrow",
+   "strokePx": 3.0,
+   "w": "med",
+   "len": "med",
+   "powerpoint": {
+    "wPx": 13.5,
+    "lenPx": 13.5
+   },
+   "pptxrender": {
+    "wPx": 9.0,
+    "lenPx": 5.75
+   }
+  },
+  {
+   "type": "arrow",
+   "strokePx": 3.0,
+   "w": "lg",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 18.0,
+    "lenPx": 17.75
+   },
+   "pptxrender": {
+    "wPx": 15.0,
+    "lenPx": 11.75
+   }
+  },
+  {
+   "type": "arrow",
+   "strokePx": 3.0,
+   "w": "sm",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 10.5,
+    "lenPx": 20.25
+   },
+   "pptxrender": {
+    "wPx": 6.0,
+    "lenPx": 7.0
+   }
+  },
+  {
+   "type": "arrow",
+   "strokePx": 3.0,
+   "w": "lg",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 18.0,
+    "lenPx": 9.5
+   },
+   "pptxrender": {
+    "wPx": 14.5,
+    "lenPx": 4.75
+   }
+  },
+  {
+   "type": "arrow",
+   "strokePx": 4.0,
+   "w": "sm",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 14.0,
+    "lenPx": 13.75
+   },
+   "pptxrender": {
+    "wPx": 8.0,
+    "lenPx": 3.75
+   }
+  },
+  {
+   "type": "arrow",
+   "strokePx": 4.0,
+   "w": "med",
+   "len": "med",
+   "powerpoint": {
+    "wPx": 18.0,
+    "lenPx": 18.0
+   },
+   "pptxrender": {
+    "wPx": 12.0,
+    "lenPx": 7.75
+   }
+  },
+  {
+   "type": "arrow",
+   "strokePx": 4.0,
+   "w": "lg",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 24.0,
+    "lenPx": 23.75
+   },
+   "pptxrender": {
+    "wPx": 20.0,
+    "lenPx": 15.75
+   }
+  },
+  {
+   "type": "arrow",
+   "strokePx": 4.0,
+   "w": "sm",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 14.0,
+    "lenPx": 27.25
+   },
+   "pptxrender": {
+    "wPx": 8.0,
+    "lenPx": 9.5
+   }
+  },
+  {
+   "type": "arrow",
+   "strokePx": 4.0,
+   "w": "lg",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 24.0,
+    "lenPx": 12.5
+   },
+   "pptxrender": {
+    "wPx": 19.5,
+    "lenPx": 6.25
+   }
+  },
+  {
+   "type": "arrow",
+   "strokePx": 6.0,
+   "w": "sm",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 21.0,
+    "lenPx": 20.5
+   },
+   "pptxrender": {
+    "wPx": 12.0,
+    "lenPx": 5.75
+   }
+  },
+  {
+   "type": "arrow",
+   "strokePx": 6.0,
+   "w": "med",
+   "len": "med",
+   "powerpoint": {
+    "wPx": 27.0,
+    "lenPx": 27.0
+   },
+   "pptxrender": {
+    "wPx": 18.0,
+    "lenPx": 11.75
+   }
+  },
+  {
+   "type": "arrow",
+   "strokePx": 6.0,
+   "w": "lg",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 36.0,
+    "lenPx": 36.0
+   },
+   "pptxrender": {
+    "wPx": 30.0,
+    "lenPx": 23.75
+   }
+  },
+  {
+   "type": "arrow",
+   "strokePx": 6.0,
+   "w": "sm",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 21.0,
+    "lenPx": 41.0
+   },
+   "pptxrender": {
+    "wPx": 12.0,
+    "lenPx": 14.5
+   }
+  },
+  {
+   "type": "arrow",
+   "strokePx": 6.0,
+   "w": "lg",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 36.0,
+    "lenPx": 18.75
+   },
+   "pptxrender": {
+    "wPx": 29.5,
+    "lenPx": 9.5
+   }
+  },
+  {
+   "type": "diamond",
+   "strokePx": 0.75,
+   "w": "sm",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 5.25,
+    "lenPx": 4.75
+   },
+   "pptxrender": {
+    "wPx": 5.0,
+    "lenPx": 4.25
+   }
+  },
+  {
+   "type": "diamond",
+   "strokePx": 0.75,
+   "w": "med",
+   "len": "med",
+   "powerpoint": {
+    "wPx": 7.75,
+    "lenPx": 7.25
+   },
+   "pptxrender": {
+    "wPx": 8.0,
+    "lenPx": 7.0
+   }
+  },
+  {
+   "type": "diamond",
+   "strokePx": 0.75,
+   "w": "lg",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 13.25,
+    "lenPx": 12.75
+   },
+   "pptxrender": {
+    "wPx": 13.0,
+    "lenPx": 12.25
+   }
+  },
+  {
+   "type": "diamond",
+   "strokePx": 0.75,
+   "w": "sm",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 5.25,
+    "lenPx": 12.0
+   },
+   "pptxrender": {
+    "wPx": 5.5,
+    "lenPx": 10.25
+   }
+  },
+  {
+   "type": "diamond",
+   "strokePx": 0.75,
+   "w": "lg",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 13.0,
+    "lenPx": 5.0
+   },
+   "pptxrender": {
+    "wPx": 13.0,
+    "lenPx": 4.75
+   }
+  },
+  {
+   "type": "diamond",
+   "strokePx": 1.0,
+   "w": "sm",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 5.0,
+    "lenPx": 4.5
+   },
+   "pptxrender": {
+    "wPx": 5.0,
+    "lenPx": 4.25
+   }
+  },
+  {
+   "type": "diamond",
+   "strokePx": 1.0,
+   "w": "med",
+   "len": "med",
+   "powerpoint": {
+    "wPx": 7.75,
+    "lenPx": 7.25
+   },
+   "pptxrender": {
+    "wPx": 8.0,
+    "lenPx": 7.0
+   }
+  },
+  {
+   "type": "diamond",
+   "strokePx": 1.0,
+   "w": "lg",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 13.0,
+    "lenPx": 12.5
+   },
+   "pptxrender": {
+    "wPx": 13.0,
+    "lenPx": 12.25
+   }
+  },
+  {
+   "type": "diamond",
+   "strokePx": 1.0,
+   "w": "sm",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 5.25,
+    "lenPx": 11.5
+   },
+   "pptxrender": {
+    "wPx": 5.5,
+    "lenPx": 10.25
+   }
+  },
+  {
+   "type": "diamond",
+   "strokePx": 1.0,
+   "w": "lg",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 12.75,
+    "lenPx": 5.25
+   },
+   "pptxrender": {
+    "wPx": 13.0,
+    "lenPx": 4.75
+   }
+  },
+  {
+   "type": "diamond",
+   "strokePx": 1.5,
+   "w": "sm",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 5.0,
+    "lenPx": 4.25
+   },
+   "pptxrender": {
+    "wPx": 5.0,
+    "lenPx": 3.75
+   }
+  },
+  {
+   "type": "diamond",
+   "strokePx": 1.5,
+   "w": "med",
+   "len": "med",
+   "powerpoint": {
+    "wPx": 7.75,
+    "lenPx": 7.0
+   },
+   "pptxrender": {
+    "wPx": 8.0,
+    "lenPx": 6.5
+   }
+  },
+  {
+   "type": "diamond",
+   "strokePx": 1.5,
+   "w": "lg",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 13.0,
+    "lenPx": 12.25
+   },
+   "pptxrender": {
+    "wPx": 13.0,
+    "lenPx": 11.75
+   }
+  },
+  {
+   "type": "diamond",
+   "strokePx": 1.5,
+   "w": "sm",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 5.25,
+    "lenPx": 10.75
+   },
+   "pptxrender": {
+    "wPx": 5.5,
+    "lenPx": 9.0
+   }
+  },
+  {
+   "type": "diamond",
+   "strokePx": 1.5,
+   "w": "lg",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 12.75,
+    "lenPx": 5.0
+   },
+   "pptxrender": {
+    "wPx": 13.0,
+    "lenPx": 4.75
+   }
+  },
+  {
+   "type": "diamond",
+   "strokePx": 2.0,
+   "w": "sm",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 5.0,
+    "lenPx": 4.0
+   },
+   "pptxrender": {
+    "wPx": 5.0,
+    "lenPx": 3.25
+   }
+  },
+  {
+   "type": "diamond",
+   "strokePx": 2.0,
+   "w": "med",
+   "len": "med",
+   "powerpoint": {
+    "wPx": 7.75,
+    "lenPx": 6.75
+   },
+   "pptxrender": {
+    "wPx": 8.0,
+    "lenPx": 6.0
+   }
+  },
+  {
+   "type": "diamond",
+   "strokePx": 2.0,
+   "w": "lg",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 13.0,
+    "lenPx": 12.0
+   },
+   "pptxrender": {
+    "wPx": 13.0,
+    "lenPx": 11.25
+   }
+  },
+  {
+   "type": "diamond",
+   "strokePx": 2.0,
+   "w": "sm",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 5.25,
+    "lenPx": 10.25
+   },
+   "pptxrender": {
+    "wPx": 5.5,
+    "lenPx": 7.75
+   }
+  },
+  {
+   "type": "diamond",
+   "strokePx": 2.0,
+   "w": "lg",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 12.75,
+    "lenPx": 5.0
+   },
+   "pptxrender": {
+    "wPx": 13.0,
+    "lenPx": 4.5
+   }
+  },
+  {
+   "type": "diamond",
+   "strokePx": 3.0,
+   "w": "sm",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 5.75,
+    "lenPx": 4.25
+   },
+   "pptxrender": {
+    "wPx": 6.0,
+    "lenPx": 3.0
+   }
+  },
+  {
+   "type": "diamond",
+   "strokePx": 3.0,
+   "w": "med",
+   "len": "med",
+   "powerpoint": {
+    "wPx": 8.75,
+    "lenPx": 7.25
+   },
+   "pptxrender": {
+    "wPx": 9.0,
+    "lenPx": 6.0
+   }
+  },
+  {
+   "type": "diamond",
+   "strokePx": 3.0,
+   "w": "lg",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 14.75,
+    "lenPx": 13.25
+   },
+   "pptxrender": {
+    "wPx": 15.0,
+    "lenPx": 12.0
+   }
+  },
+  {
+   "type": "diamond",
+   "strokePx": 3.0,
+   "w": "sm",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 6.0,
+    "lenPx": 10.5
+   },
+   "pptxrender": {
+    "wPx": 6.0,
+    "lenPx": 7.0
+   }
+  },
+  {
+   "type": "diamond",
+   "strokePx": 3.0,
+   "w": "lg",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 14.5,
+    "lenPx": 5.25
+   },
+   "pptxrender": {
+    "wPx": 14.5,
+    "lenPx": 4.5
+   }
+  },
+  {
+   "type": "diamond",
+   "strokePx": 4.0,
+   "w": "sm",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 7.75,
+    "lenPx": 5.75
+   },
+   "pptxrender": {
+    "wPx": 8.0,
+    "lenPx": 4.0
+   }
+  },
+  {
+   "type": "diamond",
+   "strokePx": 4.0,
+   "w": "med",
+   "len": "med",
+   "powerpoint": {
+    "wPx": 11.75,
+    "lenPx": 9.75
+   },
+   "pptxrender": {
+    "wPx": 12.0,
+    "lenPx": 8.0
+   }
+  },
+  {
+   "type": "diamond",
+   "strokePx": 4.0,
+   "w": "lg",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 19.75,
+    "lenPx": 17.75
+   },
+   "pptxrender": {
+    "wPx": 20.0,
+    "lenPx": 16.0
+   }
+  },
+  {
+   "type": "diamond",
+   "strokePx": 4.0,
+   "w": "sm",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 8.0,
+    "lenPx": 14.25
+   },
+   "pptxrender": {
+    "wPx": 8.0,
+    "lenPx": 9.5
+   }
+  },
+  {
+   "type": "diamond",
+   "strokePx": 4.0,
+   "w": "lg",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 19.5,
+    "lenPx": 7.25
+   },
+   "pptxrender": {
+    "wPx": 19.5,
+    "lenPx": 6.5
+   }
+  },
+  {
+   "type": "diamond",
+   "strokePx": 6.0,
+   "w": "sm",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 11.75,
+    "lenPx": 8.75
+   },
+   "pptxrender": {
+    "wPx": 12.0,
+    "lenPx": 6.0
+   }
+  },
+  {
+   "type": "diamond",
+   "strokePx": 6.0,
+   "w": "med",
+   "len": "med",
+   "powerpoint": {
+    "wPx": 17.75,
+    "lenPx": 14.75
+   },
+   "pptxrender": {
+    "wPx": 18.0,
+    "lenPx": 12.0
+   }
+  },
+  {
+   "type": "diamond",
+   "strokePx": 6.0,
+   "w": "lg",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 29.75,
+    "lenPx": 26.75
+   },
+   "pptxrender": {
+    "wPx": 30.0,
+    "lenPx": 24.0
+   }
+  },
+  {
+   "type": "diamond",
+   "strokePx": 6.0,
+   "w": "sm",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 12.0,
+    "lenPx": 21.75
+   },
+   "pptxrender": {
+    "wPx": 12.0,
+    "lenPx": 14.5
+   }
+  },
+  {
+   "type": "diamond",
+   "strokePx": 6.0,
+   "w": "lg",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 29.5,
+    "lenPx": 10.75
+   },
+   "pptxrender": {
+    "wPx": 29.5,
+    "lenPx": 9.5
+   }
+  },
+  {
+   "type": "stealth",
+   "strokePx": 0.75,
+   "w": "sm",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 4.75,
+    "lenPx": 5.0
+   },
+   "pptxrender": {
+    "wPx": 5.0,
+    "lenPx": 3.75
+   }
+  },
+  {
+   "type": "stealth",
+   "strokePx": 0.75,
+   "w": "med",
+   "len": "med",
+   "powerpoint": {
+    "wPx": 7.75,
+    "lenPx": 7.75
+   },
+   "pptxrender": {
+    "wPx": 7.5,
+    "lenPx": 6.5
+   }
+  },
+  {
+   "type": "stealth",
+   "strokePx": 0.75,
+   "w": "lg",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 13.0,
+    "lenPx": 13.0
+   },
+   "pptxrender": {
+    "wPx": 13.0,
+    "lenPx": 11.75
+   }
+  },
+  {
+   "type": "stealth",
+   "strokePx": 0.75,
+   "w": "sm",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 5.25,
+    "lenPx": 12.5
+   },
+   "pptxrender": {
+    "wPx": 5.0,
+    "lenPx": 9.75
+   }
+  },
+  {
+   "type": "stealth",
+   "strokePx": 0.75,
+   "w": "lg",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 12.5,
+    "lenPx": 5.0
+   },
+   "pptxrender": {
+    "wPx": 13.0,
+    "lenPx": 4.75
+   }
+  },
+  {
+   "type": "stealth",
+   "strokePx": 1.0,
+   "w": "sm",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 5.0,
+    "lenPx": 4.75
+   },
+   "pptxrender": {
+    "wPx": 5.0,
+    "lenPx": 3.75
+   }
+  },
+  {
+   "type": "stealth",
+   "strokePx": 1.0,
+   "w": "med",
+   "len": "med",
+   "powerpoint": {
+    "wPx": 7.5,
+    "lenPx": 7.5
+   },
+   "pptxrender": {
+    "wPx": 7.5,
+    "lenPx": 6.5
+   }
+  },
+  {
+   "type": "stealth",
+   "strokePx": 1.0,
+   "w": "lg",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 13.0,
+    "lenPx": 12.75
+   },
+   "pptxrender": {
+    "wPx": 13.0,
+    "lenPx": 11.75
+   }
+  },
+  {
+   "type": "stealth",
+   "strokePx": 1.0,
+   "w": "sm",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 5.0,
+    "lenPx": 12.25
+   },
+   "pptxrender": {
+    "wPx": 5.0,
+    "lenPx": 9.75
+   }
+  },
+  {
+   "type": "stealth",
+   "strokePx": 1.0,
+   "w": "lg",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 12.25,
+    "lenPx": 5.25
+   },
+   "pptxrender": {
+    "wPx": 13.0,
+    "lenPx": 4.75
+   }
+  },
+  {
+   "type": "stealth",
+   "strokePx": 1.5,
+   "w": "sm",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 5.0,
+    "lenPx": 4.75
+   },
+   "pptxrender": {
+    "wPx": 5.0,
+    "lenPx": 3.25
+   }
+  },
+  {
+   "type": "stealth",
+   "strokePx": 1.5,
+   "w": "med",
+   "len": "med",
+   "powerpoint": {
+    "wPx": 7.5,
+    "lenPx": 7.5
+   },
+   "pptxrender": {
+    "wPx": 7.5,
+    "lenPx": 6.0
+   }
+  },
+  {
+   "type": "stealth",
+   "strokePx": 1.5,
+   "w": "lg",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 13.0,
+    "lenPx": 12.75
+   },
+   "pptxrender": {
+    "wPx": 13.0,
+    "lenPx": 11.25
+   }
+  },
+  {
+   "type": "stealth",
+   "strokePx": 1.5,
+   "w": "sm",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 5.0,
+    "lenPx": 12.25
+   },
+   "pptxrender": {
+    "wPx": 5.0,
+    "lenPx": 8.5
+   }
+  },
+  {
+   "type": "stealth",
+   "strokePx": 1.5,
+   "w": "lg",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 12.25,
+    "lenPx": 5.25
+   },
+   "pptxrender": {
+    "wPx": 13.0,
+    "lenPx": 4.5
+   }
+  },
+  {
+   "type": "stealth",
+   "strokePx": 2.0,
+   "w": "sm",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 5.0,
+    "lenPx": 4.75
+   },
+   "pptxrender": {
+    "wPx": 5.0,
+    "lenPx": 2.75
+   }
+  },
+  {
+   "type": "stealth",
+   "strokePx": 2.0,
+   "w": "med",
+   "len": "med",
+   "powerpoint": {
+    "wPx": 7.5,
+    "lenPx": 7.5
+   },
+   "pptxrender": {
+    "wPx": 7.5,
+    "lenPx": 5.5
+   }
+  },
+  {
+   "type": "stealth",
+   "strokePx": 2.0,
+   "w": "lg",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 13.0,
+    "lenPx": 12.75
+   },
+   "pptxrender": {
+    "wPx": 13.0,
+    "lenPx": 10.75
+   }
+  },
+  {
+   "type": "stealth",
+   "strokePx": 2.0,
+   "w": "sm",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 5.0,
+    "lenPx": 12.25
+   },
+   "pptxrender": {
+    "wPx": 5.0,
+    "lenPx": 7.25
+   }
+  },
+  {
+   "type": "stealth",
+   "strokePx": 2.0,
+   "w": "lg",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 12.25,
+    "lenPx": 5.25
+   },
+   "pptxrender": {
+    "wPx": 13.0,
+    "lenPx": 4.25
+   }
+  },
+  {
+   "type": "stealth",
+   "strokePx": 3.0,
+   "w": "sm",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 5.5,
+    "lenPx": 5.5
+   },
+   "pptxrender": {
+    "wPx": 5.5,
+    "lenPx": 2.5
+   }
+  },
+  {
+   "type": "stealth",
+   "strokePx": 3.0,
+   "w": "med",
+   "len": "med",
+   "powerpoint": {
+    "wPx": 8.5,
+    "lenPx": 8.5
+   },
+   "pptxrender": {
+    "wPx": 8.5,
+    "lenPx": 5.5
+   }
+  },
+  {
+   "type": "stealth",
+   "strokePx": 3.0,
+   "w": "lg",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 14.5,
+    "lenPx": 14.5
+   },
+   "pptxrender": {
+    "wPx": 14.5,
+    "lenPx": 11.5
+   }
+  },
+  {
+   "type": "stealth",
+   "strokePx": 3.0,
+   "w": "sm",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 5.5,
+    "lenPx": 14.0
+   },
+   "pptxrender": {
+    "wPx": 5.5,
+    "lenPx": 6.0
+   }
+  },
+  {
+   "type": "stealth",
+   "strokePx": 3.0,
+   "w": "lg",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 14.0,
+    "lenPx": 5.75
+   },
+   "pptxrender": {
+    "wPx": 14.0,
+    "lenPx": 4.5
+   }
+  },
+  {
+   "type": "stealth",
+   "strokePx": 4.0,
+   "w": "sm",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 7.5,
+    "lenPx": 7.5
+   },
+   "pptxrender": {
+    "wPx": 7.5,
+    "lenPx": 3.5
+   }
+  },
+  {
+   "type": "stealth",
+   "strokePx": 4.0,
+   "w": "med",
+   "len": "med",
+   "powerpoint": {
+    "wPx": 11.5,
+    "lenPx": 11.5
+   },
+   "pptxrender": {
+    "wPx": 11.5,
+    "lenPx": 7.5
+   }
+  },
+  {
+   "type": "stealth",
+   "strokePx": 4.0,
+   "w": "lg",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 19.5,
+    "lenPx": 19.5
+   },
+   "pptxrender": {
+    "wPx": 19.5,
+    "lenPx": 15.5
+   }
+  },
+  {
+   "type": "stealth",
+   "strokePx": 4.0,
+   "w": "sm",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 7.5,
+    "lenPx": 19.0
+   },
+   "pptxrender": {
+    "wPx": 7.5,
+    "lenPx": 8.75
+   }
+  },
+  {
+   "type": "stealth",
+   "strokePx": 4.0,
+   "w": "lg",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 19.0,
+    "lenPx": 7.75
+   },
+   "pptxrender": {
+    "wPx": 19.0,
+    "lenPx": 6.0
+   }
+  },
+  {
+   "type": "stealth",
+   "strokePx": 6.0,
+   "w": "sm",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 11.5,
+    "lenPx": 11.5
+   },
+   "pptxrender": {
+    "wPx": 11.5,
+    "lenPx": 5.5
+   }
+  },
+  {
+   "type": "stealth",
+   "strokePx": 6.0,
+   "w": "med",
+   "len": "med",
+   "powerpoint": {
+    "wPx": 17.5,
+    "lenPx": 17.5
+   },
+   "pptxrender": {
+    "wPx": 17.5,
+    "lenPx": 11.5
+   }
+  },
+  {
+   "type": "stealth",
+   "strokePx": 6.0,
+   "w": "lg",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 29.5,
+    "lenPx": 29.5
+   },
+   "pptxrender": {
+    "wPx": 29.5,
+    "lenPx": 23.5
+   }
+  },
+  {
+   "type": "stealth",
+   "strokePx": 6.0,
+   "w": "sm",
+   "len": "lg",
+   "powerpoint": {
+    "wPx": 11.5,
+    "lenPx": 29.0
+   },
+   "pptxrender": {
+    "wPx": 11.5,
+    "lenPx": 13.75
+   }
+  },
+  {
+   "type": "stealth",
+   "strokePx": 6.0,
+   "w": "lg",
+   "len": "sm",
+   "powerpoint": {
+    "wPx": 29.0,
+    "lenPx": 11.75
+   },
+   "pptxrender": {
+    "wPx": 29.0,
+    "lenPx": 9.25
+   }
+  }
+ ],
+ "spaces": {
+  "note": "Calibri 40 px, one nowrap line per row at x=60, 'X' + <space> + 'X|'; left edge of the second X (and of the third glyph cluster) in canvas px, measured at 4x in each renderer",
+  "rows": {
+   "space": {
+    "browser": 90.8,
+    "powerpoint": 90.8,
+    "pptxrender": 90.8
+   },
+   "&nbsp;": {
+    "browser": 90.8,
+    "powerpoint": 90.8,
+    "pptxrender": 90.8
+   },
+   "space nbsp space": {
+    "browser": 108.8,
+    "powerpoint": 108.8,
+    "pptxrender": 109.0
+   },
+   "3 x &nbsp;": {
+    "browser": 108.8,
+    "powerpoint": 108.8,
+    "pptxrender": 109.0
+   },
+   "&ensp;": {
+    "browser": 101.8,
+    "powerpoint": 101.8,
+    "pptxrender": 101.8
+   },
+   "&emsp;": {
+    "browser": 121.8,
+    "powerpoint": 121.8,
+    "pptxrender": 121.8
+   },
+   "&thinsp;": {
+    "browser": 89.8,
+    "powerpoint": 89.8,
+    "pptxrender": 89.8
+   },
+   "U+2028": {
+    "browser": 90.8,
+    "powerpoint": 96.2,
+    "pptxrender": 96.5
+   },
+   "U+202F": {
+    "browser": 90.8,
+    "powerpoint": 90.8,
+    "pptxrender": 90.8
+   },
+   "U+FEFF after '|'": {
+    "browser": 130.0,
+    "powerpoint": 130.2,
+    "pptxrender": 130.0
+   }
+  }
+ }
+}

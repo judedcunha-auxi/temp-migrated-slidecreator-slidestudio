@@ -1,0 +1,142 @@
+{
+  "version": 1,
+  "canvas": {
+    "w": 1280,
+    "h": 720,
+    "pxPerIn": 96
+  },
+  "slide": {
+    "id": "emit-charts",
+    "title": "emit-charts",
+    "layoutId": "layout-07",
+    "notes": null
+  },
+  "fonts": {
+    "forced": {},
+    "used": [],
+    "substituted": []
+  },
+  "groups": [],
+  "elements": [
+    {
+      "id": "e1",
+      "kind": "chart",
+      "box": {
+        "x": 96.0,
+        "y": 120.0,
+        "w": 560.0,
+        "h": 320.0
+      },
+      "z": 0,
+      "name": "growth",
+      "spec": {
+        "type": "column_stacked",
+        "categories": [
+          "2019",
+          "2021",
+          "2022",
+          "2023"
+        ],
+        "series": [
+          {
+            "name": "Internal",
+            "values": [
+              40,
+              52,
+              57,
+              71
+            ]
+          },
+          {
+            "name": "Partner",
+            "values": [
+              12,
+              9,
+              21,
+              18
+            ]
+          }
+        ],
+        "colors": [
+          "#B9C7C9",
+          "#1A9AFB"
+        ],
+        "options": {
+          "dataLabels": true,
+          "legend": false,
+          "gapWidth": 60
+        }
+      },
+      "style": {
+        "font": "Arial",
+        "sizePx": 11,
+        "color": "516467"
+      },
+      "origin": "authored",
+      "confidence": 1.0,
+      "plotRect": {
+        "x": 140.0,
+        "y": 136.0,
+        "w": 470.0,
+        "h": 250.0
+      },
+      "overlay": [
+        "e2"
+      ]
+    },
+    {
+      "id": "e2",
+      "kind": "text",
+      "box": {
+        "x": 700.0,
+        "y": 140.0,
+        "w": 400.0,
+        "h": 30.0
+      },
+      "z": 1,
+      "name": "callout",
+      "paragraphs": [
+        {
+          "align": "left",
+          "lineHeightPx": 24,
+          "spaceBeforePx": 0.0,
+          "spaceAfterPx": 0.0,
+          "bullet": null,
+          "lines": [
+            {
+              "box": {
+                "x": 700,
+                "y": 140,
+                "w": 226.875,
+                "h": 24
+              },
+              "runs": [
+                {
+                  "text": "Annotation drawn over the chart",
+                  "font": "Arial",
+                  "sizePx": 16.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "2E2E38",
+                  "alpha": 1,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "anchor": "top",
+      "writingMode": "horizontal",
+      "wrap": true,
+      "transformCase": null
+    }
+  ],
+  "diagnostics": []
+}

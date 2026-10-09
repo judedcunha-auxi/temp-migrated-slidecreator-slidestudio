@@ -1,0 +1,720 @@
+{
+  "version": 1,
+  "canvas": {
+    "w": 1280,
+    "h": 720,
+    "pxPerIn": 96
+  },
+  "slide": {
+    "id": "tor_boxes",
+    "title": "torture · boxes",
+    "layoutId": "layout-07",
+    "notes": null
+  },
+  "fonts": {
+    "forced": {
+      "major": "Calibri Light",
+      "minor": "Calibri"
+    },
+    "used": [
+      "Calibri",
+      "Calibri Light"
+    ],
+    "substituted": []
+  },
+  "groups": [
+    {
+      "id": "g1",
+      "parent": null,
+      "name": "badges",
+      "box": {
+        "x": 950.0,
+        "y": 530.0,
+        "w": 280.0,
+        "h": 110.0
+      }
+    }
+  ],
+  "elements": [
+    {
+      "id": "e1",
+      "kind": "shape",
+      "box": {
+        "x": 40.0,
+        "y": 50.0,
+        "w": 160.0,
+        "h": 110.0
+      },
+      "z": 0,
+      "name": "solid-fill",
+      "source": {
+        "path": "body > [data-name=solid-fill]",
+        "tag": "div",
+        "svg": null
+      },
+      "geometry": {
+        "type": "rect"
+      },
+      "fill": {
+        "type": "solid",
+        "color": "1A9AFA",
+        "alpha": 1.0
+      },
+      "stroke": null,
+      "shadow": null,
+      "flipH": false,
+      "flipV": false
+    },
+    {
+      "id": "e2",
+      "kind": "shape",
+      "box": {
+        "x": 235.0,
+        "y": 50.0,
+        "w": 160.0,
+        "h": 110.0
+      },
+      "z": 1,
+      "name": "uniform-border",
+      "source": {
+        "path": "body > [data-name=uniform-border]",
+        "tag": "div",
+        "svg": null
+      },
+      "geometry": {
+        "type": "rect"
+      },
+      "fill": {
+        "type": "solid",
+        "color": "E8F4FE",
+        "alpha": 1.0
+      },
+      "stroke": {
+        "color": "0B5FA5",
+        "alpha": 1.0,
+        "width": 2.0,
+        "dash": "solid",
+        "cap": "butt",
+        "join": "miter",
+        "headEnd": null,
+        "tailEnd": null
+      },
+      "shadow": null,
+      "flipH": false,
+      "flipV": false
+    },
+    {
+      "id": "e3",
+      "kind": "shape",
+      "box": {
+        "x": 430.0,
+        "y": 50.0,
+        "w": 160.0,
+        "h": 110.0
+      },
+      "z": 2,
+      "name": "radius-uniform",
+      "source": {
+        "path": "body > [data-name=radius-uniform]",
+        "tag": "div",
+        "svg": null
+      },
+      "geometry": {
+        "type": "roundRect",
+        "radius": {
+          "tl": 16,
+          "tr": 16,
+          "br": 16,
+          "bl": 16
+        }
+      },
+      "fill": {
+        "type": "solid",
+        "color": "2DB757",
+        "alpha": 1.0
+      },
+      "stroke": null,
+      "shadow": null,
+      "flipH": false,
+      "flipV": false
+    },
+    {
+      "id": "e4",
+      "kind": "shape",
+      "box": {
+        "x": 625.0,
+        "y": 50.0,
+        "w": 160.0,
+        "h": 110.0
+      },
+      "z": 3,
+      "name": "radius-per-corner",
+      "source": {
+        "path": "body > [data-name=radius-per-corner]",
+        "tag": "div",
+        "svg": null
+      },
+      "geometry": {
+        "type": "roundRect",
+        "radius": {
+          "tl": 24,
+          "tr": 0,
+          "br": 24,
+          "bl": 0
+        }
+      },
+      "fill": {
+        "type": "solid",
+        "color": "F5A623",
+        "alpha": 1.0
+      },
+      "stroke": null,
+      "shadow": null,
+      "flipH": false,
+      "flipV": false
+    },
+    {
+      "id": "e5",
+      "kind": "shape",
+      "box": {
+        "x": 820.0,
+        "y": 50.0,
+        "w": 160.0,
+        "h": 110.0
+      },
+      "z": 4,
+      "name": "linear-135",
+      "source": {
+        "path": "body > [data-name=linear-135]",
+        "tag": "div",
+        "svg": null
+      },
+      "geometry": {
+        "type": "rect"
+      },
+      "fill": {
+        "type": "gradient",
+        "kind": "linear",
+        "angle": 135,
+        "stops": [
+          {
+            "pos": 0.0,
+            "color": "1A9AFA",
+            "alpha": 1.0
+          },
+          {
+            "pos": 0.55,
+            "color": "2DB757",
+            "alpha": 1.0
+          },
+          {
+            "pos": 1.0,
+            "color": "F5A623",
+            "alpha": 1.0
+          }
+        ]
+      },
+      "stroke": null,
+      "shadow": null,
+      "flipH": false,
+      "flipV": false
+    },
+    {
+      "id": "e6",
+      "kind": "shape",
+      "box": {
+        "x": 1015.0,
+        "y": 50.0,
+        "w": 160.0,
+        "h": 110.0
+      },
+      "z": 5,
+      "name": "radial",
+      "source": {
+        "path": "body > [data-name=radial]",
+        "tag": "div",
+        "svg": null
+      },
+      "geometry": {
+        "type": "rect"
+      },
+      "fill": {
+        "type": "gradient",
+        "kind": "radial",
+        "angle": 0,
+        "stops": [
+          {
+            "pos": 0.0,
+            "color": "FFFFFF",
+            "alpha": 1.0
+          },
+          {
+            "pos": 1.0,
+            "color": "1A9AFA",
+            "alpha": 1.0
+          }
+        ]
+      },
+      "stroke": null,
+      "shadow": null,
+      "flipH": false,
+      "flipV": false
+    },
+    {
+      "id": "e7",
+      "kind": "shape",
+      "box": {
+        "x": 40.0,
+        "y": 210.0,
+        "w": 160.0,
+        "h": 110.0
+      },
+      "z": 6,
+      "name": "shadow-one",
+      "source": {
+        "path": "body > [data-name=shadow-one]",
+        "tag": "div",
+        "svg": null
+      },
+      "geometry": {
+        "type": "rect"
+      },
+      "fill": {
+        "type": "solid",
+        "color": "FFFFFF",
+        "alpha": 1.0
+      },
+      "stroke": {
+        "color": "E6E6EC",
+        "alpha": 1.0,
+        "width": 1.0,
+        "dash": "solid",
+        "cap": "butt",
+        "join": "miter",
+        "headEnd": null,
+        "tailEnd": null
+      },
+      "shadow": {
+        "color": "2E2E38",
+        "alpha": 0.28,
+        "blur": 10,
+        "dx": 0,
+        "dy": 4
+      },
+      "flipH": false,
+      "flipV": false
+    },
+    {
+      "id": "e8",
+      "kind": "shape",
+      "box": {
+        "x": 235.0,
+        "y": 210.0,
+        "w": 160.0,
+        "h": 110.0
+      },
+      "z": 7,
+      "opacity": 0.45,
+      "name": "opacity-45",
+      "source": {
+        "path": "body > [data-name=opacity-45]",
+        "tag": "div",
+        "svg": null
+      },
+      "geometry": {
+        "type": "rect"
+      },
+      "fill": {
+        "type": "solid",
+        "color": "1A9AFA",
+        "alpha": 1.0
+      },
+      "stroke": null,
+      "shadow": null,
+      "flipH": false,
+      "flipV": false
+    },
+    {
+      "id": "e9",
+      "kind": "shape",
+      "box": {
+        "x": 430.0,
+        "y": 210.0,
+        "w": 160.0,
+        "h": 110.0
+      },
+      "z": 8,
+      "name": "rgba-fill",
+      "source": {
+        "path": "body > [data-name=rgba-fill]",
+        "tag": "div",
+        "svg": null
+      },
+      "geometry": {
+        "type": "rect"
+      },
+      "fill": {
+        "type": "solid",
+        "color": "E2445C",
+        "alpha": 0.35
+      },
+      "stroke": null,
+      "shadow": null,
+      "flipH": false,
+      "flipV": false
+    },
+    {
+      "id": "e10",
+      "kind": "shape",
+      "box": {
+        "x": 625.0,
+        "y": 210.0,
+        "w": 160.0,
+        "h": 110.0
+      },
+      "z": 9,
+      "name": "clip-path-chevron",
+      "source": {
+        "path": "body > [data-name=clip-path-chevron]",
+        "tag": "div",
+        "svg": null
+      },
+      "geometry": {
+        "type": "custom",
+        "fillRule": "nonzero",
+        "path": [
+          [
+            "M",
+            625,
+            210
+          ],
+          [
+            "L",
+            750,
+            210
+          ],
+          [
+            "L",
+            785,
+            265
+          ],
+          [
+            "L",
+            750,
+            320
+          ],
+          [
+            "L",
+            625,
+            320
+          ],
+          [
+            "L",
+            660,
+            265
+          ],
+          [
+            "Z"
+          ]
+        ]
+      },
+      "fill": {
+        "type": "solid",
+        "color": "0B5FA5",
+        "alpha": 1.0
+      },
+      "stroke": null,
+      "shadow": null,
+      "flipH": false,
+      "flipV": false
+    },
+    {
+      "id": "e11",
+      "kind": "shape",
+      "box": {
+        "x": 820.0,
+        "y": 210.0,
+        "w": 160.0,
+        "h": 110.0
+      },
+      "z": 10,
+      "name": "overflow-clip",
+      "source": {
+        "path": "body > [data-name=overflow-clip]",
+        "tag": "div",
+        "svg": null
+      },
+      "geometry": {
+        "type": "rect"
+      },
+      "fill": {
+        "type": "solid",
+        "color": "F7F7FA",
+        "alpha": 1.0
+      },
+      "stroke": null,
+      "shadow": null,
+      "flipH": false,
+      "flipV": false
+    },
+    {
+      "id": "e12",
+      "kind": "shape",
+      "box": {
+        "x": 790.0,
+        "y": 230.0,
+        "w": 200.0,
+        "h": 60.0
+      },
+      "z": 11,
+      "clip": {
+        "x": 820.0,
+        "y": 230.0,
+        "w": 160.0,
+        "h": 60.0
+      },
+      "name": "clipped-child",
+      "source": {
+        "path": "body > [data-name=clipped-child]",
+        "tag": "div",
+        "svg": null
+      },
+      "geometry": {
+        "type": "rect"
+      },
+      "fill": {
+        "type": "solid",
+        "color": "1A9AFA",
+        "alpha": 1.0
+      },
+      "stroke": null,
+      "shadow": null,
+      "flipH": false,
+      "flipV": false
+    },
+    {
+      "id": "e13",
+      "kind": "shape",
+      "box": {
+        "x": 1015.0,
+        "y": 210.0,
+        "w": 160.0,
+        "h": 110.0
+      },
+      "z": 12,
+      "rotation": 18.0,
+      "name": "rotated-18",
+      "source": {
+        "path": "body > [data-name=rotated-18]",
+        "tag": "div",
+        "svg": null
+      },
+      "geometry": {
+        "type": "rect"
+      },
+      "fill": {
+        "type": "solid",
+        "color": "2DB757",
+        "alpha": 1.0
+      },
+      "stroke": null,
+      "shadow": null,
+      "flipH": false,
+      "flipV": false
+    },
+    {
+      "id": "e14",
+      "kind": "shape",
+      "box": {
+        "x": 40.0,
+        "y": 370.0,
+        "w": 160.0,
+        "h": 110.0
+      },
+      "z": 13,
+      "name": "dashed-border",
+      "source": {
+        "path": "body > [data-name=dashed-border]",
+        "tag": "div",
+        "svg": null
+      },
+      "geometry": {
+        "type": "rect"
+      },
+      "fill": {
+        "type": "solid",
+        "color": "FFFFFF",
+        "alpha": 1.0
+      },
+      "stroke": {
+        "color": "516467",
+        "alpha": 1.0,
+        "width": 2.0,
+        "dash": [
+          6,
+          4
+        ],
+        "cap": "butt",
+        "join": "miter",
+        "headEnd": null,
+        "tailEnd": null
+      },
+      "shadow": null,
+      "flipH": false,
+      "flipV": false
+    },
+    {
+      "id": "e15",
+      "kind": "shape",
+      "box": {
+        "x": 235.0,
+        "y": 370.0,
+        "w": 160.0,
+        "h": 110.0
+      },
+      "z": 14,
+      "name": "flipped",
+      "source": {
+        "path": "body > [data-name=flipped]",
+        "tag": "div",
+        "svg": null
+      },
+      "geometry": {
+        "type": "custom",
+        "fillRule": "nonzero",
+        "path": [
+          [
+            "M",
+            235,
+            370
+          ],
+          [
+            "C",
+            295,
+            370,
+            295,
+            480,
+            395,
+            480
+          ],
+          [
+            "L",
+            235,
+            480
+          ],
+          [
+            "Z"
+          ]
+        ]
+      },
+      "fill": {
+        "type": "solid",
+        "color": "747480",
+        "alpha": 1.0
+      },
+      "stroke": null,
+      "shadow": null,
+      "flipH": true,
+      "flipV": false
+    },
+    {
+      "id": "e16",
+      "kind": "shape",
+      "box": {
+        "x": 950.0,
+        "y": 530.0,
+        "w": 130.0,
+        "h": 110.0
+      },
+      "z": 15,
+      "name": "badge-a",
+      "group": "g1",
+      "source": {
+        "path": "body > [data-name=badge-a]",
+        "tag": "div",
+        "svg": null
+      },
+      "geometry": {
+        "type": "roundRect",
+        "radius": {
+          "tl": 8,
+          "tr": 8,
+          "br": 8,
+          "bl": 8
+        }
+      },
+      "fill": {
+        "type": "solid",
+        "color": "E8F4FE",
+        "alpha": 1.0
+      },
+      "stroke": null,
+      "shadow": null,
+      "flipH": false,
+      "flipV": false
+    },
+    {
+      "id": "e17",
+      "kind": "shape",
+      "box": {
+        "x": 1100.0,
+        "y": 530.0,
+        "w": 130.0,
+        "h": 110.0
+      },
+      "z": 16,
+      "name": "badge-b",
+      "group": "g1",
+      "source": {
+        "path": "body > [data-name=badge-b]",
+        "tag": "div",
+        "svg": null
+      },
+      "geometry": {
+        "type": "roundRect",
+        "radius": {
+          "tl": 8,
+          "tr": 8,
+          "br": 8,
+          "bl": 8
+        }
+      },
+      "fill": {
+        "type": "solid",
+        "color": "E6F6EC",
+        "alpha": 1.0
+      },
+      "stroke": null,
+      "shadow": null,
+      "flipH": false,
+      "flipV": false
+    },
+    {
+      "id": "e18",
+      "kind": "raster",
+      "box": {
+        "x": 430.0,
+        "y": 370.0,
+        "w": 160.0,
+        "h": 110.0
+      },
+      "z": 17,
+      "name": "conic-gradient",
+      "source": {
+        "path": "body > [data-name=conic-gradient]",
+        "tag": "div",
+        "svg": null
+      },
+      "src": "tests/engine/fixtures/torture/assets/photo-400x300.png",
+      "reason": "conic-gradient: not expressible in DrawingML"
+    }
+  ],
+  "diagnostics": [
+    {
+      "level": "warn",
+      "source": "body > [data-name=conic-gradient]",
+      "message": "conic-gradient rasterised",
+      "elementId": "e18"
+    }
+  ]
+}

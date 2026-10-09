@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>torture · tables-spacing</title>
+<style>
+html,body{margin:0;width:1280px;height:720px;overflow:hidden;background:transparent;
+  font-family:"Calibri",Arial,sans-serif;color:#1d2433;font-size:12px}
+/* the heading reaches the right edge of layout-06's title zone (48 + 864 = 912): see tables-cells' notes */
+.h{position:absolute;left:40px;top:24px;width:872px;font-size:26px;font-weight:700}
+
+/* A: the scorecard - white gaps between filled cells, 4 px between rows and 2 px between columns. */
+.sc{position:absolute;left:40px;top:96px;width:640px;table-layout:fixed;border-collapse:separate;border-spacing:2px 4px}
+.sc th,.sc td{padding:6px 8px;text-align:left;vertical-align:middle}
+.sc th{background:#0B2545;color:#fff;font-weight:700}
+.sc td{background:#EEF1F6}
+.sc td.area{background:#DCE6F5;font-weight:700}
+.sc td.g{background:#D6F0DF;color:#12703A;font-weight:700;text-align:center}
+.sc td.a{background:#FCEBC7;color:#8A5A00;font-weight:700;text-align:center}
+.sc td.r{background:#F8D7D7;color:#9B1C1C;font-weight:700;text-align:center}
+
+/* B: bordered cards on the table's own surface - 6 px spacing, a colspan header, a 4 px accent rule. */
+.bd{position:absolute;left:720px;top:96px;width:520px;table-layout:fixed;border-collapse:separate;border-spacing:6px;
+  background:#F3F5F9;border:1px solid #C9D2DF;border-radius:8px}
+.bd th,.bd td{padding:6px 10px;text-align:left;vertical-align:top;border:1px solid #C9D2DF;background:#fff}
+.bd th{background:#0B5CAD;color:#fff;border-color:#0B5CAD}
+.bd td.acc{border-left:4px solid #0B5CAD;font-weight:700}
+
+/* C: a 1 px hairline between filled cells - under 1 pt, so the export closes it (warn). */
+.hl{position:absolute;left:720px;top:360px;width:520px;table-layout:fixed;border-collapse:separate;border-spacing:1px}
+.hl td{padding:5px 8px;background:#E1E6EE}
+.hl td.k{background:#0B2545;color:#fff;font-weight:700}
+
+/* D: the default 2 px spacing around cells that paint nothing - invisible gaps, no spacer. */
+.pl{position:absolute;left:720px;top:470px;width:520px;table-layout:fixed}
+.pl td{padding:4px 8px}
+</style></head><body>
+<div class="h" data-placeholder="title">Scorecards with border-spacing</div>
+
+<table class="sc" data-name="scorecard">
+  <colgroup><col style="width:120px"><col style="width:200px"><col><col><col></colgroup>
+  <thead><tr><th>Area</th><th>Measure</th><th>Q1</th><th>Q2</th><th>Q3</th></tr></thead>
+  <tbody>
+    <tr><td class="area" rowspan="2">Growth</td><td>Net revenue retention</td><td class="g">112%</td><td class="g">114%</td><td class="a">108%</td></tr>
+    <tr><td>New logos</td><td class="a">18</td><td class="g">24</td><td class="g">27</td></tr>
+    <tr><td class="area">Cost</td><td>Cost to serve per seat</td><td class="r">$41</td><td class="a">$37</td><td class="g">$33</td></tr>
+    <tr><td class="area">People</td><td>Regretted attrition</td><td class="g">4%</td><td class="g">5%</td><td class="r">9%</td></tr>
+  </tbody>
+</table>
+
+<table class="bd" data-name="cards">
+  <colgroup><col style="width:150px"><col><col></colgroup>
+  <tr><th colspan="2">Workstream</th><th>Owner</th></tr>
+  <tr><td class="acc" rowspan="2">Discovery and build</td><td>Interviews and data audit</td><td>Strategy</td></tr>
+  <tr><td>Pilot in two regions</td><td>Delivery</td></tr>
+</table>
+
+<table class="hl" data-name="hairline">
+  <tr><td class="k">Scope</td><td>Eight markets</td><td>Two waves</td></tr>
+  <tr><td class="k">Budget</td><td>$4.2M</td><td>Phased</td></tr>
+</table>
+
+<table class="pl" data-name="plain">
+  <tr><td>Plain</td><td>separate table</td><td>no paint</td></tr>
+  <tr><td>Second</td><td>row of</td><td>text</td></tr>
+</table>
+</body></html>

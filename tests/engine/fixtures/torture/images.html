@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>torture · images</title>
+<style>
+html,body{margin:0;width:1280px;height:720px;overflow:hidden;background:transparent;
+  font-family:"Calibri",Arial,sans-serif;color:#2E2E38}
+
+/* Three rows of six 180 x 140 frames. Sources: 400x300 PNG (4:3), 300x400 JPEG (3:4), 160x160 RGBA PNG. */
+.f{position:absolute;width:180px;height:140px}
+.f img{width:100%;height:100%;display:block}
+.c1{left:40px}.c2{left:245px}.c3{left:450px}.c4{left:655px}.c5{left:860px}.c6{left:1065px}
+.r1{top:70px}.r2{top:300px}.r3{top:530px}
+.bg{background-repeat:no-repeat}
+</style></head><body>
+
+<!-- row 1: object-fit, radius, circle -->
+<div class="f r1 c1" data-name="cover-landscape">
+  <img src="/api/projects/prj_torture/assets/photo-400x300.png" alt="" style="object-fit:cover">
+</div>
+<div class="f r1 c2" data-name="contain-landscape">
+  <img src="/api/projects/prj_torture/assets/photo-400x300.png" alt="" style="object-fit:contain">
+</div>
+<div class="f r1 c3" data-name="fill-landscape">
+  <img src="/api/projects/prj_torture/assets/photo-400x300.png" alt="" style="object-fit:fill">
+</div>
+<div class="f r1 c4" data-name="cover-portrait">
+  <img src="/api/projects/prj_torture/assets/photo-300x400.jpg" alt="" style="object-fit:cover">
+</div>
+<div class="f r1 c5" data-name="radius-14">
+  <img src="/api/projects/prj_torture/assets/photo-400x300.png" alt="" style="object-fit:cover;border-radius:14px">
+</div>
+<div class="f r1 c6" data-name="circle" style="width:140px;height:140px">
+  <img src="/api/projects/prj_torture/assets/logo-160x160.png" alt="" style="object-fit:cover;border-radius:50%">
+</div>
+
+<!-- row 2: opacity, background-image, clipping, an SVG asset -->
+<div class="f r2 c1" data-name="opacity-50">
+  <img src="/api/projects/prj_torture/assets/photo-400x300.png" alt="" style="object-fit:cover;opacity:.5">
+</div>
+<div class="f r2 c2 bg" data-name="bg-cover"
+     style="background-image:url(/api/projects/prj_torture/assets/photo-400x300.png);
+            background-size:cover;background-position:center center"></div>
+<div class="f r2 c3 bg" data-name="bg-contain"
+     style="background-image:url(/api/projects/prj_torture/assets/photo-400x300.png);
+            background-size:contain;background-position:center center"></div>
+<div class="f r2 c4 bg" data-name="bg-cover-right-bottom"
+     style="background-image:url(/api/projects/prj_torture/assets/photo-300x400.jpg);
+            background-size:cover;background-position:right bottom"></div>
+<!-- The container has no paint of its own, so it contributes a clip and not a shape. -->
+<div class="f r2 c5" data-name="clip-frame" style="overflow:hidden">
+  <img src="/api/projects/prj_torture/assets/photo-400x300.png" alt="" data-name="clipped-image"
+       style="position:absolute;left:-40px;top:-30px;width:300px;height:225px;object-fit:fill">
+</div>
+<div class="f r2 c6" data-name="svg-asset" style="width:96px;height:96px">
+  <img src="/api/projects/prj_torture/assets/icon.svg" alt="" style="object-fit:contain">
+</div>
+
+<!-- row 3 (r3, plan §16 #30): positions as lengths, offsets and calc(), object-fit none and
+     scale-down, a rounded frame around a letterboxed photo, background-size lengths, background-repeat -->
+<div class="f r3 c1" data-name="none-offsets">
+  <img src="/api/projects/prj_torture/assets/photo-400x300.png" alt=""
+       style="object-fit:none;object-position:left 20px bottom 10px">
+</div>
+<div class="f r3 c2" data-name="scale-down-corner">
+  <img src="/api/projects/prj_torture/assets/logo-160x160.png" alt=""
+       style="object-fit:scale-down;object-position:right bottom">
+</div>
+<div class="f r3 c3" data-name="contain-rounded">
+  <img src="/api/projects/prj_torture/assets/photo-300x400.jpg" alt="" style="object-fit:contain;border-radius:18px">
+</div>
+<div class="f r3 c4 bg" data-name="bg-size-offsets"
+     style="background-image:url(/api/projects/prj_torture/assets/photo-400x300.png);
+            background-size:120px auto;background-position:right 12px bottom 10px"></div>
+<div class="f r3 c5 bg" data-name="bg-cover-calc"
+     style="background-image:url(/api/projects/prj_torture/assets/photo-300x400.jpg);
+            background-size:cover;background-position:calc(50% + 10px) 25%"></div>
+<div class="f r3 c6" data-name="bg-repeat-tiles"
+     style="background-image:url(/api/projects/prj_torture/assets/logo-160x160.png);background-size:90px auto"></div>
+
+<aside class="notes" style="display:none">Image torture: three object-fit modes on both source
+aspect ratios, radius, circle, opacity, background-image with cover/contain/position, an
+overflow-clipped image and an SVG asset that has to be rasterised at its displayed size; then positions
+written as lengths, offsets and calc(), object-fit none and scale-down, rounded corners around a letterbox,
+background-size lengths and a repeated background.</aside>
+
+</body></html>

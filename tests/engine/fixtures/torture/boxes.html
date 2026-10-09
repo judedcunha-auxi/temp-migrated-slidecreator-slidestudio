@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>torture · boxes</title>
+<style>
+html,body{margin:0;width:1280px;height:720px;overflow:hidden;background:transparent;
+  font-family:"Calibri",Arial,sans-serif;color:#2E2E38}
+
+/* One 6 x 4 grid of 160 x 110 cells so every case sits at a coordinate that is easy to assert. */
+.b{position:absolute;width:160px;height:110px;box-sizing:border-box}
+.c1{left:40px}.c2{left:235px}.c3{left:430px}.c4{left:625px}.c5{left:820px}.c6{left:1015px}
+.r1{top:50px}.r2{top:210px}.r3{top:370px}.r4{top:530px}
+</style></head><body>
+
+<!-- row 1: fills, borders, radii -->
+<div class="b r1 c1" data-name="solid-fill" style="background:#1A9AFA"></div>
+<div class="b r1 c2" data-name="uniform-border" style="background:#E8F4FE;border:2px solid #0B5FA5"></div>
+<!-- Four different sides: one shape for the background plus one thin rect per side (5 in total). -->
+<div class="b r1 c3" data-name="per-side-borders" style="background:#F7F7FA;
+     border-top:4px solid #E2445C;border-right:2px dashed #1A9AFA;
+     border-bottom:6px dotted #2DB757;border-left:1px solid #2E2E38"></div>
+<div class="b r1 c4" data-name="radius-uniform" style="background:#2DB757;border-radius:16px"></div>
+<div class="b r1 c5" data-name="radius-per-corner" style="background:#F5A623;
+     border-radius:24px 0 24px 0"></div>
+<div class="b r1 c6" data-name="radius-50pc" style="background:#E2445C;width:110px;border-radius:50%"></div>
+
+<!-- row 2: gradients, shadows, opacity -->
+<div class="b r2 c1" data-name="linear-135" style="background:linear-gradient(135deg,#1A9AFA 0%,#2DB757 55%,#F5A623 100%)"></div>
+<div class="b r2 c2" data-name="linear-to-right" style="background:linear-gradient(to right,#2E2E38,#747480)"></div>
+<div class="b r2 c3" data-name="radial" style="background:radial-gradient(circle at 50% 50%,#FFFFFF,#1A9AFA)"></div>
+<div class="b r2 c4" data-name="shadow-one" style="background:#FFFFFF;border:1px solid #E6E6EC;
+     box-shadow:0 4px 10px rgba(46,46,56,.28)"></div>
+<!-- Two outer shadows: allowed by the contract, but ir.shadow holds one — see expect.json. -->
+<div class="b r2 c5" data-name="shadow-two" style="background:#FFFFFF;border:1px solid #E6E6EC;
+     box-shadow:0 4px 10px rgba(46,46,56,.28), 0 12px 24px rgba(26,154,250,.22)"></div>
+<div class="b r2 c6" data-name="opacity-45" style="background:#1A9AFA;opacity:.45"></div>
+
+<!-- row 3: clipping, rotation, alpha, groups -->
+<div class="b r3 c1" data-name="clip-path-chevron" style="background:#0B5FA5;
+     clip-path:polygon(0% 0%, 78% 0%, 100% 50%, 78% 100%, 0% 100%, 22% 50%)"></div>
+<div class="b r3 c2" data-name="overflow-clip" style="background:#F7F7FA;overflow:hidden">
+  <div data-name="clipped-child" style="position:absolute;left:-30px;top:20px;width:200px;height:60px;
+       background:#1A9AFA"></div>
+</div>
+<div class="b r3 c3" data-name="rotated-18" style="background:#2DB757;transform:rotate(18deg)"></div>
+<div class="b r3 c4" data-name="rgba-fill" style="background:rgba(226,68,92,.35)"></div>
+<div class="b r3 c5" data-name="group" data-pptx="group">
+  <div data-name="group-child-a" style="position:absolute;left:0;top:0;width:74px;height:110px;background:#2E2E38"></div>
+  <div data-name="group-child-b" style="position:absolute;left:86px;top:0;width:74px;height:110px;background:#747480"></div>
+</div>
+<div class="b r3 c6" data-name="border-no-fill" style="border:3px solid #F5A623"></div>
+
+<!-- row 4: raster-only constructs, then dashed / dotted / combined borders -->
+<div class="b r4 c1" data-name="conic-gradient" style="background:conic-gradient(#1A9AFA 0deg 120deg,#2DB757 120deg 240deg,#F5A623 240deg 360deg)"></div>
+<div class="b r4 c2" data-name="css-filter" style="background:#1A9AFA;filter:blur(3px)"></div>
+<div class="b r4 c3" data-name="forced-raster" data-pptx="raster" style="background:linear-gradient(90deg,#E2445C,#F5A623)"></div>
+<div class="b r4 c4" data-name="dashed-border" style="background:#FFFFFF;border:2px dashed #516467"></div>
+<div class="b r4 c5" data-name="dotted-border" style="background:#FFFFFF;border:3px dotted #516467"></div>
+<div class="b r4 c6" data-name="fill-hairline-radius" style="background:#E6F6EC;border:1px solid #12703A;border-radius:6px"></div>
+
+<aside class="notes" style="display:none">Box decoration torture: fills, per-side borders, radii,
+gradients, shadows, opacity, clip-path, overflow clipping, rotation, groups and the three raster-only
+constructs.</aside>
+
+</body></html>

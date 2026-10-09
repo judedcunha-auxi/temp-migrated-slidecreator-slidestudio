@@ -1,0 +1,420 @@
+{
+  "version": 1,
+  "canvas": {
+    "w": 1280,
+    "h": 720,
+    "pxPerIn": 96
+  },
+  "slide": {
+    "id": "emit-wrap",
+    "title": "emit-wrap",
+    "layoutId": "layout-06",
+    "notes": null
+  },
+  "fonts": {
+    "forced": {},
+    "used": [],
+    "substituted": []
+  },
+  "groups": [],
+  "elements": [
+    {
+      "id": "e1",
+      "kind": "text",
+      "box": {
+        "x": 24.0,
+        "y": 18.0,
+        "w": 1232.0,
+        "h": 80.0
+      },
+      "z": 0,
+      "name": "title-edge",
+      "paragraphs": [
+        {
+          "align": "left",
+          "lineHeightPx": 40,
+          "spaceBeforePx": 0.0,
+          "spaceAfterPx": 0.0,
+          "bullet": null,
+          "lines": [
+            {
+              "box": {
+                "x": 24,
+                "y": 18,
+                "w": 947.728,
+                "h": 40
+              },
+              "runs": [
+                {
+                  "text": "Independence and cross-border reach create a differentiated proposition versus balance-",
+                  "font": "Arial",
+                  "sizePx": 31.0,
+                  "weight": 700,
+                  "italic": false,
+                  "color": "2E2E38",
+                  "alpha": 1,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            },
+            {
+              "box": {
+                "x": 24,
+                "y": 58,
+                "w": 128.863,
+                "h": 40
+              },
+              "runs": [
+                {
+                  "text": "sheet banks",
+                  "font": "Arial",
+                  "sizePx": 31.0,
+                  "weight": 700,
+                  "italic": false,
+                  "color": "2E2E38",
+                  "alpha": 1,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "anchor": "top",
+      "writingMode": "horizontal",
+      "wrap": true,
+      "transformCase": null,
+      "extras": {
+        "x-wp4-placeholder": "title"
+      }
+    },
+    {
+      "id": "e2",
+      "kind": "text",
+      "box": {
+        "x": 64.0,
+        "y": 200.0,
+        "w": 300.0,
+        "h": 120.0
+      },
+      "z": 1,
+      "name": "body-column",
+      "paragraphs": [
+        {
+          "align": "left",
+          "lineHeightPx": 20,
+          "spaceBeforePx": 0.0,
+          "spaceAfterPx": 0.0,
+          "bullet": null,
+          "lines": [
+            {
+              "box": {
+                "x": 64,
+                "y": 200,
+                "w": 232.5,
+                "h": 20
+              },
+              "runs": [
+                {
+                  "text": "Balance-sheet lenders carry higher",
+                  "font": "Arial",
+                  "sizePx": 15.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "2E2E38",
+                  "alpha": 1,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            },
+            {
+              "box": {
+                "x": 64,
+                "y": 220,
+                "w": 245.156,
+                "h": 20
+              },
+              "runs": [
+                {
+                  "text": "capital charges on mid-market loans,",
+                  "font": "Arial",
+                  "sizePx": 15.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "2E2E38",
+                  "alpha": 1,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            },
+            {
+              "box": {
+                "x": 64,
+                "y": 240,
+                "w": 226.641,
+                "h": 20
+              },
+              "runs": [
+                {
+                  "text": "while private-credit funds can hold",
+                  "font": "Arial",
+                  "sizePx": 15.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "2E2E38",
+                  "alpha": 1,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            },
+            {
+              "box": {
+                "x": 64,
+                "y": 260,
+                "w": 237.656,
+                "h": 20
+              },
+              "runs": [
+                {
+                  "text": "concentrated positions and price for",
+                  "font": "Arial",
+                  "sizePx": 15.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "2E2E38",
+                  "alpha": 1,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            },
+            {
+              "box": {
+                "x": 64,
+                "y": 280,
+                "w": 218.672,
+                "h": 20
+              },
+              "runs": [
+                {
+                  "text": "certainty of execution rather than",
+                  "font": "Arial",
+                  "sizePx": 15.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "2E2E38",
+                  "alpha": 1,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            },
+            {
+              "box": {
+                "x": 64,
+                "y": 300,
+                "w": 208.594,
+                "h": 20
+              },
+              "runs": [
+                {
+                  "text": "for the tightest possible spread.",
+                  "font": "Arial",
+                  "sizePx": 15.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "2E2E38",
+                  "alpha": 1,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "anchor": "top",
+      "writingMode": "horizontal",
+      "wrap": true,
+      "transformCase": null
+    },
+    {
+      "id": "e3",
+      "kind": "text",
+      "box": {
+        "x": 700.0,
+        "y": 200.0,
+        "w": 280.0,
+        "h": 40.0
+      },
+      "z": 2,
+      "name": "centred-card",
+      "paragraphs": [
+        {
+          "align": "center",
+          "lineHeightPx": 20,
+          "spaceBeforePx": 0.0,
+          "spaceAfterPx": 0.0,
+          "bullet": null,
+          "lines": [
+            {
+              "box": {
+                "x": 766.446,
+                "y": 200,
+                "w": 147.109,
+                "h": 20
+              },
+              "runs": [
+                {
+                  "text": "Certainty of execution",
+                  "font": "Arial",
+                  "sizePx": 14.0,
+                  "weight": 700,
+                  "italic": false,
+                  "color": "2E2E38",
+                  "alpha": 1,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            },
+            {
+              "box": {
+                "x": 755.508,
+                "y": 220,
+                "w": 168.984,
+                "h": 20
+              },
+              "runs": [
+                {
+                  "text": "beats price for borrowers",
+                  "font": "Arial",
+                  "sizePx": 14.0,
+                  "weight": 700,
+                  "italic": false,
+                  "color": "2E2E38",
+                  "alpha": 1,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "anchor": "top",
+      "writingMode": "horizontal",
+      "wrap": true,
+      "transformCase": null
+    },
+    {
+      "id": "e4",
+      "kind": "text",
+      "box": {
+        "x": 1000.0,
+        "y": 400.0,
+        "w": 19.2,
+        "h": 18.0
+      },
+      "z": 3,
+      "name": "chip",
+      "paragraphs": [
+        {
+          "align": "left",
+          "lineHeightPx": 18,
+          "spaceBeforePx": 0.0,
+          "spaceAfterPx": 0.0,
+          "bullet": null,
+          "lines": [
+            {
+              "box": {
+                "x": 1000,
+                "y": 400,
+                "w": 28.0,
+                "h": 18
+              },
+              "runs": [
+                {
+                  "text": "20%",
+                  "font": "Arial",
+                  "sizePx": 14.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "2E2E38",
+                  "alpha": 1,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "anchor": "top",
+      "writingMode": "horizontal",
+      "wrap": true,
+      "transformCase": null
+    }
+  ],
+  "diagnostics": []
+}

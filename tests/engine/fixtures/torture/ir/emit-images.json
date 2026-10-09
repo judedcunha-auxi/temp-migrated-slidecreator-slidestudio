@@ -1,0 +1,158 @@
+{
+  "version": 1,
+  "canvas": {
+    "w": 1280,
+    "h": 720,
+    "pxPerIn": 96
+  },
+  "slide": {
+    "id": "emit-images",
+    "title": "emit-images",
+    "layoutId": "layout-07",
+    "notes": null
+  },
+  "fonts": {
+    "forced": {},
+    "used": [],
+    "substituted": []
+  },
+  "groups": [],
+  "elements": [
+    {
+      "id": "e1",
+      "kind": "image",
+      "box": {
+        "x": 40.0,
+        "y": 40.0,
+        "w": 300.0,
+        "h": 200.0
+      },
+      "z": 0,
+      "name": "photo-cover",
+      "src": "../assets/photo-400x300.png",
+      "fit": "cover",
+      "crop": null,
+      "radius": 0.0,
+      "circle": false
+    },
+    {
+      "id": "e2",
+      "kind": "image",
+      "box": {
+        "x": 380.0,
+        "y": 40.0,
+        "w": 300.0,
+        "h": 200.0
+      },
+      "z": 1,
+      "name": "photo-contain",
+      "src": "../assets/photo-400x300.png",
+      "fit": "contain",
+      "crop": null,
+      "radius": 0.0,
+      "circle": false
+    },
+    {
+      "id": "e3",
+      "kind": "image",
+      "box": {
+        "x": 720.0,
+        "y": 40.0,
+        "w": 200.0,
+        "h": 200.0
+      },
+      "z": 2,
+      "name": "logo-circle",
+      "src": "../assets/logo-160x160.png",
+      "fit": "fill",
+      "crop": null,
+      "radius": 0.0,
+      "circle": true
+    },
+    {
+      "id": "e4",
+      "kind": "image",
+      "box": {
+        "x": 960.0,
+        "y": 40.0,
+        "w": 240.0,
+        "h": 100.0
+      },
+      "z": 3,
+      "opacity": 0.6,
+      "name": "logo-rounded",
+      "src": "../assets/logo-160x160.png",
+      "fit": "fill",
+      "crop": null,
+      "radius": 16.0,
+      "circle": false
+    },
+    {
+      "id": "e5",
+      "kind": "image",
+      "box": {
+        "x": 40.0,
+        "y": 300.0,
+        "w": 314.0,
+        "h": 102.0
+      },
+      "z": 4,
+      "name": "logo-cropped",
+      "src": "../assets/logo-160x160.png",
+      "fit": "fill",
+      "crop": {
+        "l": 0.1,
+        "t": 0.0,
+        "r": 0.1,
+        "b": 0.0
+      },
+      "radius": 0.0,
+      "circle": false
+    },
+    {
+      "id": "e6",
+      "kind": "image",
+      "box": {
+        "x": 400.0,
+        "y": 300.0,
+        "w": 314.0,
+        "h": 102.0
+      },
+      "z": 5,
+      "clip": {
+        "x": 400.0,
+        "y": 300.0,
+        "w": 160.0,
+        "h": 102.0
+      },
+      "name": "logo-clipped",
+      "src": "../assets/logo-160x160.png",
+      "fit": "fill",
+      "crop": null,
+      "radius": 0.0,
+      "circle": false
+    },
+    {
+      "id": "e7",
+      "kind": "raster",
+      "box": {
+        "x": 760.0,
+        "y": 300.0,
+        "w": 200.0,
+        "h": 120.0
+      },
+      "z": 6,
+      "name": "filtered-badge",
+      "src": "../assets/logo-160x160.png",
+      "reason": "svg filter: feGaussianBlur"
+    }
+  ],
+  "diagnostics": [
+    {
+      "level": "warn",
+      "source": "svg#1 > filter",
+      "message": "filter rasterised",
+      "elementId": "e7"
+    }
+  ]
+}

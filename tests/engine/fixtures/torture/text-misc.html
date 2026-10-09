@@ -1,0 +1,33 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><style>
+html,body{margin:0;width:1280px;height:720px;overflow:hidden;background:transparent;font-family:Calibri,Arial,sans-serif;color:#1d2433}
+/* the heading reaches the right edge of layout-06's title zone (48 + 864 = 912): see the notes */
+.h{position:absolute;left:40px;top:24px;width:872px;font-size:26px;font-weight:700}
+.lbl{position:absolute;font-size:12px;font-weight:700;color:#0B5CAD}
+/* A: gradient text */
+.grad{position:absolute;left:40px;top:110px;font-size:54px;font-weight:700;background:linear-gradient(90deg,#0B5CAD,#1E9E5A);-webkit-background-clip:text;background-clip:text;color:transparent}
+/* B: CSS multi-column text */
+.cols{position:absolute;left:400px;top:110px;width:520px;columns:2;column-gap:24px;font-size:13px;line-height:1.4}
+/* C: display:contents wrapper inside a flex row */
+.row{position:absolute;left:40px;top:330px;width:600px;display:flex;gap:16px;font-size:14px}
+.row .cell{background:#E8F1FB;padding:8px 12px;border-radius:6px}
+/* D: a stat whose number and unit are separate spans in a flex baseline row */
+.stat{position:absolute;left:40px;top:420px;display:flex;align-items:baseline;gap:4px;color:#0B2545}
+.stat .num{font-size:44px;font-weight:700}.stat .unit{font-size:16px;font-weight:700;color:#556}
+/* E: a legend row: swatch + label pairs */
+.legend{position:absolute;left:400px;top:430px;display:flex;gap:18px;font-size:12px;align-items:center}
+.legend span{display:flex;align-items:center;gap:6px}
+.legend i{width:10px;height:10px;border-radius:2px;display:inline-block}
+</style></head><body>
+<div class="h" data-placeholder="title">More constructs (probe 10)</div>
+<div class="lbl" style="left:40px;top:90px">A · gradient text (background-clip:text)</div>
+<div class="grad">$12.4B</div>
+<div class="lbl" style="left:400px;top:90px">B · CSS columns: 2</div>
+<div class="cols">Private credit funds now write most sponsor-backed unitranche loans in the mid-market. Banks retain the revolver and the treasury relationship, but lose the term debt. Pricing is 150–250 bps wider, which borrowers accept for certainty and speed of execution. Covenant packages are looser, and hold sizes above $500M are now common. The shift is structural rather than cyclical: capital rules raised the cost of holding the loans on balance sheet.</div>
+<div class="lbl" style="left:40px;top:310px">C · display:contents wrapper in a flex row</div>
+<div class="row"><div style="display:contents"><div class="cell">Sources</div><div class="cell">Uses</div></div><div class="cell">Valuation</div><div class="cell">Comps</div></div>
+<div class="lbl" style="left:40px;top:400px">D · number + unit in a baseline flex row</div>
+<div class="stat"><span class="num">6.2</span><span class="unit">$B SOM</span></div>
+<div class="lbl" style="left:400px;top:410px">E · legend: swatch + label pairs</div>
+<div class="legend"><span><i style="background:#0B2545"></i>UAE</span><span><i style="background:#0B5CAD"></i>KSA</span><span><i style="background:#1E9E5A"></i>Qatar</span><span><i style="background:#F59E0B"></i>Bahrain</span></div>
+</body></html>

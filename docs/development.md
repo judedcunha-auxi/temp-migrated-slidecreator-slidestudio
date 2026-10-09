@@ -12,6 +12,13 @@ python3.11 -m venv .venv                                 # Linux / macOS
 .venv/Scripts/python.exe -m pip install -r requirements.txt -r requirements-dev.txt
 ```
 
+Then install the export engine's browser once per machine (Playwright's bundled Chromium, at the
+version `requirements.txt` pins; CI does the same):
+
+```bash
+.venv/Scripts/python.exe -m playwright install chromium          # add --with-deps on Linux
+```
+
 Run every tool through that interpreter (`.venv/Scripts/python.exe -m pytest`, and so on).
 `scripts/gate.py` prints the interpreter and key package versions first, and warns when it is
 not 3.11.
@@ -45,6 +52,25 @@ off.
   values and uses fakeredis behind the real `RedisClient`.
 - Async tests carry `@pytest.mark.asyncio` (strict mode, set in `pyproject.toml`).
 
+### The engine tests (`tests/engine/`)
+
+- They drive a real headless Chromium (install it as above) and take a few minutes; run one area
+  with `pytest tests/engine/emit -q`.
+- **Every fixture is synthetic.** The torture families and test masters are in
+  `tests/engine/fixtures/`; the end-to-end sample project is generated per session by
+  `tests/engine/sample_project.py`. Never add a client master, deck or slide (risk R6); build what
+  a test needs with python-pptx or Pillow in the test, or as a small synthetic HTML file.
+- Tests that need **PptxRender** carry a marker and are skipped, with the reason (`pytest -rs`),
+  when it is not configured: `renderer` needs `/render-layouts` (`SLIDE_ENGINE_RENDERER_URL`);
+  `renderer_full` also needs `/render` and `/verify`, which only a local PptxRender build serves
+  (list them in `SLIDE_ENGINE_RENDERER_ENDPOINTS`); `validator` needs the OOXML validator
+  (`SLIDE_ENGINE_VALIDATE_PY`). Nothing else may skip: a missing fixture fails.
+- The engine takes its workspace and renderer as arguments; in tests, `tests/engine/helpers.py`
+  fills in a per-test workspace and the configured renderer, and `tests/fakes/renderer.py` has a
+  `FakeRenderer` and a fake of the PptxRender HTTP service.
+- Measurements were calibrated on Windows; CI runs Linux Chromium with Carlito/Liberation fonts.
+  A test that needs one particular installed face skips when that face is absent, with the reason.
+
 Before pushing, run the whole gate: `.venv/Scripts/python.exe scripts/gate.py` (see
 [scripts/README.md](../scripts/README.md)).
 
@@ -65,6 +91,11 @@ Before pushing, run the whole gate: `.venv/Scripts/python.exe scripts/gate.py` (
 5. Write its tests, including the negative cases, next to the others in `tests/api/routes/`.
 
 ## Adding a setting
+
+Engine settings live in `EngineSettings` in `app/config/engine.py` (environment prefix
+`SLIDE_ENGINE_`); the steps are the same, with the rule in `check_engine_config()` (or
+`check_engine_production()`) and its test in `tests/config/test_engine.py`.
+
 
 1. Add the field to `Settings` in `app/config/settings.py`, with a comment saying what it is for.
 2. Add it to `.env.example` with a placeholder (`tests/config/test_env_example.py` fails

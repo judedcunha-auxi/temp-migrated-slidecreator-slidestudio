@@ -1,0 +1,226 @@
+{
+  "version": 1,
+  "canvas": {
+    "w": 960,
+    "h": 720,
+    "pxPerIn": 96
+  },
+  "slide": {
+    "id": "emit-sizes-4x3",
+    "title": "emit-sizes-4x3",
+    "layoutId": "layout-06",
+    "notes": null
+  },
+  "fonts": {
+    "forced": {},
+    "used": [],
+    "substituted": []
+  },
+  "groups": [],
+  "elements": [
+    {
+      "id": "e1",
+      "kind": "shape",
+      "box": {
+        "x": 48.0,
+        "y": 180.0,
+        "w": 400.0,
+        "h": 160.0
+      },
+      "z": 0,
+      "name": "panel",
+      "geometry": {
+        "type": "roundRect",
+        "radius": {
+          "tl": 12,
+          "tr": 12,
+          "br": 12,
+          "bl": 12
+        }
+      },
+      "fill": {
+        "type": "solid",
+        "color": "F3F3F5",
+        "alpha": 1.0
+      },
+      "stroke": {
+        "color": "B9C7C9",
+        "alpha": 1,
+        "width": 1.0,
+        "cap": "butt",
+        "join": "miter"
+      },
+      "shadow": null,
+      "flipH": false,
+      "flipV": false
+    },
+    {
+      "id": "e2",
+      "kind": "shape",
+      "box": {
+        "x": 520.0,
+        "y": 180.0,
+        "w": 160.0,
+        "h": 160.0
+      },
+      "z": 1,
+      "name": "donut-4x3",
+      "geometry": {
+        "type": "blockArc",
+        "arc": {
+          "cx": 600,
+          "cy": 260,
+          "rOuter": 80,
+          "rInner": 48,
+          "startDeg": 0,
+          "endDeg": 270
+        }
+      },
+      "fill": {
+        "type": "solid",
+        "color": "1A9AFB",
+        "alpha": 1.0
+      },
+      "stroke": null,
+      "shadow": null,
+      "flipH": false,
+      "flipV": false
+    },
+    {
+      "id": "e3",
+      "kind": "text",
+      "box": {
+        "x": 48.0,
+        "y": 29.0,
+        "w": 864.0,
+        "h": 62.0
+      },
+      "z": 2,
+      "name": "title-4x3",
+      "paragraphs": [
+        {
+          "align": "left",
+          "lineHeightPx": 62,
+          "spaceBeforePx": 0.0,
+          "spaceAfterPx": 0.0,
+          "bullet": null,
+          "lines": [
+            {
+              "box": {
+                "x": 48,
+                "y": 29,
+                "w": 438.469,
+                "h": 62
+              },
+              "runs": [
+                {
+                  "text": "Four by three, same rules",
+                  "font": "Arial",
+                  "sizePx": 36.0,
+                  "weight": 700,
+                  "italic": false,
+                  "color": "2E2E38",
+                  "alpha": 1,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "anchor": "top",
+      "writingMode": "horizontal",
+      "wrap": true,
+      "transformCase": null,
+      "extras": {
+        "x-wp4-placeholder": "title"
+      }
+    },
+    {
+      "id": "e4",
+      "kind": "text",
+      "box": {
+        "x": 72.0,
+        "y": 210.0,
+        "w": 350.0,
+        "h": 90.0
+      },
+      "z": 3,
+      "name": "copy-4x3",
+      "paragraphs": [
+        {
+          "align": "left",
+          "lineHeightPx": 30,
+          "spaceBeforePx": 0.0,
+          "spaceAfterPx": 0.0,
+          "bullet": null,
+          "lines": [
+            {
+              "box": {
+                "x": 72,
+                "y": 210,
+                "w": 293.438,
+                "h": 30
+              },
+              "runs": [
+                {
+                  "text": "The canvas is 960 x 720; nothing",
+                  "font": "Arial",
+                  "sizePx": 20.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "2E2E38",
+                  "alpha": 1,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            },
+            {
+              "box": {
+                "x": 72,
+                "y": 240,
+                "w": 261.25,
+                "h": 30
+              },
+              "runs": [
+                {
+                  "text": "else about the rules changes.",
+                  "font": "Arial",
+                  "sizePx": 20.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "2E2E38",
+                  "alpha": 1,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "anchor": "top",
+      "writingMode": "horizontal",
+      "wrap": true,
+      "transformCase": null
+    }
+  ],
+  "diagnostics": []
+}

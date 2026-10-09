@@ -1,0 +1,646 @@
+{
+  "version": 1,
+  "canvas": {
+    "w": 1280,
+    "h": 720,
+    "pxPerIn": 96
+  },
+  "slide": {
+    "id": "tor_placeholders",
+    "title": "torture · placeholders",
+    "layoutId": "layout-05",
+    "notes": null
+  },
+  "fonts": {
+    "forced": {
+      "major": "Calibri Light",
+      "minor": "Calibri"
+    },
+    "used": [
+      "Calibri",
+      "Calibri Light"
+    ],
+    "substituted": []
+  },
+  "groups": [
+    {
+      "id": "g1",
+      "parent": null,
+      "name": "badges",
+      "box": {
+        "x": 950.0,
+        "y": 240.0,
+        "w": 280.0,
+        "h": 120.0
+      }
+    }
+  ],
+  "elements": [
+    {
+      "id": "e1",
+      "kind": "text",
+      "box": {
+        "x": 48.0,
+        "y": 36.0,
+        "w": 864.0,
+        "h": 70.0
+      },
+      "z": 0,
+      "name": "deck-title",
+      "source": {
+        "path": "body > [data-name=deck-title]",
+        "tag": "div",
+        "svg": null
+      },
+      "placeholder": {
+        "type": "title",
+        "idx": 0
+      },
+      "paragraphs": [
+        {
+          "align": "left",
+          "lineHeightPx": 36.0,
+          "spaceBeforePx": 0.0,
+          "spaceAfterPx": 0.0,
+          "bullet": null,
+          "lines": [
+            {
+              "box": {
+                "x": 48,
+                "y": 36,
+                "w": 780,
+                "h": 36
+              },
+              "runs": [
+                {
+                  "text": "Placeholder mapping on the Comparison layout",
+                  "font": "Calibri Light",
+                  "sizePx": 30.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "2E2E38",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "anchor": "top",
+      "writingMode": "horizontal",
+      "wrap": true,
+      "transformCase": null
+    },
+    {
+      "id": "e2",
+      "kind": "shape",
+      "box": {
+        "x": 48.0,
+        "y": 152.0,
+        "w": 864.0,
+        "h": 2.0
+      },
+      "z": 1,
+      "name": "rule",
+      "source": {
+        "path": "body > [data-name=rule]",
+        "tag": "div",
+        "svg": null
+      },
+      "geometry": {
+        "type": "rect"
+      },
+      "fill": {
+        "type": "solid",
+        "color": "1A9AFA",
+        "alpha": 1.0
+      },
+      "stroke": null,
+      "shadow": null,
+      "flipH": false,
+      "flipV": false
+    },
+    {
+      "id": "e3",
+      "kind": "text",
+      "box": {
+        "x": 48.0,
+        "y": 166.0,
+        "w": 424.0,
+        "h": 56.0
+      },
+      "z": 2,
+      "name": "left-lede",
+      "source": {
+        "path": "body > [data-name=left-lede]",
+        "tag": "div",
+        "svg": null
+      },
+      "placeholder": {
+        "type": "body",
+        "idx": 1
+      },
+      "paragraphs": [
+        {
+          "align": "left",
+          "lineHeightPx": 22.0,
+          "spaceBeforePx": 0.0,
+          "spaceAfterPx": 0.0,
+          "bullet": null,
+          "lines": [
+            {
+              "box": {
+                "x": 48,
+                "y": 166,
+                "w": 424,
+                "h": 22
+              },
+              "runs": [
+                {
+                  "text": "Left column heading, mapped by overlap alone",
+                  "font": "Calibri",
+                  "sizePx": 15.0,
+                  "weight": 700,
+                  "italic": false,
+                  "color": "0B5FA5",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "anchor": "top",
+      "writingMode": "horizontal",
+      "wrap": true,
+      "transformCase": null
+    },
+    {
+      "id": "e4",
+      "kind": "text",
+      "box": {
+        "x": 488.0,
+        "y": 166.0,
+        "w": 424.0,
+        "h": 56.0
+      },
+      "z": 3,
+      "name": "right-lede",
+      "source": {
+        "path": "body > [data-name=right-lede]",
+        "tag": "div",
+        "svg": null
+      },
+      "placeholder": {
+        "type": "body",
+        "idx": 3
+      },
+      "paragraphs": [
+        {
+          "align": "left",
+          "lineHeightPx": 22.0,
+          "spaceBeforePx": 0.0,
+          "spaceAfterPx": 0.0,
+          "bullet": null,
+          "lines": [
+            {
+              "box": {
+                "x": 488,
+                "y": 166,
+                "w": 424,
+                "h": 22
+              },
+              "runs": [
+                {
+                  "text": "Right column heading, mapped by attribute",
+                  "font": "Calibri",
+                  "sizePx": 15.0,
+                  "weight": 700,
+                  "italic": false,
+                  "color": "0B5FA5",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "anchor": "top",
+      "writingMode": "horizontal",
+      "wrap": true,
+      "transformCase": null
+    },
+    {
+      "id": "e5",
+      "kind": "text",
+      "box": {
+        "x": 48.0,
+        "y": 240.0,
+        "w": 424.0,
+        "h": 120.0
+      },
+      "z": 4,
+      "name": "left-body",
+      "source": {
+        "path": "body > [data-name=left-body]",
+        "tag": "div",
+        "svg": null
+      },
+      "placeholder": {
+        "type": "obj",
+        "idx": 2
+      },
+      "paragraphs": [
+        {
+          "align": "left",
+          "lineHeightPx": 20.0,
+          "spaceBeforePx": 0.0,
+          "spaceAfterPx": 0.0,
+          "bullet": null,
+          "lines": [
+            {
+              "box": {
+                "x": 48,
+                "y": 240,
+                "w": 424,
+                "h": 20
+              },
+              "runs": [
+                {
+                  "text": "This block carries no data-placeholder.",
+                  "font": "Calibri",
+                  "sizePx": 14.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "2E2E38",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            },
+            {
+              "box": {
+                "x": 48,
+                "y": 260,
+                "w": 424,
+                "h": 20
+              },
+              "runs": [
+                {
+                  "text": "It lies inside the second zone.",
+                  "font": "Calibri",
+                  "sizePx": 14.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "2E2E38",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "anchor": "top",
+      "writingMode": "horizontal",
+      "wrap": true,
+      "transformCase": null
+    },
+    {
+      "id": "e6",
+      "kind": "text",
+      "box": {
+        "x": 488.0,
+        "y": 240.0,
+        "w": 424.0,
+        "h": 160.0
+      },
+      "z": 5,
+      "name": "right-body",
+      "source": {
+        "path": "body > [data-name=right-body]",
+        "tag": "div",
+        "svg": null
+      },
+      "placeholder": {
+        "type": "obj",
+        "idx": 4
+      },
+      "paragraphs": [
+        {
+          "align": "left",
+          "lineHeightPx": 20.0,
+          "spaceBeforePx": 0.0,
+          "spaceAfterPx": 0.0,
+          "bullet": null,
+          "lines": [
+            {
+              "box": {
+                "x": 488,
+                "y": 240,
+                "w": 424,
+                "h": 20
+              },
+              "runs": [
+                {
+                  "text": "Two zones share the type obj on this layout,",
+                  "font": "Calibri",
+                  "sizePx": 14.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "2E2E38",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            },
+            {
+              "box": {
+                "x": 488,
+                "y": 260,
+                "w": 424,
+                "h": 20
+              },
+              "runs": [
+                {
+                  "text": "so idx 4 is the only correct answer.",
+                  "font": "Calibri",
+                  "sizePx": 14.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "2E2E38",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "anchor": "top",
+      "writingMode": "horizontal",
+      "wrap": true,
+      "transformCase": null
+    },
+    {
+      "id": "e7",
+      "kind": "text",
+      "box": {
+        "x": 380.0,
+        "y": 600.0,
+        "w": 300.0,
+        "h": 100.0
+      },
+      "z": 6,
+      "name": "below-threshold",
+      "source": {
+        "path": "body > [data-name=below-threshold]",
+        "tag": "div",
+        "svg": null
+      },
+      "paragraphs": [
+        {
+          "align": "left",
+          "lineHeightPx": 18.0,
+          "spaceBeforePx": 0.0,
+          "spaceAfterPx": 0.0,
+          "bullet": null,
+          "lines": [
+            {
+              "box": {
+                "x": 380,
+                "y": 600,
+                "w": 300,
+                "h": 18
+              },
+              "runs": [
+                {
+                  "text": "Only 13 per cent of this box overlaps the",
+                  "font": "Calibri",
+                  "sizePx": 11.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "747480",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            },
+            {
+              "box": {
+                "x": 380,
+                "y": 618,
+                "w": 300,
+                "h": 18
+              },
+              "runs": [
+                {
+                  "text": "second zone, so it stays a text box.",
+                  "font": "Calibri",
+                  "sizePx": 11.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "747480",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "anchor": "top",
+      "writingMode": "horizontal",
+      "wrap": true,
+      "transformCase": null
+    },
+    {
+      "id": "e8",
+      "kind": "text",
+      "box": {
+        "x": 48.0,
+        "y": 660.0,
+        "w": 400.0,
+        "h": 28.0
+      },
+      "z": 7,
+      "name": "source-note",
+      "source": {
+        "path": "body > [data-name=source-note]",
+        "tag": "div",
+        "svg": null
+      },
+      "paragraphs": [
+        {
+          "align": "left",
+          "lineHeightPx": 18.0,
+          "spaceBeforePx": 0.0,
+          "spaceAfterPx": 0.0,
+          "bullet": null,
+          "lines": [
+            {
+              "box": {
+                "x": 48,
+                "y": 660,
+                "w": 400,
+                "h": 18
+              },
+              "runs": [
+                {
+                  "text": "Source: torture fixture.",
+                  "font": "Calibri",
+                  "sizePx": 11.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "747480",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "anchor": "top",
+      "writingMode": "horizontal",
+      "wrap": true,
+      "transformCase": null
+    },
+    {
+      "id": "e9",
+      "kind": "shape",
+      "box": {
+        "x": 950.0,
+        "y": 240.0,
+        "w": 130.0,
+        "h": 120.0
+      },
+      "z": 8,
+      "name": "badge-a",
+      "group": "g1",
+      "source": {
+        "path": "body > [data-name=badge-a]",
+        "tag": "div",
+        "svg": null
+      },
+      "geometry": {
+        "type": "roundRect",
+        "radius": {
+          "tl": 8,
+          "tr": 8,
+          "br": 8,
+          "bl": 8
+        }
+      },
+      "fill": {
+        "type": "solid",
+        "color": "E8F4FE",
+        "alpha": 1.0
+      },
+      "stroke": null,
+      "shadow": null,
+      "flipH": false,
+      "flipV": false
+    },
+    {
+      "id": "e10",
+      "kind": "shape",
+      "box": {
+        "x": 1100.0,
+        "y": 240.0,
+        "w": 130.0,
+        "h": 120.0
+      },
+      "z": 9,
+      "name": "badge-b",
+      "group": "g1",
+      "source": {
+        "path": "body > [data-name=badge-b]",
+        "tag": "div",
+        "svg": null
+      },
+      "geometry": {
+        "type": "roundRect",
+        "radius": {
+          "tl": 8,
+          "tr": 8,
+          "br": 8,
+          "bl": 8
+        }
+      },
+      "fill": {
+        "type": "solid",
+        "color": "E6F6EC",
+        "alpha": 1.0
+      },
+      "stroke": null,
+      "shadow": null,
+      "flipH": false,
+      "flipV": false
+    }
+  ],
+  "diagnostics": []
+}

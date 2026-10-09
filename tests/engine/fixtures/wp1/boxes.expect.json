@@ -1,0 +1,21 @@
+{
+  "master": "test-16x9",
+  "layoutId": "layout-05",
+  "kinds": {
+    "shape": 23,
+    "raster": 8
+  },
+  "rasterAllowed": [
+    "CSS filter",
+    "conic-gradient",
+    "multiple background layers",
+    "mix-blend-mode",
+    "inset box-shadow",
+    "data-pptx=\"raster\"",
+    "unsupported CSS transform"
+  ],
+  "charts": {
+    "authored": 0,
+    "recognised": 0
+  }
+}

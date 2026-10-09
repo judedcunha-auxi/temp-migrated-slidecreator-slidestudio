@@ -1,0 +1,83 @@
+<!doctype html>
+<!-- Torture family: svg-paths (WP2).
+     Everything that reaches the IR through svgelements: straight-segment chevrons that must stay
+     exact under a viewBox scale, cubics, quadratics, elliptical arcs, dash patterns, markers,
+     nested group transforms, `use` of a path and of a symbol, `fill-rule: evenodd`, and the four
+     preset shapes a path can really be (rect, circle, ring segment, wedge). Every top-level block
+     is absolutely positioned and otherwise unstyled, so the IR for this slide is exactly the SVG
+     expansion and svg-paths.expect.json can state it. -->
+<html><head><meta charset="utf-8"><style>
+html,body{margin:0;width:1280px;height:720px;overflow:hidden;background:transparent;
+  font-family:Arial,Helvetica,sans-serif;color:#2E2E38}
+.block{position:absolute}
+/* fill and fill-rule carried only by a CSS class, resolved through getComputedStyle */
+.ring{fill:#2E2E38;fill-rule:evenodd}
+</style></head><body>
+
+<!-- ============ A: chevrons under a viewBox that doubles every coordinate ============ -->
+<div class="block" style="left:40px;top:40px">
+  <svg width="600" height="200" viewBox="0 0 300 100">
+    <g>
+      <path d="M0,20 H140 L156,44 L140,68 H0 L16,44 Z" fill="#2E2E38"/>
+      <path d="M150,20 H290 L290,68 H150 L166,44 Z" fill="#1A9AFA"/>
+    </g>
+    <!-- a dashed straight path: the pairs must come out scaled by the viewBox -->
+    <path d="M0,86 L290,86" fill="none" stroke="#747480" stroke-width="1.5" stroke-dasharray="4 3"/>
+  </svg>
+</div>
+
+<!-- ============ B: curves, arcs, markers, transforms, use ============ -->
+<div class="block" style="left:40px;top:280px">
+  <svg width="620" height="200" viewBox="0 0 620 200">
+    <defs>
+      <marker id="tip" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+        <path d="M0,0 L8,4 L0,8 Z" fill="#1A9AFA"/>
+      </marker>
+      <path id="chev" d="M0,0 L28,0 L36,10 L28,20 L0,20 L8,10 Z"/>
+      <symbol id="tick" viewBox="0 0 12 12">
+        <path d="M1,6 L5,10 L11,1" fill="none" stroke="#2DB757" stroke-width="2"/>
+      </symbol>
+    </defs>
+
+    <!-- cubics -->
+    <path d="M10,60 C40,10 90,10 120,60 S200,110 230,60" fill="none" stroke="#2E2E38"
+          stroke-width="2" marker-end="url(#tip)"/>
+    <!-- a quadratic stays a quadratic -->
+    <path d="M250,60 Q290,10 330,60" fill="none" stroke="#1A9AFA" stroke-width="2"/>
+    <!-- an elliptical arc becomes cubics -->
+    <path d="M350,60 A40,25 0 0,1 430,60" fill="none" stroke="#FF4136" stroke-width="2"/>
+
+    <!-- nested transforms: the CTM resolves translate ∘ rotate ∘ scale -->
+    <g transform="translate(40,110)">
+      <g transform="rotate(20) scale(1.5)">
+        <path d="M0,0 L40,0 L40,24 L0,24 Z" fill="#C4C4CD"/>
+      </g>
+    </g>
+
+    <use href="#chev" x="220" y="120" fill="#2DB757"/>
+    <use href="#tick" x="300" y="118" width="24" height="24"/>
+  </svg>
+</div>
+
+<!-- ============ C: the four presets a path can really be ============ -->
+<div class="block" style="left:700px;top:40px">
+  <svg width="520" height="440" viewBox="0 0 520 440">
+    <!-- a 4-point axis-aligned closed path is a rect -->
+    <path d="M20,20 L120,20 L120,80 L20,80 Z" fill="#C4C4CD"/>
+    <!-- two half arcs on one circle is an ellipse -->
+    <path d="M180,50 A40,40 0 1,0 260,50 A40,40 0 1,0 180,50 Z" fill="#1A9AFA"/>
+    <!-- outer arc, radial edge, inner arc, radial edge: a ring segment -->
+    <path d="M400,150 A80,80 0 0,1 320,230 L320,180 A30,30 0 0,0 350,150 Z" fill="#2E2E38"/>
+    <!-- centre, radius, arc, close: a wedge -->
+    <path d="M110,230 L190,230 A80,80 0 0,1 110,310 Z" fill="#FFE600"/>
+    <!-- two subpaths with fill-rule evenodd: a hole, not a disc -->
+    <path class="ring" d="M120,400 m-60,0 a60,60 0 1,0 120,0 a60,60 0 1,0 -120,0
+                          M120,400 m-30,0 a30,30 0 1,0 60,0 a30,30 0 1,0 -60,0"/>
+    <!-- a squiggle that is not any preset: it must keep its exact cubics -->
+    <path d="M280,340 C310,300 350,420 390,350 C420,300 460,400 500,360" fill="none"
+          stroke="#747480" stroke-width="2"/>
+  </svg>
+</div>
+
+<aside class="notes" hidden>svg-paths torture slide: curves, arcs, transforms, use, and the path presets.</aside>
+</body></html>

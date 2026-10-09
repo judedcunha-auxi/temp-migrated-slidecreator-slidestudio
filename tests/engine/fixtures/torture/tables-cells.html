@@ -1,0 +1,47 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><style>
+html,body{margin:0;width:1280px;height:720px;overflow:hidden;background:transparent;font-family:Calibri,Arial,sans-serif;color:#1d2433}
+/* the heading reaches the right edge of layout-06's title zone (48 + 864 = 912): see the notes */
+.h{position:absolute;left:40px;top:24px;width:872px;font-size:26px;font-weight:700}
+.wrap{position:absolute;left:40px;top:80px;width:760px}
+table{border-collapse:collapse;width:100%;font-size:11px}
+thead tr{background:#0B2545;color:#fff}           /* header colour on the ROW, not the cells */
+th{padding:6px 8px;text-align:left;font-weight:700}
+td{padding:5px 8px;border-bottom:1px solid #D8DDE6;vertical-align:top}
+tbody tr:nth-child(even){background:#F3F5F9}       /* zebra on the row */
+tr.hl{background:#DCF5E6}                          /* highlighted row on the row */
+.pill{display:inline-block;padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;color:#fff}
+.g{background:#1E9E5A}.a{background:#F59E0B}.r{background:#D64545}
+.num{display:inline-block;width:18px;height:18px;border-radius:50%;background:#0B5CAD;color:#fff;text-align:center;line-height:18px;font-weight:700;margin-right:6px}
+.cty{font-weight:700}
+.desc{color:#556;font-size:10px}
+.bar{height:6px;background:#E1E6EE;border-radius:3px;margin-top:3px}
+.bar i{display:block;height:6px;background:#0B5CAD;border-radius:3px}
+.side{position:absolute;left:830px;top:80px;width:410px}
+.t2 td{border:1px solid #C9D2DF}
+.t2 td.lbl{background:#EAF2FF;font-weight:700;border-left:4px solid #0B5CAD}
+.t2 td.shade{background:color-mix(in srgb,#1E9E5A 15%,white)}
+</style></head><body>
+<div class="h" data-placeholder="title">Dense tables (probe 2)</div>
+<div class="wrap">
+<table>
+  <thead><tr><th>#</th><th>Country</th><th>Strategy</th><th>Compute</th><th>Talent</th><th>Status</th></tr></thead>
+  <tbody>
+    <tr><td><span class="num">1</span></td><td><span class="cty">🇺🇸 United States</span><div class="desc">National AI Initiative Act</div></td><td>Market-led, federal R&amp;D funding</td><td><div>92</div><div class="bar"><i style="width:92%"></i></div></td><td>High</td><td><span class="pill g">Leader</span></td></tr>
+    <tr><td><span class="num">2</span></td><td><span class="cty">🇬🇧 United Kingdom</span><div class="desc">National AI Strategy 2021</div></td><td>Safety-first, sector regulators</td><td><div>78</div><div class="bar"><i style="width:78%"></i></div></td><td>High</td><td><span class="pill g">Leader</span></td></tr>
+    <tr class="hl"><td><span class="num">3</span></td><td><span class="cty">🇸🇬 Singapore</span><div class="desc">NAIS 2.0 (2023)</div></td><td>State-orchestrated, sandbox-heavy</td><td><div>74</div><div class="bar"><i style="width:74%"></i></div></td><td>Medium</td><td><span class="pill a">Challenger</span></td></tr>
+    <tr><td><span class="num">4</span></td><td><span class="cty">🇦🇪 UAE</span><div class="desc">AI Strategy 2031</div></td><td>Sovereign capital, talent visas</td><td><div>70</div><div class="bar"><i style="width:70%"></i></div></td><td>Medium</td><td><span class="pill a">Challenger</span></td></tr>
+    <tr><td><span class="num">5</span></td><td><span class="cty">🇮🇳 India</span><div class="desc">IndiaAI Mission</div></td><td>Scale via digital public goods</td><td><div>55</div><div class="bar"><i style="width:55%"></i></div></td><td>High</td><td><span class="pill r">Emerging</span></td></tr>
+    <tr><td><span class="num">6</span></td><td><span class="cty">🇸🇦 Saudi Arabia</span><div class="desc">NSDAI</div></td><td>Giga-project anchored demand</td><td><div>61</div><div class="bar"><i style="width:61%"></i></div></td><td>Low</td><td><span class="pill r">Emerging</span></td></tr>
+  </tbody>
+</table>
+</div>
+<div class="side">
+<table class="t2">
+  <tr><td class="lbl">Sandbox</td><td>Regulatory sandbox with a 12-month fast track for pilots</td></tr>
+  <tr><td class="lbl">Funding</td><td class="shade">Co-investment fund matched 1:1 by the sovereign vehicle</td></tr>
+  <tr><td class="lbl">Talent</td><td>Golden visa for AI researchers and a national PhD programme</td></tr>
+  <tr><td class="lbl">Compute</td><td><svg width="14" height="14" viewBox="0 0 14 14" style="vertical-align:middle"><circle cx="7" cy="7" r="6" fill="#1E9E5A"/></svg> Sovereign GPU cluster, 20k H100 equivalent</td></tr>
+</table>
+</div>
+</body></html>

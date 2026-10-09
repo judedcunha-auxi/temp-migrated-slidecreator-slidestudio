@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>extract cases: cards, chips and tiles</title>
+<!-- Synthetic. The element-boundary constructs a real content slide uses, one of each:
+     cards with text around an in-flow svg, headings with an inline chip beside them or wrapped onto
+     a line of their own, and tiles whose border sides differ. -->
+<style>
+html,body{margin:0;width:1280px;height:720px;overflow:hidden;background:transparent;
+  font-family:Arial,Helvetica,sans-serif;color:#2E2E38}
+.card{position:absolute;top:40px;width:260px;font-size:12px;line-height:1.3}
+.card .t{font-size:14px;font-weight:700}
+.card .d{margin-top:4px;color:#4A4A55}
+.card svg{display:block;margin-top:8px}
+.block{position:absolute;left:640px;width:560px}
+.ph{font-size:20px;font-weight:700;line-height:1.2;margin:0}
+.psub{font-size:13px;line-height:1.35;margin:6px 0 0;color:#4A4A55}
+.chip{display:inline-block;font-size:9px;font-weight:700;padding:2px 5px;margin-left:6px;
+  vertical-align:3px;background:#F5C518;color:#2E2E38;letter-spacing:.3px}
+.narrow{width:260px}
+.tile{position:absolute;top:400px;width:260px;height:200px;box-sizing:border-box;padding:10px;
+  border:1px solid #C4C4CD;border-top:2px solid #1A9AFA;font-size:11px;line-height:1.35}
+.tile .tt{font-size:13px;font-weight:700}
+.tile svg{display:block;margin:8px 0}
+</style></head><body>
+<div class="card" style="left:48px"><div class="t">North region</div><div class="d">Revenue up a third on last year</div>
+  <svg width="200" height="40" viewBox="0 0 200 40"><rect x="0" y="10" width="160" height="20" fill="#1A9AFA"/></svg></div>
+<div class="card" style="left:340px"><div class="t">South region</div><div class="d">Revenue up a fifth on last year</div>
+  <svg width="200" height="40" viewBox="0 0 200 40"><rect x="0" y="10" width="120" height="20" fill="#1A9AFA"/></svg></div>
+
+<div class="block" style="top:40px">
+  <p class="ph">Partner revenue grew in every region<span class="chip">SAMPLE</span></p>
+  <p class="psub">Partners now bring in more new revenue than any other channel.</p>
+</div>
+<div class="block narrow" style="top:160px">
+  <p class="ph">Growth compounds<span class="chip">SYNTHETIC PREVIEW ONLY</span></p>
+  <p class="psub">A chip too wide for the line it follows.</p>
+</div>
+<div class="block" style="top:290px">
+  <p class="ph">Margins held<span class="chip">DRAFT</span></p>
+</div>
+
+<div class="tile" style="left:48px"><div class="tt">Tile one</div><div>First detail line</div>
+  <svg width="80" height="30" viewBox="0 0 80 30"><rect x="0" y="5" width="60" height="20" fill="#1A9AFA"/></svg>
+  <div>Footnote one</div></div>
+<div class="tile" style="left:340px"><div class="tt">Tile two</div><div>Second detail line</div>
+  <svg width="80" height="30" viewBox="0 0 80 30"><rect x="0" y="5" width="50" height="20" fill="#1A9AFA"/></svg>
+  <div>Footnote two</div></div>
+<div class="tile" style="left:632px"><div class="tt">Tile three</div><div>Third detail line</div>
+  <svg width="80" height="30" viewBox="0 0 80 30"><rect x="0" y="5" width="40" height="20" fill="#1A9AFA"/></svg>
+  <div>Footnote three</div></div>
+<div class="tile" style="left:924px"><div class="tt">Tile four</div><div>Fourth detail line</div>
+  <svg width="80" height="30" viewBox="0 0 80 30"><rect x="0" y="5" width="30" height="20" fill="#1A9AFA"/></svg>
+  <div>Footnote four</div></div>
+</body></html>

@@ -1,0 +1,29 @@
+{
+  "family": "charts",
+  "master": "test-16x9",
+  "layoutId": "layout-07",
+  "canvas": {
+    "w": 1280,
+    "h": 720
+  },
+  "kinds": {
+    "text": 9,
+    "chart": 8
+  },
+  "rasterAllowed": [],
+  "charts": {
+    "authored": 8,
+    "recognised": 0
+  },
+  "gateMaxPx2": 2471,
+  "notes": [
+    "gateMaxPx2 7,680 = the first torture-gate measurement (WP-G, 2026-09-25: 6,400 px² masked, chart frames painted out) + 20 % (Peter #16), provisional until G-2 and H re-set every ceiling (plan §11). The area is the h1, which the browser draws in the manifest's major font (Calibri Light) while the file's `+mj-lt` resolves to the theme part's major font (Calibri) — plan D4's test-master inconsistency — plus axis labels drawn just outside the masked frames.",
+    "9 text elements: the h1 plus one caption per chart. Each caption is its own maximal run of",
+    "inline-only sibling blocks (master brief §11) because a chart div sits between every pair.",
+    "8 chart elements: one authored data-chart each, no recognisable SVG on this slide.",
+    "Every type here is one PptxRender draws, so the gate compares like for like; the overlay",
+    "lines the emitter adds for referenceLines and waterfall connectors are slide shapes inside",
+    "the chart frames, which the gate masks.",
+    "gateMaxPx2 2,471 = max(measured x 1.2, measured + 60) over the measured 2,059 px2 masked non-chart area on fidelity-w3 (2314d7f), 2026-09-25 (plan §11; Peter #16: measured + 20 %, with the 60 px2 per-slide noise tolerance as the floor). A regression guard, not a target."
+  ]
+}

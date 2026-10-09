@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>torture · sizes-4x3</title>
+<style>
+/* 10 x 7.5 in at 96 px/in = 960 x 720. The only difference from the 16:9 families is the canvas. */
+html,body{margin:0;width:960px;height:720px;overflow:hidden;background:transparent;
+  font-family:"Calibri",Arial,sans-serif;color:#2E2E38}
+h2{font-family:"Calibri Light",Arial,sans-serif;font-size:34px;font-weight:400;margin:0;line-height:1.15}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#747480}
+.sub{font-size:16px;line-height:1.4;margin:0;color:#516467}
+table{border-collapse:collapse;table-layout:fixed;font-size:12px}
+th,td{padding:5px 8px;border:1px solid #D9D9E0;text-align:left}
+th{background:#E8F4FE;color:#0B5FA5;font-weight:700}
+.num{text-align:right}
+</style></head><body>
+
+<!-- Canvas corners: the emitter must keep these inside the slide on a 960 px wide deck. -->
+<div data-name="corner-top-left" style="position:absolute;left:0;top:0;width:24px;height:24px;background:#1A9AFA"></div>
+<div data-name="corner-bottom-right" style="position:absolute;left:936px;top:696px;width:24px;height:24px;background:#2DB757"></div>
+
+<div class="eyebrow" data-name="eyebrow" style="position:absolute;left:40px;top:44px;width:360px">
+  Size generality · four by three
+</div>
+
+<div data-name="swatch-a" style="position:absolute;left:40px;top:80px;width:110px;height:60px;background:#1A9AFA"></div>
+<div data-name="swatch-b" style="position:absolute;left:160px;top:80px;width:110px;height:60px;background:#2DB757"></div>
+<div data-name="swatch-c" style="position:absolute;left:280px;top:80px;width:110px;height:60px;background:#F5A623;border-radius:10px"></div>
+
+<div data-name="hero-image" style="position:absolute;left:620px;top:40px;width:300px;height:150px">
+  <img src="/api/projects/prj_torture/assets/photo-400x300.png" alt=""
+       style="width:100%;height:100%;display:block;object-fit:cover">
+</div>
+
+<!-- ctrTitle idx 0 on the Title Slide layout = (72, 223.667, 816, 154.333); 'title' aliases onto it. -->
+<div data-placeholder="title" data-name="deck-title"
+     style="position:absolute;left:72px;top:232px;width:816px;height:80px">
+  <h2>The same IR, emitted onto a narrower canvas</h2>
+</div>
+
+<!-- subTitle idx 1 = (144, 408, 672, 184). -->
+<div data-placeholder="subtitle" data-name="deck-subtitle"
+     style="position:absolute;left:144px;top:416px;width:672px;height:60px">
+  <p class="sub">One CSS pixel is still one ninety-sixth of an inch, so only the canvas changes.</p>
+</div>
+
+<svg id="mini-diagram" data-name="mini-diagram" width="280" height="180" viewBox="0 0 280 180"
+     style="position:absolute;left:40px;top:496px">
+  <rect id="diagram-box" x="10" y="30" width="120" height="70" rx="8" fill="#E8F4FE"
+        stroke="#0B5FA5" stroke-width="2"/>
+  <circle id="diagram-dot" cx="210" cy="65" r="38" fill="#2DB757" fill-opacity="0.35"
+          stroke="#12703A" stroke-width="2"/>
+  <text id="diagram-label" x="70" y="140" font-size="13" fill="#2E2E38" text-anchor="middle">Native on both</text>
+</svg>
+
+<table data-name="mini-table" style="position:absolute;left:350px;top:496px;width:250px">
+  <colgroup><col style="width:130px"><col style="width:120px"></colgroup>
+  <tr><th>Canvas</th><th class="num">Width</th></tr>
+  <tr><td>16:9</td><td class="num">1280</td></tr>
+  <tr><td>4:3</td><td class="num">960</td></tr>
+</table>
+
+<div data-name="mini-chart" style="position:absolute;left:630px;top:496px;width:290px;height:180px" data-chart='{
+  "type": "column",
+  "categories": ["16:9","4:3"],
+  "series": [{"name":"Canvas width","values":[1280,960]}],
+  "colors": ["#1A9AFA"],
+  "options": {"dataLabels": true, "labelPosition": "outEnd", "legend": false,
+              "gridlines": false, "valueAxis": {"min": 0, "max": 1400, "majorUnit": 350}}
+}'></div>
+
+<aside class="notes" style="display:none">The 4:3 cross-section: a title-slide layout with ctrTitle and
+subTitle, canvas-corner shapes, an image, a small SVG diagram, a table and one authored chart, all on a
+960 x 720 canvas.</aside>
+
+</body></html>

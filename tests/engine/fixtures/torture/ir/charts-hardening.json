@@ -1,0 +1,988 @@
+{
+  "version": 1,
+  "canvas": {
+    "w": 1280,
+    "h": 720,
+    "pxPerIn": 96
+  },
+  "slide": {
+    "id": "tor_charts_hardening",
+    "title": "Charts — spellings the engine now reads one way",
+    "layoutId": "layout-07",
+    "notes": "Seven authored charts; every spec lints clean."
+  },
+  "fonts": {
+    "forced": {
+      "major": "Calibri Light",
+      "minor": "Calibri"
+    },
+    "used": [
+      "Calibri",
+      "Calibri Light"
+    ],
+    "substituted": []
+  },
+  "groups": [],
+  "elements": [
+    {
+      "id": "e1",
+      "kind": "text",
+      "box": {
+        "x": 40.0,
+        "y": 24.0,
+        "w": 1200.0,
+        "h": 36.0
+      },
+      "z": 0,
+      "name": "title",
+      "source": {
+        "path": "body > [data-name=title]",
+        "tag": "div",
+        "svg": null
+      },
+      "paragraphs": [
+        {
+          "align": "left",
+          "lineHeightPx": 36.0,
+          "spaceBeforePx": 0.0,
+          "spaceAfterPx": 0.0,
+          "bullet": null,
+          "lines": [
+            {
+              "box": {
+                "x": 40,
+                "y": 24,
+                "w": 1200,
+                "h": 36
+              },
+              "runs": [
+                {
+                  "text": "Charts — spellings the engine now reads one way",
+                  "font": "Calibri",
+                  "sizePx": 24.0,
+                  "weight": 700,
+                  "italic": false,
+                  "color": "12233B",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "anchor": "top",
+      "writingMode": "horizontal",
+      "wrap": true,
+      "transformCase": null
+    },
+    {
+      "id": "e2",
+      "kind": "chart",
+      "box": {
+        "x": 40.0,
+        "y": 84.0,
+        "w": 285.0,
+        "h": 250.0
+      },
+      "z": 1,
+      "name": "A totals as indices",
+      "source": {
+        "path": "body > [data-name=A totals as indices]",
+        "tag": "div",
+        "svg": null
+      },
+      "spec": {
+        "type": "waterfall",
+        "categories": [
+          "Standalone",
+          "Cost syn.",
+          "Revenue syn.",
+          "Subtotal",
+          "Integration",
+          "Tax",
+          "Combined"
+        ],
+        "series": [
+          {
+            "name": "Value",
+            "values": [
+              8.1,
+              2.4,
+              1.6,
+              12.1,
+              -0.9,
+              1.2,
+              12.4
+            ]
+          }
+        ],
+        "colors": [
+          "#1E9E5A",
+          "#D64545",
+          "#0B2545"
+        ],
+        "options": {
+          "dataLabels": true,
+          "numberFormat": "0.0",
+          "gridlines": false,
+          "legend": false,
+          "totals": [
+            0,
+            3,
+            6
+          ]
+        }
+      },
+      "style": {
+        "font": "Calibri",
+        "sizePx": 11.0,
+        "color": "333333"
+      },
+      "origin": "authored",
+      "confidence": 1.0,
+      "plotRect": null,
+      "overlay": []
+    },
+    {
+      "id": "e3",
+      "kind": "text",
+      "box": {
+        "x": 40.0,
+        "y": 340.0,
+        "w": 285.0,
+        "h": 22.0
+      },
+      "z": 2,
+      "name": "cap1",
+      "source": {
+        "path": "body > [data-name=cap1]",
+        "tag": "div",
+        "svg": null
+      },
+      "paragraphs": [
+        {
+          "align": "left",
+          "lineHeightPx": 22.0,
+          "spaceBeforePx": 0.0,
+          "spaceAfterPx": 0.0,
+          "bullet": null,
+          "lines": [
+            {
+              "box": {
+                "x": 40,
+                "y": 340,
+                "w": 285,
+                "h": 22
+              },
+              "runs": [
+                {
+                  "text": "A · p05-A: totals as indices, no plotArea",
+                  "font": "Calibri",
+                  "sizePx": 13.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "516467",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "anchor": "top",
+      "writingMode": "horizontal",
+      "wrap": true,
+      "transformCase": null
+    },
+    {
+      "id": "e4",
+      "kind": "chart",
+      "box": {
+        "x": 345.0,
+        "y": 84.0,
+        "w": 285.0,
+        "h": 250.0
+      },
+      "z": 3,
+      "name": "B totals as types",
+      "source": {
+        "path": "body > [data-name=B totals as types]",
+        "tag": "div",
+        "svg": null
+      },
+      "spec": {
+        "type": "waterfall",
+        "categories": [
+          "Standalone",
+          "Cost syn.",
+          "Revenue syn.",
+          "Subtotal",
+          "Integration",
+          "Tax",
+          "Combined"
+        ],
+        "series": [
+          {
+            "name": "Value",
+            "values": [
+              8.1,
+              2.4,
+              1.6,
+              12.1,
+              -0.9,
+              1.2,
+              12.4
+            ],
+            "types": [
+              "total",
+              "increase",
+              "increase",
+              "total",
+              "decrease",
+              "increase",
+              "total"
+            ]
+          }
+        ],
+        "colors": [
+          "#1E9E5A",
+          "#D64545",
+          "#0B2545"
+        ],
+        "options": {
+          "dataLabels": true,
+          "numberFormat": "0.0",
+          "gridlines": false,
+          "legend": false
+        }
+      },
+      "style": {
+        "font": "Calibri",
+        "sizePx": 11.0,
+        "color": "333333"
+      },
+      "origin": "authored",
+      "confidence": 1.0,
+      "plotRect": null,
+      "overlay": []
+    },
+    {
+      "id": "e5",
+      "kind": "text",
+      "box": {
+        "x": 345.0,
+        "y": 340.0,
+        "w": 285.0,
+        "h": 22.0
+      },
+      "z": 4,
+      "name": "cap2",
+      "source": {
+        "path": "body > [data-name=cap2]",
+        "tag": "div",
+        "svg": null
+      },
+      "paragraphs": [
+        {
+          "align": "left",
+          "lineHeightPx": 22.0,
+          "spaceBeforePx": 0.0,
+          "spaceAfterPx": 0.0,
+          "bullet": null,
+          "lines": [
+            {
+              "box": {
+                "x": 345,
+                "y": 340,
+                "w": 285,
+                "h": 22
+              },
+              "runs": [
+                {
+                  "text": "B · p05-B: totals from series.types",
+                  "font": "Calibri",
+                  "sizePx": 13.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "516467",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "anchor": "top",
+      "writingMode": "horizontal",
+      "wrap": true,
+      "transformCase": null
+    },
+    {
+      "id": "e6",
+      "kind": "chart",
+      "box": {
+        "x": 650.0,
+        "y": 84.0,
+        "w": 285.0,
+        "h": 250.0
+      },
+      "z": 5,
+      "name": "C totals as flags",
+      "source": {
+        "path": "body > [data-name=C totals as flags]",
+        "tag": "div",
+        "svg": null
+      },
+      "spec": {
+        "type": "waterfall",
+        "categories": [
+          "Standalone",
+          "Cost syn.",
+          "Revenue syn.",
+          "Subtotal",
+          "Integration",
+          "Tax",
+          "Combined"
+        ],
+        "series": [
+          {
+            "name": "Value",
+            "values": [
+              8.1,
+              2.4,
+              1.6,
+              12.1,
+              -0.9,
+              1.2,
+              12.4
+            ]
+          }
+        ],
+        "colors": [
+          "#1E9E5A",
+          "#D64545",
+          "#0B2545"
+        ],
+        "options": {
+          "dataLabels": true,
+          "numberFormat": "0.0",
+          "gridlines": false,
+          "legend": false,
+          "totals": [
+            true,
+            false,
+            false,
+            true,
+            false,
+            false,
+            true
+          ]
+        }
+      },
+      "style": {
+        "font": "Calibri",
+        "sizePx": 11.0,
+        "color": "333333"
+      },
+      "origin": "authored",
+      "confidence": 1.0,
+      "plotRect": null,
+      "overlay": []
+    },
+    {
+      "id": "e7",
+      "kind": "text",
+      "box": {
+        "x": 650.0,
+        "y": 340.0,
+        "w": 285.0,
+        "h": 22.0
+      },
+      "z": 6,
+      "name": "cap3",
+      "source": {
+        "path": "body > [data-name=cap3]",
+        "tag": "div",
+        "svg": null
+      },
+      "paragraphs": [
+        {
+          "align": "left",
+          "lineHeightPx": 22.0,
+          "spaceBeforePx": 0.0,
+          "spaceAfterPx": 0.0,
+          "bullet": null,
+          "lines": [
+            {
+              "box": {
+                "x": 650,
+                "y": 340,
+                "w": 285,
+                "h": 22
+              },
+              "runs": [
+                {
+                  "text": "C · p05-C: totals as per-point booleans",
+                  "font": "Calibri",
+                  "sizePx": 13.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "516467",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "anchor": "top",
+      "writingMode": "horizontal",
+      "wrap": true,
+      "transformCase": null
+    },
+    {
+      "id": "e8",
+      "kind": "chart",
+      "box": {
+        "x": 955.0,
+        "y": 84.0,
+        "w": 285.0,
+        "h": 250.0
+      },
+      "z": 7,
+      "name": "E stacked waterfall",
+      "source": {
+        "path": "body > [data-name=E stacked waterfall]",
+        "tag": "div",
+        "svg": null
+      },
+      "spec": {
+        "type": "waterfall",
+        "categories": [
+          "FY23",
+          "Price",
+          "Volume",
+          "Mix",
+          "FY24"
+        ],
+        "series": [
+          {
+            "name": "Internal",
+            "values": [
+              36,
+              9,
+              14,
+              -11,
+              48
+            ]
+          },
+          {
+            "name": "Partner",
+            "values": [
+              13,
+              5,
+              6,
+              -4,
+              20
+            ]
+          }
+        ],
+        "colors": [
+          "#0B2545",
+          "#1A9AFA"
+        ],
+        "options": {
+          "dataLabels": true,
+          "numberFormat": "0",
+          "gridlines": false,
+          "totals": [
+            0,
+            4
+          ]
+        }
+      },
+      "style": {
+        "font": "Calibri",
+        "sizePx": 11.0,
+        "color": "333333"
+      },
+      "origin": "authored",
+      "confidence": 1.0,
+      "plotRect": null,
+      "overlay": []
+    },
+    {
+      "id": "e9",
+      "kind": "text",
+      "box": {
+        "x": 955.0,
+        "y": 340.0,
+        "w": 285.0,
+        "h": 22.0
+      },
+      "z": 8,
+      "name": "cap4",
+      "source": {
+        "path": "body > [data-name=cap4]",
+        "tag": "div",
+        "svg": null
+      },
+      "paragraphs": [
+        {
+          "align": "left",
+          "lineHeightPx": 22.0,
+          "spaceBeforePx": 0.0,
+          "spaceAfterPx": 0.0,
+          "bullet": null,
+          "lines": [
+            {
+              "box": {
+                "x": 955,
+                "y": 340,
+                "w": 285,
+                "h": 22
+              },
+              "runs": [
+                {
+                  "text": "E · two series stacked, no bar crosses zero",
+                  "font": "Calibri",
+                  "sizePx": 13.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "516467",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "anchor": "top",
+      "writingMode": "horizontal",
+      "wrap": true,
+      "transformCase": null
+    },
+    {
+      "id": "e10",
+      "kind": "chart",
+      "box": {
+        "x": 40.0,
+        "y": 392.0,
+        "w": 590.0,
+        "h": 250.0
+      },
+      "z": 9,
+      "name": "G model-written waterfall",
+      "source": {
+        "path": "body > [data-name=G model-written waterfall]",
+        "tag": "div",
+        "svg": null
+      },
+      "spec": {
+        "type": "waterfall",
+        "categories": [
+          "Baseline revenue value",
+          "+ Partner growth",
+          "+ Longer terms",
+          "+ Higher spend",
+          "+ New marketplaces",
+          "+ Private investment"
+        ],
+        "series": [
+          {
+            "name": "Index",
+            "values": [
+              100,
+              30,
+              12,
+              18,
+              15,
+              20
+            ]
+          }
+        ],
+        "options": {
+          "dataLabels": true,
+          "numberFormat": "0",
+          "gridlines": false,
+          "legend": false,
+          "pointColors": [
+            "#C4C4CD",
+            "#1A9AFA",
+            "#1A9AFA",
+            "#1A9AFA",
+            "#1A9AFA",
+            "#1A9AFA"
+          ],
+          "valueAxis": {
+            "min": 0,
+            "max": 220,
+            "majorUnit": 55,
+            "visible": false
+          },
+          "plotArea": {
+            "x": 0.03,
+            "y": 0.03,
+            "w": 0.95,
+            "h": 0.86
+          }
+        }
+      },
+      "style": {
+        "font": "Calibri",
+        "sizePx": 11.0,
+        "color": "333333"
+      },
+      "origin": "authored",
+      "confidence": 1.0,
+      "plotRect": {
+        "x": 57.7,
+        "y": 399.5,
+        "w": 560.5,
+        "h": 215.0
+      },
+      "overlay": []
+    },
+    {
+      "id": "e11",
+      "kind": "text",
+      "box": {
+        "x": 40.0,
+        "y": 648.0,
+        "w": 590.0,
+        "h": 22.0
+      },
+      "z": 10,
+      "name": "cap5",
+      "source": {
+        "path": "body > [data-name=cap5]",
+        "tag": "div",
+        "svg": null
+      },
+      "paragraphs": [
+        {
+          "align": "left",
+          "lineHeightPx": 22.0,
+          "spaceBeforePx": 0.0,
+          "spaceAfterPx": 0.0,
+          "bullet": null,
+          "lines": [
+            {
+              "box": {
+                "x": 40,
+                "y": 648,
+                "w": 590,
+                "h": 22
+              },
+              "runs": [
+                {
+                  "text": "G · a model's waterfall: list pointColors, plotArea",
+                  "font": "Calibri",
+                  "sizePx": 13.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "516467",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "anchor": "top",
+      "writingMode": "horizontal",
+      "wrap": true,
+      "transformCase": null
+    },
+    {
+      "id": "e12",
+      "kind": "chart",
+      "box": {
+        "x": 650.0,
+        "y": 392.0,
+        "w": 285.0,
+        "h": 250.0
+      },
+      "z": 11,
+      "name": "H near 2750",
+      "source": {
+        "path": "body > [data-name=H near 2750]",
+        "tag": "div",
+        "svg": null
+      },
+      "spec": {
+        "type": "waterfall",
+        "categories": [
+          "FY23",
+          "Services",
+          "Products",
+          "Lending",
+          "FX & other",
+          "FY24"
+        ],
+        "series": [
+          {
+            "name": "Revenue",
+            "values": [
+              2750,
+              140,
+              95,
+              55,
+              -70,
+              2970
+            ]
+          }
+        ],
+        "colors": [
+          "#1E9E5A",
+          "#D64545",
+          "#0B3D2E"
+        ],
+        "options": {
+          "dataLabels": true,
+          "numberFormat": "#,##0",
+          "gridlines": false,
+          "legend": false,
+          "totals": [
+            0,
+            5
+          ]
+        }
+      },
+      "style": {
+        "font": "Calibri",
+        "sizePx": 11.0,
+        "color": "333333"
+      },
+      "origin": "authored",
+      "confidence": 1.0,
+      "plotRect": null,
+      "overlay": []
+    },
+    {
+      "id": "e13",
+      "kind": "text",
+      "box": {
+        "x": 650.0,
+        "y": 648.0,
+        "w": 285.0,
+        "h": 22.0
+      },
+      "z": 12,
+      "name": "cap6",
+      "source": {
+        "path": "body > [data-name=cap6]",
+        "tag": "div",
+        "svg": null
+      },
+      "paragraphs": [
+        {
+          "align": "left",
+          "lineHeightPx": 22.0,
+          "spaceBeforePx": 0.0,
+          "spaceAfterPx": 0.0,
+          "bullet": null,
+          "lines": [
+            {
+              "box": {
+                "x": 650,
+                "y": 648,
+                "w": 285,
+                "h": 22
+              },
+              "runs": [
+                {
+                  "text": "H · p11-A: a bridge near 2,750",
+                  "font": "Calibri",
+                  "sizePx": 13.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "516467",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "anchor": "top",
+      "writingMode": "horizontal",
+      "wrap": true,
+      "transformCase": null
+    },
+    {
+      "id": "e14",
+      "kind": "chart",
+      "box": {
+        "x": 955.0,
+        "y": 392.0,
+        "w": 285.0,
+        "h": 250.0
+      },
+      "z": 13,
+      "name": "I reference line",
+      "source": {
+        "path": "body > [data-name=I reference line]",
+        "tag": "div",
+        "svg": null
+      },
+      "spec": {
+        "type": "column",
+        "categories": [
+          "North",
+          "South",
+          "East",
+          "West"
+        ],
+        "series": [
+          {
+            "name": "Sales",
+            "values": [
+              42,
+              55,
+              61,
+              48
+            ]
+          }
+        ],
+        "colors": [
+          "#1A9AFA"
+        ],
+        "options": {
+          "dataLabels": true,
+          "numberFormat": "0",
+          "gridlines": false,
+          "legend": false,
+          "valueAxis": {
+            "min": 0,
+            "max": 80,
+            "majorUnit": 20
+          },
+          "referenceLines": [
+            {
+              "value": 61,
+              "label": "target"
+            }
+          ]
+        }
+      },
+      "style": {
+        "font": "Calibri",
+        "sizePx": 11.0,
+        "color": "333333"
+      },
+      "origin": "authored",
+      "confidence": 1.0,
+      "plotRect": null,
+      "overlay": []
+    },
+    {
+      "id": "e15",
+      "kind": "text",
+      "box": {
+        "x": 955.0,
+        "y": 648.0,
+        "w": 285.0,
+        "h": 22.0
+      },
+      "z": 14,
+      "name": "cap7",
+      "source": {
+        "path": "body > [data-name=cap7]",
+        "tag": "div",
+        "svg": null
+      },
+      "paragraphs": [
+        {
+          "align": "left",
+          "lineHeightPx": 22.0,
+          "spaceBeforePx": 0.0,
+          "spaceAfterPx": 0.0,
+          "bullet": null,
+          "lines": [
+            {
+              "box": {
+                "x": 955,
+                "y": 648,
+                "w": 285,
+                "h": 22
+              },
+              "runs": [
+                {
+                  "text": "I · a reference line at the third bar's value",
+                  "font": "Calibri",
+                  "sizePx": 13.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "516467",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "anchor": "top",
+      "writingMode": "horizontal",
+      "wrap": true,
+      "transformCase": null
+    }
+  ],
+  "diagnostics": []
+}

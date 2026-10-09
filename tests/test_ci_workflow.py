@@ -13,6 +13,9 @@ GATE = (ROOT / "scripts" / "gate.py").read_text(encoding="utf-8")
 
 BACKEND_STEPS = [
     ("Install dependencies", ["pip install -r requirements.txt", "pip install -r requirements-dev.txt"]),
+    # Added in Phase 2 (not in the standard list): the engine's browser and fonts for the tests.
+    ("Install Playwright Chromium and fonts", ["python -m playwright install --with-deps chromium",
+                                               "fonts-crosextra-carlito", "fonts-liberation"]),
     ("Verify dependency set is consistent", ["pip check"]),
     ("Import smoke test (app boots)", ['python -c "import app.main"']),
     ("Unit tests", ["pytest tests -v --junitxml=ci-reports/unit.xml"]),
@@ -79,6 +82,15 @@ def test_deploy_jobs_exist_as_marked_stubs_that_verify():
         assert "TODO(D2/D18/D19)" in job
         assert f"python scripts/verify_deploy.py {target}" in job
     assert "TODO(D2, D18, D19)" in CI
+
+
+def test_the_added_browser_step_sits_between_install_and_the_standard_checks():
+    """Every standard step keeps its exact name and order; the one added step installs the
+    engine's Chromium after the dependencies (so the pinned Playwright installs its own build)."""
+    names = re.findall(r"^      - name: (.+)$", _job("Backend (pytest + ruff + mypy)"), flags=re.MULTILINE)
+    standard = [name for name in names if name != "Install Playwright Chromium and fonts"]
+    assert standard[:2] == ["Install dependencies", "Verify dependency set is consistent"]
+    assert names.index("Install Playwright Chromium and fonts") == names.index("Install dependencies") + 1
 
 
 def test_the_local_gate_runs_the_same_checks():

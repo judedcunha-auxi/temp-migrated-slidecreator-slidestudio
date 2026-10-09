@@ -1,0 +1,25 @@
+{
+  "family": "svg-paths",
+  "master": "test-16x9",
+  "layoutId": "layout-06",
+  "canvas": {
+    "w": 1280,
+    "h": 720
+  },
+  "kinds": {
+    "shape": 15
+  },
+  "rasterAllowed": [],
+  "charts": {
+    "authored": 0,
+    "recognised": 0
+  },
+  "gateMaxPx2": 301,
+  "notes": [
+    "gateMaxPx2 301 = max(measured x 1.2, measured + 60) over the measured 241 px2 masked non-chart area on",
+    "fidelity/r1b-losses (main 8a756dc + r1b), 2026-09-25, two runs identical (plan 11; Peter #16). It was 304",
+    "over 244 px2 on fidelity-w3: r1b draws the 16 px `tip` marker as an lg line end (13.25 px, med before). The 241",
+    "px2 left at (256, 338) is the head's colour: the marker is filled #1A9AFA, a DrawingML line end takes its",
+    "line's colour (#2E2E38). A regression guard, not a target."
+  ]
+}

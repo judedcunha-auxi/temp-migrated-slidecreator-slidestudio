@@ -1,0 +1,21 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><style>
+html,body{margin:0;width:1280px;height:720px;overflow:hidden;background:transparent;
+  font-family:Arial,Helvetica,sans-serif}
+img{position:absolute;display:block}
+#cover{left:40px;top:40px;width:200px;height:100px;object-fit:cover}
+#contain{left:280px;top:40px;width:200px;height:100px;object-fit:contain}
+#fill{left:520px;top:40px;width:200px;height:100px;object-fit:fill}
+#round{left:760px;top:40px;width:120px;height:120px;object-fit:cover;border-radius:60px}
+#missing{left:920px;top:40px;width:80px;height:80px}
+#bg{position:absolute;left:40px;top:200px;width:240px;height:120px;
+  background-image:url(/api/projects/prj_x/assets/asset-cover-photo.jpg);
+  background-size:cover;background-position:50% 50%}
+</style></head><body>
+<img id="cover" src="/api/projects/prj_x/assets/asset-cover-photo.jpg" alt="">
+<img id="contain" src="/api/projects/prj_x/assets/asset-cover-photo.jpg" alt="">
+<img id="fill" src="/api/projects/prj_x/assets/asset-cover-photo.jpg" alt="">
+<img id="round" src="/api/projects/prj_x/assets/logo-160x160.png" alt="">
+<img id="missing" src="/api/projects/prj_x/assets/not-here.png" alt="">
+<div id="bg"></div>
+</body></html>

@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>torture · as-seen</title>
+<style>
+html,body{margin:0;width:1280px;height:720px;overflow:hidden;background:transparent;
+  font-family:"Calibri",Arial,sans-serif;color:#2E2E38;font-size:13px;line-height:1.4}
+p{margin:0}
+.lbl{position:absolute;font-size:12px;font-weight:700;color:#0B5CAD;line-height:1.2}
+
+/* A · animations: a staggered fade-up (fill: both), a looping pulse, a forwards-only reveal. */
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes pulse{from{opacity:1}to{opacity:.2}}
+@keyframes reveal{to{opacity:1}}
+.card{position:absolute;top:130px;width:130px;height:100px;padding:14px;box-sizing:border-box;
+  background:#0B2545;color:#FFFFFF;border-radius:8px;animation:fadeUp .6s ease both}
+.card .n{font-size:24px;font-weight:700;line-height:normal}
+.card .l{font-size:12px;line-height:normal}
+.dot{position:absolute;left:600px;top:136px;width:16px;height:16px;border-radius:8px;background:#1E9E5A;
+  animation:pulse 1s ease-in-out infinite alternate}
+.reveal{position:absolute;left:600px;top:170px;width:160px;height:60px;padding:10px;box-sizing:border-box;
+  background:#1A9AFA;color:#FFFFFF;opacity:0;animation:reveal .5s forwards}
+
+/* B · an SVG whose foreignObject is a picture of its text; no filter or mask anywhere in it. */
+.fo{position:absolute;left:840px;top:110px}
+
+/* C · CSS columns: one long paragraph in two columns, and two paragraphs in three. */
+.cols{position:absolute;left:40px;top:290px;width:520px;columns:2;column-gap:24px;line-height:1.4}
+.cols3{position:absolute;left:640px;top:290px;width:600px;columns:3;column-gap:20px;line-height:1.4}
+.cols3 p{margin:0 0 6px 0}
+
+/* D · clipped and clamped text. */
+.clamp{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ell{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.shows2{position:absolute;left:660px;top:540px;width:260px;height:36px;overflow:hidden}
+.narrow{position:absolute;left:980px;top:540px;width:120px;overflow:hidden;white-space:nowrap}
+</style></head><body>
+
+<div class="lbl" style="left:40px;top:100px">A · animations</div>
+<div class="card" id="card1" style="left:40px;animation-delay:0s"><div class="n">$15B</div><div class="l">Committed</div></div>
+<div class="card" id="card2" style="left:180px;animation-delay:.3s"><div class="n">5.1M</div><div class="l">Upskilled</div></div>
+<div class="card" id="card3" style="left:320px;animation-delay:.6s"><div class="n">36 mo</div><div class="l">Journey</div></div>
+<div class="card" id="card4" style="left:460px;animation-delay:.9s"><div class="n">12</div><div class="l">Programmes</div></div>
+<div class="dot" id="dot"></div>
+<div class="reveal" id="reveal">Revealed at rest</div>
+
+<div class="lbl" style="left:840px;top:90px">B · foreignObject</div>
+<svg class="fo" width="400" height="140" viewBox="0 0 400 140">
+  <rect x="0" y="0" width="400" height="140" fill="#FF4136"/>
+  <foreignObject x="16" y="16" width="368" height="108"><div xmlns="http://www.w3.org/1999/xhtml" style="font-size:14px;line-height:1.3;color:#0B2545">Text written inside a foreignObject exports as a picture of itself, not as a blank image.</div></foreignObject>
+</svg>
+
+<div class="lbl" style="left:40px;top:270px">C · CSS columns</div>
+<div class="cols" id="cols">Private credit funds now write most sponsor-backed unitranche loans in the mid-market. Banks retain the revolver and the treasury relationship, but lose the term debt. Pricing is 150–250 bps wider, which borrowers accept for certainty and speed of execution. Covenant packages are looser, and hold sizes above $500M are now common. The shift is structural rather than cyclical: capital rules raised the cost of holding the loans on balance sheet.</div>
+<div class="cols3" id="cols3"><p>The first paragraph is long enough to straddle a column break, so one paragraph becomes one paragraph in each column it reaches, in reading order, with nothing interleaved.</p><p>The second paragraph follows it in the same flow of columns.</p></div>
+
+<div class="lbl" style="left:40px;top:520px">D · clipped and clamped text</div>
+<div data-name="clamp" style="position:absolute;left:40px;top:540px;width:280px"><div class="clamp" id="clamp">A long description that the browser truncates after two lines with an ellipsis, so the rest of this sentence is never visible in the design at all, however long the paragraph grows and however many more words the author keeps adding to it.</div></div>
+<div data-name="ell" style="position:absolute;left:360px;top:540px;width:260px"><div class="ell" id="ell">A single line that is far too long for its box and ends in an ellipsis</div></div>
+<div class="shows2" id="shows2"><p>Five lines of text in a box that shows only two of them: the reader never sees the third, fourth or fifth line, so the export must not show them either, whatever the paragraph says after that, however many more words it holds.</p></div>
+<div class="narrow" id="narrow">A nowrap line that runs past its box</div>
+
+</body></html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<!--
+  Torture fixture: the `charts-negative` family (WP-C, docs/engine/fidelity/12-WPC-charts.md §8.1), on the
+  16 × 9 test master's Blank layout (1280 × 720 px canvas, 1 px = 1/96 in).
+
+  p05-D's bridge across zero (split stacks, frozen labels), p11-B's horizontal bars with one
+  negative (invertIfNegative 0, category labels low), a two-series stacked bar across zero, a
+  bridge entirely below zero, and a zero step followed by a fall that lands on zero.
+
+  Paired with `charts-negative.expect.json` (counts) and `ir/charts-negative.json` (the same specs as a hand-written
+  IR, written by `make_ir.py`). `engine/tests/test_charts_emit.py` asserts the two files carry the same
+  specs, so the table in `make_ir.py` is where a chart is changed.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Charts — below and across zero</title>
+<style>
+  html, body {
+    margin: 0;
+    width: 1280px;
+    height: 720px;
+    overflow: hidden;
+    background: transparent;
+    font-family: Calibri, Arial, sans-serif;
+    color: #2E2E38;
+  }
+  h1 {
+    position: absolute;
+    left: 40px; top: 24px; width: 1200px; height: 36px;
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 36px;
+    color: #12233B;
+  }
+  .chart { position: absolute; font-size: 11px; color: #333333; }
+  .cap {
+    position: absolute;
+    height: 22px;
+    font-size: 13px;
+    line-height: 22px;
+    color: #516467;
+  }
+</style>
+</head>
+<body>
+
+<h1>Charts — below and across zero</h1>
+<div class="chart" data-name="D bridge crosses zero"
+     style="left:40px;top:84px;width:590px;height:250px"
+     data-chart='{"type": "waterfall", "categories": ["FY23", "Price", "Volume", "Mix", "Cost out", "FY24"], "series": [{"name": "EBITDA", "values": [20, -35, 10, -8, 25, 12]}], "colors": ["#1E9E5A", "#D64545", "#0B2545"], "options": {"dataLabels": true, "numberFormat": "0", "gridlines": false, "legend": false, "totals": [0, 5]}}'></div>
+<div class="cap" style="left:40px;top:340px;width:590px">D · p05-D: a bridge that crosses zero</div>
+
+<div class="chart" data-name="F negative bar"
+     style="left:650px;top:84px;width:590px;height:250px"
+     data-chart='{"type": "bar", "categories": ["Bear case", "Base case", "Bull case"], "series": [{"name": "FY2 EPS impact", "values": [-2.0, 2.3, 6.2]}], "colors": ["#0B3D2E"], "options": {"dataLabels": true, "numberFormat": "0.0\"%\"", "gridlines": false, "legend": false}}'></div>
+<div class="cap" style="left:650px;top:340px;width:590px">F · p11-B: horizontal bars, one negative</div>
+
+<div class="chart" data-name="J stacked crossing"
+     style="left:40px;top:392px;width:386px;height:250px"
+     data-chart='{"type": "waterfall", "categories": ["FY23", "Q1", "FY24"], "series": [{"name": "Internal", "values": [30, -25, -10]}, {"name": "Partner", "values": [0, -15, 0]}], "colors": ["#0B2545", "#1A9AFA"], "options": {"numberFormat": "0", "gridlines": false, "totals": [0, 2]}}'></div>
+<div class="cap" style="left:40px;top:648px;width:386px">J · stacked, a bar across zero</div>
+
+<div class="chart" data-name="K below zero"
+     style="left:447px;top:392px;width:386px;height:250px"
+     data-chart='{"type": "waterfall", "categories": ["FY23", "Opex", "FY24"], "series": [{"name": "EBIT", "values": [-20, -10, -30]}], "options": {"numberFormat": "0", "gridlines": false, "legend": false, "totals": [0, 2]}}'></div>
+<div class="cap" style="left:447px;top:648px;width:386px">K · entirely below zero</div>
+
+<div class="chart" data-name="L zero step"
+     style="left:854px;top:392px;width:386px;height:250px"
+     data-chart='{"type": "waterfall", "categories": ["Start", "Flat", "Fall", "Rise"], "series": [{"name": "Cash", "values": [20, 0, -20, 5]}], "options": {"gridlines": false, "legend": false, "totals": [0]}}'></div>
+<div class="cap" style="left:854px;top:648px;width:386px">L · a zero step, then landing on zero</div>
+
+<aside class="notes" hidden>Five authored charts: bars and bridges below and across zero.</aside>
+
+</body>
+</html>

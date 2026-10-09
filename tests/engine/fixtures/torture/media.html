@@ -1,0 +1,33 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><style>
+html,body{margin:0;width:1280px;height:720px;overflow:hidden;background:transparent;font-family:Calibri,Arial,sans-serif;color:#1d2433}
+/* the heading reaches the right edge of layout-06's title zone (48 + 864 = 912): see the notes */
+.h{position:absolute;left:40px;top:24px;width:872px;font-size:26px;font-weight:700}
+.lbl{position:absolute;font-size:12px;font-weight:700;color:#0B5CAD}
+.flags{position:absolute;left:640px;top:100px;font-size:22px;line-height:1.6}
+.icons{position:absolute;left:640px;top:260px;font-size:16px;line-height:1.8}
+.fo{position:absolute;left:40px;top:440px}
+.pins{position:absolute;left:640px;top:440px}
+</style></head><body>
+<div class="h" data-placeholder="title">Emoji, foreignObject and SVG pins (probe 7)</div>
+<div class="lbl" style="left:640px;top:80px">B · emoji flags in text</div>
+<div class="flags">🇺🇸 United States &nbsp; 🇬🇧 United Kingdom<br>🇸🇬 Singapore &nbsp; 🇦🇪 UAE &nbsp; 🇮🇳 India</div>
+<div class="lbl" style="left:640px;top:240px">C · emoji icons in text</div>
+<div class="icons">✅ Approved &nbsp; ⚠️ At risk &nbsp; ❌ Blocked<br>📈 Growth &nbsp; 💰 Capital &nbsp; 🏦 Banks &nbsp; ⭐ Best bet</div>
+<div class="lbl" style="left:40px;top:420px">D · SVG with foreignObject text (becomes a picture)</div>
+<svg class="fo" width="560" height="200" viewBox="0 0 560 200">
+  <rect x="0" y="0" width="560" height="200" rx="8" fill="#E8F1FB"/>
+  <foreignObject x="16" y="16" width="528" height="168"><div xmlns="http://www.w3.org/1999/xhtml" style="font:14px Calibri;color:#0B2545">Swimlane text written inside foreignObject — the whole SVG turns into an image, so none of this is editable text in PowerPoint.</div></foreignObject>
+</svg>
+<div class="lbl" style="left:640px;top:420px">E · plain inline SVG map pins + connectors (native)</div>
+<svg class="pins" width="560" height="200" viewBox="0 0 560 200">
+  <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#D64545"/></marker></defs>
+  <rect x="0" y="0" width="560" height="200" rx="8" fill="#F3F5F9"/>
+  <line x1="80" y1="60" x2="260" y2="120" stroke="#D64545" stroke-width="2" marker-end="url(#ah)"/>
+  <line x1="260" y1="120" x2="470" y2="70" stroke="#D64545" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#ah)"/>
+  <circle cx="80" cy="60" r="9" fill="#0B5CAD"/><circle cx="260" cy="120" r="9" fill="#0B5CAD"/><circle cx="470" cy="70" r="9" fill="#0B5CAD"/>
+  <text x="80" y="90" text-anchor="middle" font-size="12" fill="#0B2545">Minsk</text>
+  <text x="260" y="150" text-anchor="middle" font-size="12" fill="#0B2545">Budapest</text>
+  <text x="470" y="100" text-anchor="middle" font-size="12" fill="#0B2545">Hyderabad</text>
+</svg>
+</body></html>

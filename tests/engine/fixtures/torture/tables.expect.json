@@ -1,0 +1,32 @@
+{
+  "family": "tables",
+  "master": "test-16x9",
+  "layoutId": "layout-07",
+  "canvas": {"w": 1280, "h": 720},
+  "kinds": {"table": 2, "text": 2},
+  "groups": 0,
+  "rasterAllowed": [],
+  "charts": {"authored": 0, "recognised": 0},
+  "gateMaxPx2": 60,
+  "notes": [
+    "Each table sits under a caption inside one absolutely positioned container, so the caption is a",
+    "text element and the table a table element — the same split the .card rule produces on a client deck",
+    "slides (a text run of in-flow blocks, then a non-text sibling).",
+    "table-layout:fixed plus a <colgroup> makes colWidthsPx a property of the CSS rather than of the",
+    "text, so the expected widths below are exact.",
+    "Spans are counted once, at their origin cell: a rowSpan 2 cell appears in the cells list only for",
+    "the row it starts in, which is why t1 has 17 cells and not 19.",
+    "gateMaxPx2 60 = max(measured x 1.2, measured + 60) over the measured 0 px2 masked non-chart area on fidelity-w3 (2314d7f), 2026-09-25 (plan §11; Peter #16: measured + 20 %, with the 60 px2 per-slide noise tolerance as the floor). A regression guard, not a target."
+  ],
+  "elements": [
+    {"name": null, "kind": "text", "paragraphs": 1, "note": "caption 'Partners by segment, millions'"},
+    {"name": null, "kind": "table", "rows": 5, "cols": 4, "cells": 17,
+     "colWidthsPx": [130, 170, 130, 130],
+     "note": "header th colspan 2; two rowSpan 2 cells (valign middle, own fill and right border); last row has a 2 px top border and valign bottom; the 2023/FY27E columns are right aligned"},
+    {"name": null, "kind": "text", "paragraphs": 1, "note": "caption 'Delivery plan'"},
+    {"name": null, "kind": "table", "rows": 4, "cols": 3, "cells": 12,
+     "colWidthsPx": [170, 150, 100],
+     "note": "every cell fully bordered; the middle body row carries an alternating fill"}
+  ],
+  "expectedDiagnostics": []
+}

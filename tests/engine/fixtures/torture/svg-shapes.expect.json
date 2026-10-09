@@ -1,0 +1,36 @@
+{
+  "family": "svg-shapes",
+  "master": "test-16x9",
+  "layoutId": "layout-06",
+  "canvas": {
+    "w": 1280,
+    "h": 720
+  },
+  "kinds": {
+    "shape": 22,
+    "text": 3,
+    "image": 1,
+    "raster": 7
+  },
+  "rasterAllowed": [
+    "svg markerEnd marker",
+    "svg filter",
+    "svg mask",
+    "svg fill pattern",
+    "svg clipPath",
+    "svg foreignObject",
+    "svg textPath"
+  ],
+  "charts": {
+    "authored": 0,
+    "recognised": 0
+  },
+  "gateMaxPx2": 4899,
+  "notes": [
+    "gateMaxPx2 4,899 = max(measured x 1.2, measured + 60) over the measured 4,082 px2 masked non-chart area on",
+    "fidelity/r1b-losses (main 8a756dc + r1b), 2026-09-25, two runs identical (plan 11; Peter #16). It was 5,074",
+    "over 4,228 px2 on fidelity-w3: r1b sizes each marker's line end as PowerPoint draws it (svg.py _line_end, lg",
+    "for the 12 and 16 px mDot and mTriangle on the 2 px line, med before), and the 146 px2 at (144, 441) went. A",
+    "regression guard, not a target."
+  ]
+}

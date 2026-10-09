@@ -1,0 +1,549 @@
+{
+  "version": 1,
+  "canvas": {
+    "w": 1280,
+    "h": 720,
+    "pxPerIn": 96
+  },
+  "slide": {
+    "id": "emit-tables",
+    "title": "emit-tables",
+    "layoutId": "layout-07",
+    "notes": null
+  },
+  "fonts": {
+    "forced": {},
+    "used": [],
+    "substituted": []
+  },
+  "groups": [],
+  "elements": [
+    {
+      "id": "e1",
+      "kind": "table",
+      "box": {
+        "x": 64.0,
+        "y": 80.0,
+        "w": 800.0,
+        "h": 240.0
+      },
+      "z": 0,
+      "name": "summary",
+      "rows": 3,
+      "cols": 3,
+      "colWidthsPx": [
+        320.0,
+        240.0,
+        240.0
+      ],
+      "rowHeightsPx": [
+        60.0,
+        90.0,
+        90.0
+      ],
+      "cells": [
+        {
+          "r": 0,
+          "c": 0,
+          "rowSpan": 1,
+          "colSpan": 1,
+          "fill": {
+            "type": "solid",
+            "color": "F3F3F5",
+            "alpha": 1
+          },
+          "borders": {
+            "top": null,
+            "right": null,
+            "left": null,
+            "bottom": {
+              "width": 1,
+              "color": "B9C7C9",
+              "dash": "solid"
+            }
+          },
+          "paddingPx": {
+            "t": 6,
+            "r": 8,
+            "b": 6,
+            "l": 8
+          },
+          "valign": "middle",
+          "paragraphs": [
+            {
+              "align": "left",
+              "lineHeightPx": 22,
+              "spaceBeforePx": 0.0,
+              "spaceAfterPx": 0.0,
+              "bullet": null,
+              "lines": [
+                {
+                  "box": {
+                    "x": 0,
+                    "y": 0,
+                    "w": 51.625,
+                    "h": 22
+                  },
+                  "runs": [
+                    {
+                      "text": "Market",
+                      "font": "Arial",
+                      "sizePx": 16.0,
+                      "weight": 700,
+                      "italic": false,
+                      "color": "2E2E38",
+                      "alpha": 1,
+                      "underline": false,
+                      "strike": false,
+                      "letterSpacingPx": 0,
+                      "baseline": "normal",
+                      "baselineShiftPx": 0,
+                      "caps": false,
+                      "href": null
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "r": 0,
+          "c": 1,
+          "rowSpan": 1,
+          "colSpan": 1,
+          "fill": {
+            "type": "solid",
+            "color": "F3F3F5",
+            "alpha": 1
+          },
+          "borders": {
+            "top": null,
+            "right": null,
+            "left": null,
+            "bottom": {
+              "width": 1,
+              "color": "B9C7C9",
+              "dash": "solid"
+            }
+          },
+          "paddingPx": {
+            "t": 6,
+            "r": 8,
+            "b": 6,
+            "l": 8
+          },
+          "valign": "middle",
+          "paragraphs": [
+            {
+              "align": "left",
+              "lineHeightPx": 22,
+              "spaceBeforePx": 0.0,
+              "spaceAfterPx": 0.0,
+              "bullet": null,
+              "lines": [
+                {
+                  "box": {
+                    "x": 0,
+                    "y": 0,
+                    "w": 35.5,
+                    "h": 22
+                  },
+                  "runs": [
+                    {
+                      "text": "2023",
+                      "font": "Arial",
+                      "sizePx": 16.0,
+                      "weight": 700,
+                      "italic": false,
+                      "color": "2E2E38",
+                      "alpha": 1,
+                      "underline": false,
+                      "strike": false,
+                      "letterSpacingPx": 0,
+                      "baseline": "normal",
+                      "baselineShiftPx": 0,
+                      "caps": false,
+                      "href": null
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "r": 0,
+          "c": 2,
+          "rowSpan": 1,
+          "colSpan": 1,
+          "fill": {
+            "type": "solid",
+            "color": "F3F3F5",
+            "alpha": 1
+          },
+          "borders": {
+            "top": null,
+            "right": null,
+            "left": null,
+            "bottom": {
+              "width": 1,
+              "color": "B9C7C9",
+              "dash": "solid"
+            }
+          },
+          "paddingPx": {
+            "t": 6,
+            "r": 8,
+            "b": 6,
+            "l": 8
+          },
+          "valign": "middle",
+          "paragraphs": [
+            {
+              "align": "left",
+              "lineHeightPx": 22,
+              "spaceBeforePx": 0.0,
+              "spaceAfterPx": 0.0,
+              "bullet": null,
+              "lines": [
+                {
+                  "box": {
+                    "x": 0,
+                    "y": 0,
+                    "w": 47.0,
+                    "h": 22
+                  },
+                  "runs": [
+                    {
+                      "text": "FY27E",
+                      "font": "Arial",
+                      "sizePx": 16.0,
+                      "weight": 700,
+                      "italic": false,
+                      "color": "2E2E38",
+                      "alpha": 1,
+                      "underline": false,
+                      "strike": false,
+                      "letterSpacingPx": 0,
+                      "baseline": "normal",
+                      "baselineShiftPx": 0,
+                      "caps": false,
+                      "href": null
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "r": 1,
+          "c": 0,
+          "rowSpan": 1,
+          "colSpan": 2,
+          "fill": null,
+          "borders": {
+            "top": null,
+            "right": null,
+            "left": null,
+            "bottom": {
+              "width": 1,
+              "color": "B9C7C9",
+              "dash": "solid"
+            }
+          },
+          "paddingPx": {
+            "t": 6,
+            "r": 8,
+            "b": 6,
+            "l": 8
+          },
+          "valign": "middle",
+          "paragraphs": [
+            {
+              "align": "left",
+              "lineHeightPx": 22,
+              "spaceBeforePx": 0.0,
+              "spaceAfterPx": 0.0,
+              "bullet": null,
+              "lines": [
+                {
+                  "box": {
+                    "x": 0,
+                    "y": 0,
+                    "w": 207.125,
+                    "h": 22
+                  },
+                  "runs": [
+                    {
+                      "text": "Internal spans two columns",
+                      "font": "Arial",
+                      "sizePx": 16.0,
+                      "weight": 400,
+                      "italic": false,
+                      "color": "2E2E38",
+                      "alpha": 1,
+                      "underline": false,
+                      "strike": false,
+                      "letterSpacingPx": 0,
+                      "baseline": "normal",
+                      "baselineShiftPx": 0,
+                      "caps": false,
+                      "href": null
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "r": 1,
+          "c": 2,
+          "rowSpan": 1,
+          "colSpan": 1,
+          "fill": null,
+          "borders": {
+            "top": null,
+            "right": null,
+            "left": null,
+            "bottom": {
+              "width": 1,
+              "color": "B9C7C9",
+              "dash": "solid"
+            }
+          },
+          "paddingPx": {
+            "t": 6,
+            "r": 8,
+            "b": 6,
+            "l": 8
+          },
+          "valign": "middle",
+          "paragraphs": [
+            {
+              "align": "left",
+              "lineHeightPx": 22,
+              "spaceBeforePx": 0.0,
+              "spaceAfterPx": 0.0,
+              "bullet": null,
+              "lines": [
+                {
+                  "box": {
+                    "x": 0,
+                    "y": 0,
+                    "w": 17.75,
+                    "h": 22
+                  },
+                  "runs": [
+                    {
+                      "text": "80",
+                      "font": "Arial",
+                      "sizePx": 16.0,
+                      "weight": 400,
+                      "italic": false,
+                      "color": "2E2E38",
+                      "alpha": 1,
+                      "underline": false,
+                      "strike": false,
+                      "letterSpacingPx": 0,
+                      "baseline": "normal",
+                      "baselineShiftPx": 0,
+                      "caps": false,
+                      "href": null
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "r": 2,
+          "c": 0,
+          "rowSpan": 1,
+          "colSpan": 1,
+          "fill": null,
+          "borders": {
+            "top": null,
+            "right": null,
+            "left": null,
+            "bottom": {
+              "width": 1,
+              "color": "B9C7C9",
+              "dash": "solid"
+            }
+          },
+          "paddingPx": {
+            "t": 6,
+            "r": 8,
+            "b": 6,
+            "l": 8
+          },
+          "valign": "middle",
+          "paragraphs": [
+            {
+              "align": "left",
+              "lineHeightPx": 22,
+              "spaceBeforePx": 0.0,
+              "spaceAfterPx": 0.0,
+              "bullet": null,
+              "lines": [
+                {
+                  "box": {
+                    "x": 0,
+                    "y": 0,
+                    "w": 57.75,
+                    "h": 22
+                  },
+                  "runs": [
+                    {
+                      "text": "Partner",
+                      "font": "Arial",
+                      "sizePx": 16.0,
+                      "weight": 400,
+                      "italic": false,
+                      "color": "2E2E38",
+                      "alpha": 1,
+                      "underline": false,
+                      "strike": false,
+                      "letterSpacingPx": 0,
+                      "baseline": "normal",
+                      "baselineShiftPx": 0,
+                      "caps": false,
+                      "href": null
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "r": 2,
+          "c": 1,
+          "rowSpan": 1,
+          "colSpan": 1,
+          "fill": null,
+          "borders": {
+            "top": null,
+            "right": null,
+            "left": null,
+            "bottom": {
+              "width": 1,
+              "color": "B9C7C9",
+              "dash": "solid"
+            }
+          },
+          "paddingPx": {
+            "t": 6,
+            "r": 8,
+            "b": 6,
+            "l": 8
+          },
+          "valign": "middle",
+          "paragraphs": [
+            {
+              "align": "left",
+              "lineHeightPx": 22,
+              "spaceBeforePx": 0.0,
+              "spaceAfterPx": 0.0,
+              "bullet": null,
+              "lines": [
+                {
+                  "box": {
+                    "x": 0,
+                    "y": 0,
+                    "w": 17.75,
+                    "h": 22
+                  },
+                  "runs": [
+                    {
+                      "text": "26",
+                      "font": "Arial",
+                      "sizePx": 16.0,
+                      "weight": 400,
+                      "italic": false,
+                      "color": "2E2E38",
+                      "alpha": 1,
+                      "underline": false,
+                      "strike": false,
+                      "letterSpacingPx": 0,
+                      "baseline": "normal",
+                      "baselineShiftPx": 0,
+                      "caps": false,
+                      "href": null
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "r": 2,
+          "c": 2,
+          "rowSpan": 1,
+          "colSpan": 1,
+          "fill": null,
+          "borders": {
+            "top": null,
+            "right": null,
+            "left": null,
+            "bottom": {
+              "width": 1,
+              "color": "B9C7C9",
+              "dash": "solid"
+            }
+          },
+          "paddingPx": {
+            "t": 6,
+            "r": 8,
+            "b": 6,
+            "l": 8
+          },
+          "valign": "middle",
+          "paragraphs": [
+            {
+              "align": "left",
+              "lineHeightPx": 22,
+              "spaceBeforePx": 0.0,
+              "spaceAfterPx": 0.0,
+              "bullet": null,
+              "lines": [
+                {
+                  "box": {
+                    "x": 0,
+                    "y": 0,
+                    "w": 17.75,
+                    "h": 22
+                  },
+                  "runs": [
+                    {
+                      "text": "70",
+                      "font": "Arial",
+                      "sizePx": 16.0,
+                      "weight": 400,
+                      "italic": false,
+                      "color": "2E2E38",
+                      "alpha": 1,
+                      "underline": false,
+                      "strike": false,
+                      "letterSpacingPx": 0,
+                      "baseline": "normal",
+                      "baselineShiftPx": 0,
+                      "caps": false,
+                      "href": null
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "diagnostics": []
+}

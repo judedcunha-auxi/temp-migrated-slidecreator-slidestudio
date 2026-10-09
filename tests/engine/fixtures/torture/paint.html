@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>torture · paint</title>
+<style>
+html,body{margin:0;width:1280px;height:720px;overflow:hidden;background:transparent;
+  font-family:"Calibri",Arial,sans-serif;color:#2E2E38}
+:root{--accent:#1E9E5A;--brand:#0B5CAD}
+
+/* The 6 x 4 grid of boxes.html: 160 x 110 cells, so every case sits at a coordinate that is easy to assert. */
+.b{position:absolute;width:160px;height:110px;box-sizing:border-box}
+.c1{left:40px}.c2{left:235px}.c3{left:430px}.c4{left:625px}.c5{left:820px}.c6{left:1015px}
+.r1{top:50px}.r2{top:210px}.r3{top:370px}.r4{top:530px}
+
+/* row 2: gradient text */
+.gt{font-size:54px;font-weight:700;line-height:1.2;white-space:nowrap}
+
+/* row 3: pseudo-elements */
+.axis-dot::before{content:"";position:absolute;left:0;right:0;top:20px;height:3px;background:var(--brand)}
+.axis-dot::after{content:"";position:absolute;left:67px;top:8px;width:26px;height:26px;border-radius:50%;
+  background:var(--brand)}
+.counters{counter-reset:n;font-size:14px}
+.step{counter-increment:n;position:relative;padding-left:30px;height:28px;line-height:22px}
+.step::before{content:counter(n);position:absolute;left:0;top:0;width:22px;height:22px;border-radius:50%;
+  background:#0B5CAD;color:#fff;font-size:12px;line-height:22px;text-align:center}
+.tag{font-size:16px}
+.tag::before{content:"→ " attr(data-x) " ";color:#0B5CAD;font-weight:700}
+.q{font-size:18px}
+.q::before{content:open-quote}
+.q::after{content:close-quote}
+.none-host::before{content:none}
+.cf::after{content:"";display:table;clear:both}
+.row{display:flex;gap:8px;align-items:center;font-size:14px}
+.row::before{content:"";display:block;width:24px;height:24px;background:#D64545;border-radius:4px}
+
+/* row 4: triangles and joins */
+.zero{width:0;height:0;box-sizing:content-box}
+.chevron::after{content:"";position:absolute;right:-20px;top:0;border-top:20px solid transparent;
+  border-bottom:20px solid transparent;border-left:20px solid #1E9E5A}
+
+/* row 5: opacity (r1d, r1e) — four 280 x 36 cells in the band between rows 2 and 3 (the canvas's
+   bottom is the layout's date/footer/number zones, which the gate masks) */
+.r5{top:330px;width:280px;height:36px;margin:0;font-size:20px;color:#0B2545}
+.o1{left:40px}.o2{left:335px}.o3{left:630px}.o4{left:925px}
+.chip{display:inline-block;padding:2px 8px;background:#0B5CAD;color:#fff}
+</style></head><body>
+
+<!-- row 1: colours in every syntax -->
+<div class="b r1 c1" data-name="mix-srgb" style="background:color-mix(in srgb, var(--accent) 12%, white)"></div>
+<div class="b r1 c2" data-name="oklch-fill" style="background:oklch(0.95 0.04 150)"></div>
+<div class="b r1 c3" data-name="p3-fill" style="background:color(display-p3 0.9 0.97 0.92)"></div>
+<div class="b r1 c4" data-name="lab-fill" style="background:lab(95 -5 3)"></div>
+<div class="b r1 c5" data-name="gradient-modern-stops"
+     style="background:linear-gradient(90deg, color-mix(in srgb, var(--brand) 20%, white), oklch(0.98 0 0))"></div>
+<div class="b r1 c6" data-name="dark-oklch-text" style="background:#0B2545;color:oklch(0.98 0 0);font-size:16px;
+     padding:12px;border:2px solid color-mix(in oklab, #0B5CAD 50%, white);
+     box-shadow:0 4px 12px oklch(0.2 0.1 240 / 0.3)">Dark box, oklch text</div>
+
+<!-- row 2: gradient text -->
+<div class="b r2 c1 gt" data-name="grad-text" style="background:linear-gradient(90deg, #0B5CAD, #1E9E5A);
+     -webkit-background-clip:text;background-clip:text;color:transparent">$12.4B</div>
+<div class="b r2 c2 gt" data-name="solid-clip-text" style="background:#0B5CAD;
+     -webkit-background-clip:text;background-clip:text;color:transparent">$12.4B</div>
+<div class="b r2 c3" data-name="span-clip-text" style="font-size:14px">Growth of <span
+     style="background:linear-gradient(90deg, #0B5CAD, #1E9E5A);-webkit-background-clip:text;background-clip:text;
+     color:transparent;font-weight:700">42%</span> this year</div>
+<div class="b r2 c4 gt" data-name="clip-text-image" style="background-image:url(/api/projects/p/assets/photo-400x300.png);
+     background-size:cover;-webkit-background-clip:text;background-clip:text;color:transparent">$9</div>
+<div class="b r2 c5 gt" data-name="grad-text-padding" style="font-size:40px;padding:0 12px;letter-spacing:1px;
+     background:linear-gradient(90deg, #0B5CAD, #1E9E5A);-webkit-background-clip:text;background-clip:text;
+     color:transparent">$12.4B</div>
+<div class="b r2 c6 gt" data-name="grad-text-3-stops" style="background:linear-gradient(to right, #0B5CAD, #FFFFFF 50%, #1E9E5A);
+     -webkit-background-clip:text;background-clip:text;color:transparent">Mid</div>
+
+<!-- row 3: pseudo-elements -->
+<div class="b r3 c1 axis-dot" data-name="axis-dot"></div>
+<div class="b r3 c2 counters" data-name="counter-circles">
+  <div class="step">Step one</div><div class="step">Step two</div><div class="step">Step three</div>
+</div>
+<div class="b r3 c3" data-name="attr-inline"><div class="tag" data-x="Q3">Revenue</div></div>
+<div class="b r3 c4" data-name="quotes"><div class="q">Quoted</div></div>
+<div class="b r3 c5" data-name="none-and-clearfix">
+  <div class="none-host" style="font-size:14px">No pseudo</div>
+  <div class="cf"><div data-name="floated" style="float:left;width:60px;height:30px;background:#E8F1FB"></div></div>
+</div>
+<div class="b r3 c6 row" data-name="flex-block-before">Legend</div>
+
+<!-- row 4: CSS border triangles and joins -->
+<div class="b r4 c1 zero" data-name="tri-right"
+     style="border-left:14px solid #0B5CAD;border-top:8px solid transparent;border-bottom:8px solid transparent"></div>
+<div class="b r4 c2 zero" data-name="tri-up"
+     style="border-bottom:12px solid #1E9E5A;border-left:10px solid transparent;border-right:10px solid transparent"></div>
+<div class="b r4 c3 chevron" data-name="chevron-after" style="width:120px;height:40px;background:#1E9E5A"></div>
+<div class="b r4 c4 zero" data-name="two-sides-zero" style="border-top:10px solid #D64545;border-left:10px solid #0B5CAD"></div>
+<div class="b r4 c5" data-name="two-sides-box"
+     style="border-top:6px solid #D64545;border-left:10px solid #0B5CAD;background:#F7F7FA"></div>
+<div class="b r4 c6 zero" data-name="tri-oklch-transparent"
+     style="border-left:14px solid #0B5CAD;border-top:8px solid oklch(0 0 0 / 0);border-bottom:8px solid oklch(0 0 0 / 0)"></div>
+
+<!-- row 5: opacity — an element at 0, a contents wrapper that fades nothing, an inline box's own paint -->
+<div class="b r5 o1" data-name="opacity-0-text" style="opacity:0">Invisible words</div>
+<p class="b r5 o2" data-name="contents-chip">Pay <span style="display:contents;opacity:.2"><span class="chip">CHIP</span></span> now</p>
+<p class="b r5 o3" data-name="inline-half">Plain <span style="opacity:.5;background:#0B5CAD;color:#fff;padding:2px 6px">half</span> text</p>
+<p class="b r5 o4" data-name="mark-around-chip">Text <mark style="opacity:.5;background:#FFE600;padding:6px 0">around <span class="chip">CHIP</span></mark> after</p>
+
+<aside class="notes" style="display:none">Paint torture: modern colour syntaxes, gradient text, ::before/::after
+(counters, attr(), quotes, a clearfix, a block pseudo in a flex row), CSS border triangles and joins, and
+opacity (an element at 0, a display:contents wrapper, an inline box's own opacity).</aside>
+
+</body></html>

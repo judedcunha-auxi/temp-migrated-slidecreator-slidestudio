@@ -1,0 +1,244 @@
+{
+  "version": 1,
+  "canvas": {
+    "w": 1280,
+    "h": 720,
+    "pxPerIn": 96
+  },
+  "slide": {
+    "id": "emit-placeholders",
+    "title": "emit-placeholders",
+    "layoutId": "layout-02",
+    "notes": null
+  },
+  "fonts": {
+    "forced": {},
+    "used": [],
+    "substituted": []
+  },
+  "groups": [],
+  "elements": [
+    {
+      "id": "e1",
+      "kind": "shape",
+      "box": {
+        "x": 0.0,
+        "y": 0.0,
+        "w": 1280.0,
+        "h": 20.0
+      },
+      "z": 0,
+      "name": "rule",
+      "geometry": {
+        "type": "rect"
+      },
+      "fill": {
+        "type": "solid",
+        "color": "1A9AFB",
+        "alpha": 1.0
+      },
+      "stroke": null,
+      "shadow": null,
+      "flipH": false,
+      "flipV": false
+    },
+    {
+      "id": "e2",
+      "kind": "text",
+      "box": {
+        "x": 48.0,
+        "y": 29.0,
+        "w": 864.0,
+        "h": 62.0
+      },
+      "z": 1,
+      "name": "title",
+      "paragraphs": [
+        {
+          "align": "left",
+          "lineHeightPx": 62,
+          "spaceBeforePx": 0.0,
+          "spaceAfterPx": 0.0,
+          "bullet": null,
+          "lines": [
+            {
+              "box": {
+                "x": 48,
+                "y": 29,
+                "w": 330.0,
+                "h": 62
+              },
+              "runs": [
+                {
+                  "text": "Explicitly the title",
+                  "font": "Arial",
+                  "sizePx": 40.0,
+                  "weight": 700,
+                  "italic": false,
+                  "color": "2E2E38",
+                  "alpha": 1,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "anchor": "top",
+      "writingMode": "horizontal",
+      "wrap": true,
+      "transformCase": null,
+      "extras": {
+        "x-wp4-placeholder": "title"
+      }
+    },
+    {
+      "id": "e3",
+      "kind": "text",
+      "box": {
+        "x": 60.0,
+        "y": 200.0,
+        "w": 700.0,
+        "h": 60.0
+      },
+      "z": 2,
+      "name": "body-by-overlap",
+      "paragraphs": [
+        {
+          "align": "left",
+          "lineHeightPx": 30,
+          "spaceBeforePx": 0.0,
+          "spaceAfterPx": 0.0,
+          "bullet": null,
+          "lines": [
+            {
+              "box": {
+                "x": 60,
+                "y": 200,
+                "w": 357.188,
+                "h": 30
+              },
+              "runs": [
+                {
+                  "text": "Body text that overlaps the content zone",
+                  "font": "Arial",
+                  "sizePx": 20.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "2E2E38",
+                  "alpha": 1,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "align": "left",
+          "lineHeightPx": 30,
+          "spaceBeforePx": 0.0,
+          "spaceAfterPx": 0.0,
+          "bullet": null,
+          "lines": [
+            {
+              "box": {
+                "x": 60,
+                "y": 230,
+                "w": 246.094,
+                "h": 30
+              },
+              "runs": [
+                {
+                  "text": "by more than sixty per cent.",
+                  "font": "Arial",
+                  "sizePx": 20.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "2E2E38",
+                  "alpha": 1,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "anchor": "top",
+      "writingMode": "horizontal",
+      "wrap": true,
+      "transformCase": null
+    },
+    {
+      "id": "e4",
+      "kind": "text",
+      "box": {
+        "x": 980.0,
+        "y": 660.0,
+        "w": 260.0,
+        "h": 24.0
+      },
+      "z": 3,
+      "name": "free-caption",
+      "paragraphs": [
+        {
+          "align": "left",
+          "lineHeightPx": 24,
+          "spaceBeforePx": 0.0,
+          "spaceAfterPx": 0.0,
+          "bullet": null,
+          "lines": [
+            {
+              "box": {
+                "x": 980,
+                "y": 660,
+                "w": 73.172,
+                "h": 24
+              },
+              "runs": [
+                {
+                  "text": "free caption",
+                  "font": "Arial",
+                  "sizePx": 14.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "2E2E38",
+                  "alpha": 1,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "anchor": "top",
+      "writingMode": "horizontal",
+      "wrap": true,
+      "transformCase": null
+    }
+  ],
+  "diagnostics": []
+}

@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>torture · rows</title>
+<style>
+html,body{margin:0;width:1280px;height:720px;overflow:hidden;background:transparent;
+  font-family:"Calibri",Arial,sans-serif;color:#1D2433;font-size:13px;line-height:1.35}
+h1{font-family:"Calibri Light",Arial,sans-serif;font-size:28px;font-weight:400;margin:0;line-height:1.15}
+p{margin:0}
+.abs{position:absolute}
+
+/* kv / kv-loose: label | value rows in a flex container */
+.panel{position:absolute;background:#F3F5F9;border-radius:8px;padding:12px}
+.panel .t{font-size:15px;font-weight:700;margin-bottom:6px}
+.row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #D8DDE6;font-size:13px}
+.row .v{font-weight:700;color:#0B5CAD}
+.row .k{font-weight:700}
+
+/* dl: a four-column label | description grid built from divs */
+.dl{position:absolute;display:grid;grid-template-columns:160px 1fr 160px 1fr;column-gap:12px;row-gap:6px;font-size:12px}
+.dl .k{font-weight:700;color:#0B2545}
+
+/* kpi: a flex column centring a number over its label */
+.kpi{position:absolute;display:flex;flex-direction:column;align-items:center;background:#E8F1FB;border-radius:8px;padding:10px 8px}
+.kpi .n{font-size:28px;font-weight:700;color:#0B5CAD;line-height:1.2}
+.kpi .l{font-size:12px;color:#445}
+
+/* badge: a flex-centred number badge beside a bold block and loose text */
+.item{position:absolute;display:flex;gap:10px;align-items:flex-start;background:#FFF7E6;border-left:4px solid #F59E0B;padding:10px;border-radius:4px}
+.badge{width:22px;height:22px;border-radius:50%;background:#F59E0B;color:#FFFFFF;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none}
+.item .txt{font-size:12px;line-height:1.35}
+.item .txt b{display:block;font-size:13px;margin-bottom:2px}
+
+/* pills: inline-flex pills with a dot, laid in a flex row */
+.pills{position:absolute;display:flex;gap:8px}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:12px;background:#E8F1FB;color:#0B5CAD;font-size:12px;font-weight:700}
+.dot{width:8px;height:8px;border-radius:50%;background:#0B5CAD}
+
+/* chips: atomic inline boxes with padding and a margin */
+.head{position:absolute;font-size:15px;font-weight:700}
+.chip{display:inline-block;padding:2px 6px;margin-left:6px;background:#FFE600;color:#2E2E38;font-size:10px;font-weight:700;letter-spacing:.3px;vertical-align:2px}
+.tag{display:inline-block;padding:2px 10px;border-radius:10px;background:#E8F4FE;color:#0B5FA5;font-size:12px;white-space:nowrap}
+.tag.alt{background:#E6F6EC;color:#12703A}
+
+/* columns: a fixed-width label column beside a wrapping text column */
+.lab{display:inline-block;width:90px;font-size:11px;font-weight:700;color:#1A9AFA;vertical-align:top;text-transform:uppercase}
+.col{display:inline-block;width:400px;font-size:12px;line-height:14px;vertical-align:top}
+
+/* unit: a number and its unit on one baseline */
+.stat{position:absolute;display:flex;align-items:baseline;gap:4px;color:#0B2545}
+.stat .num{font-size:44px;font-weight:700;line-height:1.1}
+.stat .unit{font-size:16px;font-weight:700;color:#556677}
+
+/* styled-word: style changes inside one word */
+.accent{color:#1A9AFA;font-weight:700}
+.small{font-size:10px}
+.unit2{font-size:11px;color:#556677}
+
+/* legend: swatch + label pairs */
+.legend{position:absolute;display:flex;gap:18px;font-size:12px;align-items:center}
+.legend span{display:flex;align-items:center;gap:6px}
+.legend i{width:10px;height:10px;border-radius:2px;display:inline-block}
+
+/* contents: a display:contents wrapper inside a flex row */
+.crow{position:absolute;display:flex;gap:12px;font-size:13px}
+.cell{background:#E8F1FB;padding:6px 10px;border-radius:6px}
+
+/* centred: text centred by flexbox and by grid only */
+.cchip{position:absolute;width:120px;height:40px;display:flex;align-items:center;justify-content:center;background:#0B5CAD;color:#FFFFFF;font-weight:700;font-size:14px;border-radius:20px}
+.circle{position:absolute;width:64px;height:64px;border-radius:50%;display:grid;place-items:center;background:#1E9E5A;color:#FFFFFF;font-size:18px;font-weight:700}
+
+/* swatches: an empty inline-block before the text, in a list and in a sentence */
+.swl{margin:0;padding-left:22px;font-size:13px;line-height:1.35}
+.swl li{margin:0 0 4px 0}
+.sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px}
+
+/* padded-inline: a non-atomic inline box with padding, spaced on both sides */
+.pad{background:#FFE9A8;padding:0 6px}
+
+/* stacked-right: a flex column aligned to its right edge */
+.sright{position:absolute;display:flex;flex-direction:column;align-items:flex-end;font-size:13px}
+
+/* the B1 critique's cases: a mark around a chip, flex-wrapped tags, a chips-only list item */
+.hl{background:#FFE9A8;color:inherit}
+.tags{position:absolute;display:flex;flex-wrap:wrap;gap:4px 6px}
+.tight .h{font-size:20px;line-height:1.2;font-weight:700}
+.tight .s{margin-top:-5px}
+
+/* seams (r1a): gaps an inline box's margin, padding or an empty box leaves between two texts of a line */
+.mk{color:#1A9AFA;font-weight:700;margin-right:4px}
+.lbl{color:#747480}
+.val{margin-left:4px}
+.ft{font-weight:700;letter-spacing:.5px}
+.op{color:#1A9AFA;font-weight:700;margin:0 4px}
+.lk{display:inline-block;width:10px;height:10px;border-radius:2px;vertical-align:-1px;margin:0 4px 0 12px}
+.su{font-size:12px;color:#1A9AFA;margin-left:3px}
+.dash{color:#1A9AFA;margin:0 10px}
+.sub{font-weight:400;font-size:11px;letter-spacing:1px}
+.boxed{display:inline-block;padding:0 6px;font-weight:700}
+
+.notes{display:none}
+</style></head><body>
+
+<!-- title: 1 text. -->
+<h1 data-name="title" class="abs" style="left:40px;top:18px;width:1200px">Side by side: rows, chips and alignment</h1>
+
+<!-- kv: 7 text (title + 3 x label, value), 4 shapes (panel fill + 3 row borders). -->
+<div data-name="kv" class="panel" style="left:40px;top:70px;width:356px">
+  <div class="t">Key metrics</div>
+  <div class="row"><span>Revenue 2023</span><span class="v">$15.2B</span></div>
+  <div class="row"><span>EBITDA margin</span><span class="v">21.4%</span></div>
+  <div class="row"><span>Headcount</span><span class="v">5.1M</span></div>
+</div>
+
+<!-- kv-loose: a block beside loose text in a flex row. 2 text, 1 shape (the border). -->
+<div data-name="kv-loose" class="row abs" style="left:40px;top:222px;width:380px"><span class="k">Headcount</span> 5.1M</div>
+
+<!-- chip-tail: a chip glued to the heading's last word by its margin. 2 text, 1 shape. -->
+<div data-name="chip-tail" class="head" style="left:40px;top:262px;width:380px">Size and spend compound<span class="chip">ILLUSTRATIVE</span></div>
+
+<!-- unit: 44 px number + 16 px unit on one baseline. 2 text. -->
+<div data-name="unit" class="stat" style="left:40px;top:300px"><span class="num">6.2</span><span class="unit">$B SOM</span></div>
+
+<!-- styled-word: three style changes inside words. 1 text, 1 paragraph, 7 runs, no seam. -->
+<p data-name="styled-word" class="abs" style="left:40px;top:370px;width:380px;font-size:15px">Auxi<span class="accent">Studio</span> cuts CO<span class="small">2</span> by 4.2<span class="unit2">B</span> tonnes</p>
+
+<!-- kpi: 1 text of 2 centred paragraphs, 1 shape. -->
+<div data-name="kpi" class="kpi" style="left:450px;top:70px;width:144px">
+  <div class="n">$3.8B</div>
+  <div class="l">Deal value</div>
+</div>
+
+<!-- badge: the badge's text (centre, middle) + the txt (2 paragraphs). 2 text, 3 shapes. -->
+<div data-name="badge" class="item" style="left:620px;top:70px;width:206px">
+  <div class="badge">1</div>
+  <div class="txt"><b>Key takeaway</b>Concentrate capital on two platforms.</div>
+</div>
+
+<!-- pills: 2 text, 4 shapes (2 pill fills + 2 dots). -->
+<div data-name="pills" class="pills" style="left:450px;top:164px"><span class="pill"><span class="dot"></span>On track</span><span class="pill"><span class="dot"></span>Applied AI</span></div>
+
+<!-- legend: 3 text, 3 shapes (the swatches). -->
+<div data-name="legend" class="legend" style="left:450px;top:204px"><span><i style="background:#0B2545"></i>UAE</span><span><i style="background:#0B5CAD"></i>KSA</span><span><i style="background:#1E9E5A"></i>Qatar</span></div>
+
+<!-- contents: 4 text, 4 shapes — two cells inside a display:contents wrapper. -->
+<div data-name="contents" class="crow" style="left:450px;top:236px"><div style="display:contents"><div class="cell">Sources</div><div class="cell">Uses</div></div><div class="cell">Valuation</div><div class="cell">Comps</div></div>
+
+<!-- centred: a flex-centred chip and a grid-centred circle. 2 text (center, middle), 2 shapes. -->
+<div data-name="centred-chip" class="cchip" style="left:450px;top:292px">Leader</div>
+<div data-name="centred-circle" class="circle" style="left:600px;top:280px">1</div>
+
+<!-- icon-inline: an inline image between two texts. 2 text, 1 image. -->
+<p data-name="icon-inline" class="abs" style="left:450px;top:362px;font-size:14px">Rated <img src="/api/projects/prj_torture/assets/logo-160x160.png" alt="" style="width:14px;height:14px;vertical-align:-2px"> by analysts</p>
+
+<!-- stacked-right: 1 text of 2 right-aligned paragraphs of different widths. -->
+<div data-name="stacked-right" class="sright" style="left:450px;top:396px;width:380px">
+  <div>Right-aligned column, a longer first line</div>
+  <div>A shorter second line</div>
+</div>
+
+<!-- swatch-li: 1 text of 3 paragraphs (item 1; item 2's first line with its bullet; its
+     continuation without), 2 shapes (the swatches). -->
+<ul data-name="swatch-li" class="swl abs" style="left:870px;top:70px;width:340px">
+  <li><i class="sw" style="background:#0B5CAD"></i>United Arab Emirates</li>
+  <li><i class="sw" style="background:#1E9E5A"></i>Kingdom of Saudi Arabia, whose second line wraps back under the swatch to the item's own edge</li>
+</ul>
+
+<!-- swatch-inline: 1 text, 1 shape. -->
+<p data-name="swatch-inline" class="abs" style="left:870px;top:170px"><i class="sw" style="background:#F59E0B"></i>UAE in a sentence with a swatch before it</p>
+
+<!-- chips-only: two chips and a space. 2 text, 2 shapes. -->
+<p data-name="chips-only" class="abs" style="left:870px;top:206px"><span class="tag">Baseline</span> <span class="tag alt">Target</span></p>
+
+<!-- padded-inline: a padded span with spaces on both sides stays inline. 1 text, 1 shape. -->
+<p data-name="padded-inline" class="abs" style="left:870px;top:246px">Words and <span class="pad">spaced</span> and more words</p>
+
+<!-- chip-mid: a spaced, padded chip on line 1; the text after it wraps to a second line.
+     3 text (before, chip, after with 2 lines), 1 shape. -->
+<p data-name="chip-mid" class="abs" style="left:40px;top:450px;width:620px;font-size:15px;line-height:20px">The mid-line chip <span class="chip">FORECAST</span> sits between two spaces, and the words after it carry on past the end of this first line and wrap onto a second line.</p>
+
+<!-- columns: an inline-block label column + a real space + a wrapping inline-block text column,
+     zero margins. 2 text. -->
+<div data-name="columns" class="abs" style="left:700px;top:450px;width:540px"><span class="lab">Insight</span> <span class="col">Two columns on one line box: a fixed-width label and a text column that wraps inside its own box.</span></div>
+
+<!-- dl: 8 text, one per grid cell. -->
+<div data-name="dl" class="dl" style="left:40px;top:530px;width:1200px">
+  <div class="k">Adoption mechanism</div><div>Regulatory sandbox with a 12-month fast track for pilots</div>
+  <div class="k">GCC applicability</div><div>High, mirroring the frameworks already in place</div>
+  <div class="k">Funding model</div><div>Co-investment fund matched 1:1 by the sovereign vehicle</div>
+  <div class="k">Talent lever</div><div>Golden visa for researchers and a national PhD programme</div>
+</div>
+
+<!-- The B1 critique's cases (fidelity-reports/b1-review.md), one per finding it fixed. -->
+
+<!-- chip-centre-wrap (#2): a centred paragraph opening with a chip. The part-line after the chip is a
+     paragraph of its own: it is not centred on the paragraph. 2 text (the chip; the rest, 2 paragraphs), 1 shape. -->
+<p data-name="chip-centre-wrap" class="abs" style="left:40px;top:610px;width:360px;text-align:center"><span class="chip">NEW</span> Our centred announcement carries on past the first line and onto a second one.</p>
+
+<!-- chip-right-end (#2): a right-aligned paragraph ending with a chip. The part-line before the chip
+     ends at the chip, not at the paragraph's edge: its own paragraph. 2 text (the text in 2 paragraphs; the chip), 1 shape. -->
+<p data-name="chip-right-end" class="abs" style="left:430px;top:610px;width:300px;text-align:right">A right-aligned statement long enough to reach a second line <span class="chip">END</span></p>
+
+<!-- tight-pair (#8): a standfirst pulled 5 px into the heading's line box. More overlap than STACK_TOL
+     allows, so two elements, each placed where the browser put it. 2 text. -->
+<div data-name="tight-pair" class="tight abs" style="left:40px;top:666px;width:360px"><div class="h">Tight heading</div><div class="s">A standfirst pulled up under it</div></div>
+
+<!-- mark-around-chip (#3): a highlight around a chip paints under the chip, and the chip reads between
+     the two texts. 3 text, 2 shapes (the mark, the chip). -->
+<p data-name="mark-around-chip" class="abs" style="left:760px;top:610px">Plain <mark class="hl">highlight with <span class="chip">CHIP</span> inside</mark> after</p>
+
+<!-- inline-flex-gap (#6): an inline-flex box that lays two items out with a gap is a layout, not a
+     word. 4 text: 'Total', '6.2', '$B', 'in 2030'. -->
+<p data-name="inline-flex-gap" class="abs" style="left:760px;top:650px">Total <span style="display:inline-flex;gap:8px"><b>6.2</b><span>$B</span></span> in 2030</p>
+
+<!-- wrap-tags (#9): flex-wrapped tags; the tag that wraps to the second flex line is a row, not a
+     stack. 3 text, 3 shapes. -->
+<div data-name="wrap-tags" class="tags" style="left:1040px;top:610px;width:170px"><span class="tag">AI</span><span class="tag">Sovereign cloud</span><span class="tag alt">Energy transition</span></div>
+
+<!-- li-chips (#11): a list item made only of chips keeps its bullet, on the first chip's text.
+     2 text, 2 shapes. -->
+<ul data-name="li-chips" class="swl abs" style="left:1040px;top:676px;width:170px"><li><span class="tag">AI</span> <span class="tag alt">Cloud</span></li></ul>
+
+<!-- The r1a cases (plan 16 #25): a gap an inline box's margin or padding, or an empty inline box,
+     leaves between two texts of one line is carried by a space sized to it, so the words after it
+     start where the browser put them. One text each; the legend's swatches are 2 shapes. -->
+<p data-name="seam-bullet" class="abs" style="left:870px;top:280px"><span class="mk">&bull;</span><b>Severe leakage:</b> net price fell 4.2% on discounting</p>
+<p data-name="seam-label" class="abs" style="left:870px;top:300px"><span class="lbl">Target:</span><span class="val">Business, events, premium upsell</span></p>
+<p data-name="seam-formula" class="abs" style="left:870px;top:320px"><span class="ft">GROWTH</span><span class="op">+</span><span class="ft">LONGER STAYS</span><span class="op">=</span><span class="ft" style="color:#1A9AFA">IMPACT</span></p>
+<p data-name="seam-legend" class="abs" style="left:870px;top:340px;color:#556677">Residual exposure:<i class="lk" style="background:#FF4136"></i>High<i class="lk" style="background:#2DB757"></i>Low</p>
+<p data-name="seam-unit" class="abs" style="left:870px;top:358px;font-size:20px;font-weight:700;line-height:1.2;color:#0B2545">70M<span class="su">intl</span></p>
+<p data-name="seam-centred" class="abs" style="left:870px;top:386px;width:360px;text-align:center;font-weight:700;letter-spacing:2px">VISION 2030<span class="dash">&mdash;</span><span class="sub">THE MANDATE</span></p>
+<p data-name="seam-wrap" class="abs" style="left:870px;top:406px;width:250px"><span class="mk">&bull;</span><b>Low use:</b> warehouses run at 58% of capacity, trapping cash in leases</p>
+
+<!-- faded (r1a): an in-flow text block's own opacity (flexgrid's `.lbl{opacity:.85}`) is on what it
+     paints, though the walk hands it its container's context: its text (run alpha) and the box it
+     detaches (element opacity). Nothing of it paints over its own fill, so per-shape alpha is exact.
+     3 text (before the box, the box, after it), 1 shape (the card's fill). -->
+<div data-name="faded-card" class="abs" style="left:40px;top:402px;width:364px;padding:3px 8px;background:#E8F1FB;color:#0B2545"><div data-name="faded" style="opacity:.6">A faded label with a <span class="boxed">NOTE</span> inside it</div></div>
+
+<aside class="notes">Speaker notes for the rows torture slide: text laid out side by side by flexbox,
+grid, inline-block chips and swatches.</aside>
+
+</body></html>

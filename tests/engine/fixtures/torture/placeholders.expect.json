@@ -1,0 +1,51 @@
+{
+  "family": "placeholders",
+  "master": "test-16x9",
+  "layoutId": "layout-05",
+  "canvas": {"w": 1280, "h": 720},
+  "kinds": {"text": 7, "shape": 3},
+  "groups": 1,
+  "rasterAllowed": [],
+  "charts": {"authored": 0, "recognised": 0},
+  "gateMaxPx2": 188,
+  "notes": [
+    "layout-05 is the default template's 'Comparison': title idx 0, body idx 1, obj idx 2, body idx 3,",
+    "obj idx 4, plus dt/ftr/sldNum. It is the only layout on this master with two zones of the same",
+    "type, which is exactly what forces the emitter to locate a placeholder shape by idx and not by type.",
+    "Overlap is measured as the share of the TEXT element's box that lies inside the zone (Box.overlap_fraction).",
+    "The default template's placeholders are laid out for a 960 px canvas, so x > 912 is free space on",
+    "this 1280 px canvas — the group sits there and must map to nothing.",
+    "No subtitle case here: this layout has no subTitle zone. subtitle -> subTitle is covered by",
+    "sizes-4x3.html on the Title Slide layout.",
+    "gateMaxPx2 188 = max(measured x 1.2, measured + 60) over the measured 128 px2 masked non-chart area on fidelity-w3 (2314d7f), 2026-09-25 (plan §11; Peter #16: measured + 20 %, with the 60 px2 per-slide noise tolerance as the floor). A regression guard, not a target."
+  ],
+  "elements": [
+    {"name": "deck-title", "kind": "text", "paragraphs": 1,
+     "placeholder": {"type": "title", "idx": 0}, "note": "explicit data-placeholder=title"},
+    {"name": "left-lede", "kind": "text", "paragraphs": 1,
+     "placeholder": {"type": "body", "idx": 1}, "note": "no attribute; 100 % of the box is inside the zone"},
+    {"name": "left-body", "kind": "text", "paragraphs": 1,
+     "placeholder": {"type": "obj", "idx": 2}, "note": "no attribute; 100 % inside"},
+    {"name": "right-lede", "kind": "text", "paragraphs": 1,
+     "placeholder": {"type": "body", "idx": 3}, "note": "explicit data-placeholder=body onto the second body zone"},
+    {"name": "right-body", "kind": "text", "paragraphs": 1,
+     "placeholder": {"type": "obj", "idx": 4},
+     "note": "two obj zones exist, so type alone is ambiguous — idx 4 is the only correct answer"},
+    {"name": "source-note", "kind": "text", "paragraphs": 1, "placeholder": null},
+    {"name": "below-threshold", "kind": "text", "paragraphs": 1, "placeholder": null,
+     "overlapFraction": 0.133,
+     "note": "box (380, 600, 300, 100) against obj idx 2 (48, 228.333, 424.167, 414.833): the overlap is 92.167 x 43.167 px = 3978 of 30000, i.e. 13.3 % — under the 60 % rule"},
+    {"name": "rule", "kind": "shape", "geometry": "rect", "note": "2 px divider, named from data-name"},
+    {"name": "badge-a", "kind": "shape", "geometry": "roundRect", "group": "badges"},
+    {"name": "badge-b", "kind": "shape", "geometry": "roundRect", "group": "badges"}
+  ],
+  "placeholdersUsed": [
+    {"type": "title", "idx": 0}, {"type": "body", "idx": 1}, {"type": "obj", "idx": 2},
+    {"type": "body", "idx": 3}, {"type": "obj", "idx": 4}
+  ],
+  "placeholdersUnused": [
+    {"type": "dt", "idx": 10}, {"type": "ftr", "idx": 11}, {"type": "sldNum", "idx": 12},
+    {"note": "an unused placeholder shape must be deleted, never left with an empty text frame"}
+  ],
+  "expectedDiagnostics": []
+}

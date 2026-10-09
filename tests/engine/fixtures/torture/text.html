@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>torture · text</title>
+<style>
+html,body{margin:0;width:1280px;height:720px;overflow:hidden;background:transparent;
+  font-family:"Calibri",Arial,sans-serif;color:#2E2E38;font-size:15px;line-height:1.35}
+h1{font-family:"Calibri Light",Arial,sans-serif;font-size:30px;font-weight:400;margin:0;line-height:1.15}
+p{margin:0}
+a{color:#1A9AFA}
+
+/* Inline decoration: each of these becomes a shape behind the text, one per line fragment. */
+.hl{background:#FFE9A8;padding:0 3px;white-space:nowrap}
+.chip{display:inline-block;padding:2px 10px;border-radius:10px;background:#E8F4FE;color:#0B5FA5;
+  font-size:12px;white-space:nowrap}
+.chip.alt{background:#E6F6EC;color:#12703A}
+
+/* Line-height rows for the emitter's vertical-placement calibration (14-WP4 §Text engine). */
+.lh{position:absolute;left:700px;width:440px;font-size:20px}
+.lh1{top:300px;line-height:1.0}
+.lh15{top:372px;line-height:1.5}
+.lh3{top:452px;line-height:3.0}
+
+ul,ol{margin:0 0 14px 0;padding-left:26px}
+li{margin:0 0 4px 0}
+
+.notes{display:none}
+</style></head><body>
+
+<!-- 1 text element, 2 paragraphs: two in-flow blocks under one absolutely positioned parent. -->
+<div data-name="head" style="position:absolute;left:40px;top:24px;width:620px">
+  <h1>Text torture</h1>
+  <p style="margin-top:6px">Two in-flow blocks under one absolutely positioned parent are one text
+  element with two paragraphs; absolutely positioned siblings are never merged.</p>
+</div>
+
+<!-- 1 text element, 1 paragraph, every allowed inline tag; the mark adds 1 shape. -->
+<div data-name="runs" style="position:absolute;left:40px;top:104px;width:620px">
+  <b>bold</b> <strong>strong</strong> <i>italic</i> <em>emphasis</em> <u>underline</u>
+  <s>strikethrough</s> <span style="color:#1A9AFA">coloured span</span>
+  <a href="https://example.com/report">hyperlink</a> base<sup>sup</sup> base<sub>sub</sub><br>
+  after an explicit break, <mark class="hl">highlighted</mark> and
+  <span style="letter-spacing:1.6px">tracked out</span>.
+</div>
+
+<!-- 1 text element, 1 paragraph; the two inline-block chips add 2 shapes from their border boxes. -->
+<div data-name="chips" style="position:absolute;left:40px;top:188px;width:620px">
+  Inline-block chips <span class="chip">Baseline</span> <span class="chip alt">Target</span> sit in the
+  line and keep their own backgrounds.
+</div>
+
+<!-- 1 text element, 4 paragraphs, one per alignment. The justified one must wrap. -->
+<div data-name="align" style="position:absolute;left:40px;top:236px;width:620px">
+  <div style="text-align:left">Left aligned paragraph.</div>
+  <div style="text-align:center">Centre aligned paragraph.</div>
+  <div style="text-align:right">Right aligned paragraph.</div>
+  <div style="text-align:justify">Justified paragraph, long enough that the browser has to break it
+  over two lines so the last line stays ragged while the first is stretched.</div>
+</div>
+
+<!-- 1 text element, 3 paragraphs carrying spaceBefore / spaceAfter from their margins. -->
+<div data-name="spacing" style="position:absolute;left:40px;top:376px;width:620px">
+  <p style="margin:0 0 14px 0">Paragraph with 14 px after.</p>
+  <p style="margin:18px 0 0 0">Paragraph with 18 px before.</p>
+  <p style="margin:10px 0 10px 0">Paragraph with 10 px on both sides.</p>
+</div>
+
+<div data-name="caps" style="position:absolute;left:40px;top:492px;width:620px;
+     text-transform:uppercase;letter-spacing:2px;font-weight:700;font-size:13px">
+  Transformed to upper case and tracked
+</div>
+
+<!-- white-space:nowrap — the line box is wider than the content box and must not be re-broken. -->
+<div data-name="nowrap" style="position:absolute;left:40px;top:526px;width:300px;white-space:nowrap">
+  This line sets white-space:nowrap and refuses to break.
+</div>
+
+<!-- white-space:pre-line — the source newlines are real line breaks inside one paragraph. -->
+<div data-name="preline" style="position:absolute;left:40px;top:560px;width:620px;white-space:pre-line">First line held by pre-line.
+Second line held by pre-line.
+Third line held by pre-line.</div>
+
+<!-- Detached inline boxes: separated from their neighbour by layout, not by a space character.
+     Kept in one paragraph their runs would concatenate ("…breaks outBASELINE"), so each chip and
+     each column is its own text element. 1 heading + 1 chip text + 1 chip shape. -->
+<div data-name="detached-chip" style="position:absolute;left:40px;top:630px;width:620px;
+     font-size:13px;font-weight:700;text-transform:uppercase">Heading the chip breaks out<span
+     class="chip" style="margin-left:6px;vertical-align:1px">Baseline</span></div>
+
+<!-- A fixed-width label column beside a wrapping text column, zero margins: the gap is the label
+     box's own unused width. 2 text elements, one per column; the text column wraps to 2 lines. -->
+<div data-name="label-column" style="position:absolute;left:40px;top:660px;width:520px"><span
+     style="display:inline-block;width:90px;font-size:11px;font-weight:700;color:#1A9AFA;
+     vertical-align:top;text-transform:uppercase">Insight</span><span style="display:inline-block;
+     width:400px;font-size:12px;line-height:14px;vertical-align:top">Two columns laid out on one line
+     box, where the only gap between them is the label column's unused width.</span></div>
+
+<!-- 2 text elements: one per list. A ul/ol is not inline-only, so it never merges with a sibling. -->
+<div data-name="lists" style="position:absolute;left:700px;top:104px;width:440px">
+  <ul>
+    <li>Unordered item one</li>
+    <li>Unordered item two, long enough to wrap onto a second line inside its own bullet</li>
+    <li>Unordered item three</li>
+  </ul>
+  <ol>
+    <li>Ordered item one</li>
+    <li>Ordered item two</li>
+    <li>Ordered item three</li>
+  </ol>
+</div>
+
+<div class="lh lh1" data-name="line-height-1">Line height 1.0, first line<br>Line height 1.0, second line</div>
+<div class="lh lh15" data-name="line-height-1_5">Line height 1.5, first line<br>Line height 1.5, second line</div>
+<div class="lh lh3" data-name="line-height-3">Line height 3.0, first line<br>Line height 3.0, second line</div>
+
+<!-- Lone lines in tall line boxes (fidelity r1c): one line each, its line-height well above its size,
+     so the browser centres the glyphs in the line box. PowerPoint sets an exact line that tall about a
+     quarter of its leading higher than PptxRender does (10 px for a client deck's 20 px operators in 60 px lines);
+     the emitter writes a lone line at its glyphs' own height (text._fit_lone_line), where the two agree.
+     5 text elements, 2 shapes (the chevron's fill, the counter's circle). -->
+<div data-name="lone-op" style="position:absolute;left:700px;top:18px;width:28px;height:60px;
+     line-height:60px;text-align:center;font-size:20px;font-weight:700;color:#1A9AFA">×</div>
+<div data-name="lone-chevron" style="position:absolute;left:740px;top:20px;width:150px;height:56px;
+     line-height:56px;padding-left:16px;box-sizing:border-box;background:#0B2545;color:#FFFFFF;
+     font-size:14px;font-weight:700">1 · Diagnose</div>
+<div data-name="lone-counter" style="position:absolute;left:904px;top:35px;width:26px;height:26px;
+     border-radius:50%;background:#1A9AFA;color:#FFFFFF;font-size:13px;font-weight:700;
+     line-height:26px;text-align:center">3</div>
+<div data-name="lone-large" style="position:absolute;left:946px;top:28px;font-size:24px;
+     line-height:40px">Large, 40 px</div>
+<div data-name="lone-small" style="position:absolute;left:1116px;top:32px;font-size:11px;
+     line-height:32px">Small print, 32 px</div>
+
+<!-- A change of leading between paragraphs (fidelity r2): a KPI number at line-height 1 over a 12 px
+     label at line-height 22px, as on the KPI tiles of real client slides. 1 text element of
+     2 paragraphs. The label's baseline must sit the browser's distance under the number's
+     (text._exact_gap); the gap it replaced, Δc − (L1 + L2)/2, was blind to the leading and put the label
+     7 px low in both renderers. -->
+<div data-name="kpi-leading" style="position:absolute;left:1010px;top:560px;width:160px">
+  <div style="font-size:26px;line-height:1;font-weight:700;color:#1A9AFA">120k</div>
+  <div style="font-size:12px;line-height:22px;font-weight:700;margin-top:4px">Partners by 2030</div>
+</div>
+
+<!-- Vertical text: rotate(-90deg). The unrotated box stays inside the canvas on purpose. -->
+<div data-name="rotated-90" style="position:absolute;left:1120px;top:389px;width:160px;height:22px;
+     transform:rotate(-90deg);white-space:nowrap;text-align:center;font-size:13px;font-weight:700">
+  Rotated minus 90 degrees
+</div>
+
+<div data-name="rotated-8" style="position:absolute;left:700px;top:600px;width:300px;height:26px;
+     transform:rotate(-8deg);white-space:nowrap;font-size:14px">
+  Rotated minus 8 degrees
+</div>
+
+<aside class="notes">Speaker notes for the text torture slide: every allowed inline tag, four
+alignments, three line heights and two rotations.</aside>
+
+</body></html>

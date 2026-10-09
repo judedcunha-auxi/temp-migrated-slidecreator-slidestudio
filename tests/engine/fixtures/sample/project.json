@@ -1,0 +1,9 @@
+{
+  "id": "prj_sample",
+  "name": "Synthetic sample deck",
+  "master": {"filename": "master.pptx"},
+  "slides": [
+    {"id": "sld_sample_01", "title": "Growth by channel", "layoutId": "layout-06", "current": 1},
+    {"id": "sld_sample_02", "title": "Synthetic sample deck", "layoutId": "layout-01", "current": 1}
+  ]
+}

@@ -1,0 +1,90 @@
+[
+  {
+    "file": "layout-01-title-slide.png",
+    "renderIndex": 1,
+    "masterIndex": 0,
+    "layoutIndex": 0,
+    "name": "Title Slide",
+    "partName": "/ppt/slideLayouts/slideLayout1.xml"
+  },
+  {
+    "file": "layout-02-title-and-content.png",
+    "renderIndex": 2,
+    "masterIndex": 0,
+    "layoutIndex": 1,
+    "name": "Title and Content",
+    "partName": "/ppt/slideLayouts/slideLayout2.xml"
+  },
+  {
+    "file": "layout-03-section-header.png",
+    "renderIndex": 3,
+    "masterIndex": 0,
+    "layoutIndex": 2,
+    "name": "Section Header",
+    "partName": "/ppt/slideLayouts/slideLayout3.xml"
+  },
+  {
+    "file": "layout-04-two-content.png",
+    "renderIndex": 4,
+    "masterIndex": 0,
+    "layoutIndex": 3,
+    "name": "Two Content",
+    "partName": "/ppt/slideLayouts/slideLayout4.xml"
+  },
+  {
+    "file": "layout-05-comparison.png",
+    "renderIndex": 5,
+    "masterIndex": 0,
+    "layoutIndex": 4,
+    "name": "Comparison",
+    "partName": "/ppt/slideLayouts/slideLayout5.xml"
+  },
+  {
+    "file": "layout-06-title-only.png",
+    "renderIndex": 6,
+    "masterIndex": 0,
+    "layoutIndex": 5,
+    "name": "Title Only",
+    "partName": "/ppt/slideLayouts/slideLayout6.xml"
+  },
+  {
+    "file": "layout-07-blank.png",
+    "renderIndex": 7,
+    "masterIndex": 0,
+    "layoutIndex": 6,
+    "name": "Blank",
+    "partName": "/ppt/slideLayouts/slideLayout7.xml"
+  },
+  {
+    "file": "layout-08-content-with-caption.png",
+    "renderIndex": 8,
+    "masterIndex": 0,
+    "layoutIndex": 7,
+    "name": "Content with Caption",
+    "partName": "/ppt/slideLayouts/slideLayout8.xml"
+  },
+  {
+    "file": "layout-09-picture-with-caption.png",
+    "renderIndex": 9,
+    "masterIndex": 0,
+    "layoutIndex": 8,
+    "name": "Picture with Caption",
+    "partName": "/ppt/slideLayouts/slideLayout9.xml"
+  },
+  {
+    "file": "layout-10-title-and-vertical-text.png",
+    "renderIndex": 10,
+    "masterIndex": 0,
+    "layoutIndex": 9,
+    "name": "Title and Vertical Text",
+    "partName": "/ppt/slideLayouts/slideLayout10.xml"
+  },
+  {
+    "file": "layout-11-vertical-title-and-text.png",
+    "renderIndex": 11,
+    "masterIndex": 0,
+    "layoutIndex": 10,
+    "name": "Vertical Title and Text",
+    "partName": "/ppt/slideLayouts/slideLayout11.xml"
+  }
+]

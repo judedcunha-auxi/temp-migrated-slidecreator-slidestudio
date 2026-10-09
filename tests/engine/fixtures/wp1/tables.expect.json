@@ -1,0 +1,10 @@
+{
+  "master": "test-16x9",
+  "layoutId": "layout-05",
+  "kinds": {"table": 1},
+  "rasterAllowed": [],
+  "charts": {"authored": 0, "recognised": 0},
+  "notes": [
+    "D14, final (WP-A, rebased onto F): re-taken on the merged engine under master brief section 11 as amended by WP-B, read inside a table (10-WPA section 8.1): every cell holds one in-flow paragraph (no chip, icon, image, painted box or side-by-side paragraph), so every glyph stays in the native table and nothing is drawn over it: table 1."
+  ]
+}

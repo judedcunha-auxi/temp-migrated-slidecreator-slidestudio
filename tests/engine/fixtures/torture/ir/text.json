@@ -1,0 +1,1343 @@
+{
+  "version": 1,
+  "canvas": {
+    "w": 1280,
+    "h": 720,
+    "pxPerIn": 96
+  },
+  "slide": {
+    "id": "tor_text",
+    "title": "torture · text",
+    "layoutId": "layout-07",
+    "notes": "Speaker notes for the text torture slide."
+  },
+  "fonts": {
+    "forced": {
+      "major": "Calibri Light",
+      "minor": "Calibri"
+    },
+    "used": [
+      "Calibri",
+      "Calibri Light"
+    ],
+    "substituted": []
+  },
+  "groups": [],
+  "elements": [
+    {
+      "id": "e1",
+      "kind": "text",
+      "box": {
+        "x": 40.0,
+        "y": 24.0,
+        "w": 620.0,
+        "h": 78.0
+      },
+      "z": 0,
+      "name": "head",
+      "source": {
+        "path": "body > [data-name=head]",
+        "tag": "div",
+        "svg": null
+      },
+      "paragraphs": [
+        {
+          "align": "left",
+          "lineHeightPx": 34.5,
+          "spaceBeforePx": 0.0,
+          "spaceAfterPx": 6.0,
+          "bullet": null,
+          "lines": [
+            {
+              "box": {
+                "x": 40,
+                "y": 24,
+                "w": 232,
+                "h": 35
+              },
+              "runs": [
+                {
+                  "text": "Text torture",
+                  "font": "Calibri Light",
+                  "sizePx": 30.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "2E2E38",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "align": "left",
+          "lineHeightPx": 20.0,
+          "spaceBeforePx": 0.0,
+          "spaceAfterPx": 0.0,
+          "bullet": null,
+          "lines": [
+            {
+              "box": {
+                "x": 40,
+                "y": 65,
+                "w": 620,
+                "h": 20
+              },
+              "runs": [
+                {
+                  "text": "Two in-flow blocks under one parent are one element.",
+                  "font": "Calibri",
+                  "sizePx": 15.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "2E2E38",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            },
+            {
+              "box": {
+                "x": 40,
+                "y": 85,
+                "w": 300,
+                "h": 20
+              },
+              "runs": [
+                {
+                  "text": "Each block is a paragraph.",
+                  "font": "Calibri",
+                  "sizePx": 15.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "2E2E38",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "anchor": "top",
+      "writingMode": "horizontal",
+      "wrap": true,
+      "transformCase": null
+    },
+    {
+      "id": "e2",
+      "kind": "shape",
+      "box": {
+        "x": 232.5,
+        "y": 128.0,
+        "w": 78.0,
+        "h": 19.0
+      },
+      "z": 1,
+      "name": "mark-hl",
+      "source": {
+        "path": "body > [data-name=mark-hl]",
+        "tag": "div",
+        "svg": null
+      },
+      "geometry": {
+        "type": "rect"
+      },
+      "fill": {
+        "type": "solid",
+        "color": "FFE9A8",
+        "alpha": 1.0
+      },
+      "stroke": null,
+      "shadow": null,
+      "flipH": false,
+      "flipV": false
+    },
+    {
+      "id": "e3",
+      "kind": "text",
+      "box": {
+        "x": 40.0,
+        "y": 104.0,
+        "w": 620.0,
+        "h": 44.0
+      },
+      "z": 2,
+      "name": "runs",
+      "source": {
+        "path": "body > [data-name=runs]",
+        "tag": "div",
+        "svg": null
+      },
+      "paragraphs": [
+        {
+          "align": "left",
+          "lineHeightPx": 20.0,
+          "spaceBeforePx": 0.0,
+          "spaceAfterPx": 0.0,
+          "bullet": null,
+          "lines": [
+            {
+              "box": {
+                "x": 40,
+                "y": 104,
+                "w": 620,
+                "h": 20
+              },
+              "runs": [
+                {
+                  "text": "bold ",
+                  "font": "Calibri",
+                  "sizePx": 15.0,
+                  "weight": 700,
+                  "italic": false,
+                  "color": "2E2E38",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                },
+                {
+                  "text": "italic ",
+                  "font": "Calibri",
+                  "sizePx": 15.0,
+                  "weight": 400,
+                  "italic": true,
+                  "color": "2E2E38",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                },
+                {
+                  "text": "underline ",
+                  "font": "Calibri",
+                  "sizePx": 15.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "2E2E38",
+                  "alpha": 1.0,
+                  "underline": true,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                },
+                {
+                  "text": "struck ",
+                  "font": "Calibri",
+                  "sizePx": 15.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "2E2E38",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": true,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                },
+                {
+                  "text": "coloured ",
+                  "font": "Calibri",
+                  "sizePx": 15.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "1A9AFA",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                },
+                {
+                  "text": "link",
+                  "font": "Calibri",
+                  "sizePx": 15.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "1A9AFA",
+                  "alpha": 1.0,
+                  "underline": true,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": "https://example.com/report"
+                }
+              ]
+            },
+            {
+              "box": {
+                "x": 40,
+                "y": 124,
+                "w": 620,
+                "h": 20
+              },
+              "runs": [
+                {
+                  "text": "base",
+                  "font": "Calibri",
+                  "sizePx": 15.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "2E2E38",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                },
+                {
+                  "text": "sup",
+                  "font": "Calibri",
+                  "sizePx": 10.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "2E2E38",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "super",
+                  "baselineShiftPx": -4.5,
+                  "caps": false,
+                  "href": null
+                },
+                {
+                  "text": " and ",
+                  "font": "Calibri",
+                  "sizePx": 15.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "2E2E38",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                },
+                {
+                  "text": "highlighted",
+                  "font": "Calibri",
+                  "sizePx": 15.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "2E2E38",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                },
+                {
+                  "text": " tracked",
+                  "font": "Calibri",
+                  "sizePx": 15.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "2E2E38",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 1.6,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "anchor": "top",
+      "writingMode": "horizontal",
+      "wrap": true,
+      "transformCase": null
+    },
+    {
+      "id": "e4",
+      "kind": "shape",
+      "box": {
+        "x": 170.0,
+        "y": 188.0,
+        "w": 74.0,
+        "h": 20.0
+      },
+      "z": 3,
+      "name": "chip-baseline",
+      "source": {
+        "path": "body > [data-name=chip-baseline]",
+        "tag": "div",
+        "svg": null
+      },
+      "geometry": {
+        "type": "roundRect",
+        "radius": {
+          "tl": 10,
+          "tr": 10,
+          "br": 10,
+          "bl": 10
+        }
+      },
+      "fill": {
+        "type": "solid",
+        "color": "E8F4FE",
+        "alpha": 1.0
+      },
+      "stroke": null,
+      "shadow": null,
+      "flipH": false,
+      "flipV": false
+    },
+    {
+      "id": "e5",
+      "kind": "shape",
+      "box": {
+        "x": 252.0,
+        "y": 188.0,
+        "w": 62.0,
+        "h": 20.0
+      },
+      "z": 4,
+      "name": "chip-target",
+      "source": {
+        "path": "body > [data-name=chip-target]",
+        "tag": "div",
+        "svg": null
+      },
+      "geometry": {
+        "type": "roundRect",
+        "radius": {
+          "tl": 10,
+          "tr": 10,
+          "br": 10,
+          "bl": 10
+        }
+      },
+      "fill": {
+        "type": "solid",
+        "color": "E6F6EC",
+        "alpha": 1.0
+      },
+      "stroke": null,
+      "shadow": null,
+      "flipH": false,
+      "flipV": false
+    },
+    {
+      "id": "e6",
+      "kind": "text",
+      "box": {
+        "x": 40.0,
+        "y": 186.0,
+        "w": 620.0,
+        "h": 24.0
+      },
+      "z": 5,
+      "name": "chips",
+      "source": {
+        "path": "body > [data-name=chips]",
+        "tag": "div",
+        "svg": null
+      },
+      "paragraphs": [
+        {
+          "align": "left",
+          "lineHeightPx": 24.0,
+          "spaceBeforePx": 0.0,
+          "spaceAfterPx": 0.0,
+          "bullet": null,
+          "lines": [
+            {
+              "box": {
+                "x": 40,
+                "y": 186,
+                "w": 480,
+                "h": 24
+              },
+              "runs": [
+                {
+                  "text": "Inline-block chips ",
+                  "font": "Calibri",
+                  "sizePx": 15.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "2E2E38",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                },
+                {
+                  "text": "Baseline",
+                  "font": "Calibri",
+                  "sizePx": 12.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "0B5FA5",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                },
+                {
+                  "text": " ",
+                  "font": "Calibri",
+                  "sizePx": 15.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "2E2E38",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                },
+                {
+                  "text": "Target",
+                  "font": "Calibri",
+                  "sizePx": 12.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "12703A",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                },
+                {
+                  "text": " sit in the line.",
+                  "font": "Calibri",
+                  "sizePx": 15.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "2E2E38",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "anchor": "top",
+      "writingMode": "horizontal",
+      "wrap": true,
+      "transformCase": null
+    },
+    {
+      "id": "e7",
+      "kind": "text",
+      "box": {
+        "x": 40.0,
+        "y": 236.0,
+        "w": 620.0,
+        "h": 100.0
+      },
+      "z": 6,
+      "name": "align",
+      "source": {
+        "path": "body > [data-name=align]",
+        "tag": "div",
+        "svg": null
+      },
+      "paragraphs": [
+        {
+          "align": "left",
+          "lineHeightPx": 20.0,
+          "spaceBeforePx": 0.0,
+          "spaceAfterPx": 0.0,
+          "bullet": null,
+          "lines": [
+            {
+              "box": {
+                "x": 40,
+                "y": 236,
+                "w": 200,
+                "h": 20
+              },
+              "runs": [
+                {
+                  "text": "Left aligned.",
+                  "font": "Calibri",
+                  "sizePx": 15.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "2E2E38",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "align": "center",
+          "lineHeightPx": 20.0,
+          "spaceBeforePx": 0.0,
+          "spaceAfterPx": 0.0,
+          "bullet": null,
+          "lines": [
+            {
+              "box": {
+                "x": 250,
+                "y": 256,
+                "w": 200,
+                "h": 20
+              },
+              "runs": [
+                {
+                  "text": "Centre aligned.",
+                  "font": "Calibri",
+                  "sizePx": 15.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "2E2E38",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "align": "right",
+          "lineHeightPx": 20.0,
+          "spaceBeforePx": 0.0,
+          "spaceAfterPx": 0.0,
+          "bullet": null,
+          "lines": [
+            {
+              "box": {
+                "x": 460,
+                "y": 276,
+                "w": 200,
+                "h": 20
+              },
+              "runs": [
+                {
+                  "text": "Right aligned.",
+                  "font": "Calibri",
+                  "sizePx": 15.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "2E2E38",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "align": "justify",
+          "lineHeightPx": 20.0,
+          "spaceBeforePx": 0.0,
+          "spaceAfterPx": 0.0,
+          "bullet": null,
+          "lines": [
+            {
+              "box": {
+                "x": 40,
+                "y": 296,
+                "w": 620,
+                "h": 20
+              },
+              "runs": [
+                {
+                  "text": "Justified first line stretched to the full measure.",
+                  "font": "Calibri",
+                  "sizePx": 15.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "2E2E38",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            },
+            {
+              "box": {
+                "x": 40,
+                "y": 316,
+                "w": 300,
+                "h": 20
+              },
+              "runs": [
+                {
+                  "text": "Ragged last line.",
+                  "font": "Calibri",
+                  "sizePx": 15.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "2E2E38",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "anchor": "top",
+      "writingMode": "horizontal",
+      "wrap": true,
+      "transformCase": null
+    },
+    {
+      "id": "e8",
+      "kind": "text",
+      "box": {
+        "x": 700.0,
+        "y": 104.0,
+        "w": 440.0,
+        "h": 72.0
+      },
+      "z": 7,
+      "name": "bullets-char",
+      "source": {
+        "path": "body > [data-name=bullets-char]",
+        "tag": "div",
+        "svg": null
+      },
+      "paragraphs": [
+        {
+          "align": "left",
+          "lineHeightPx": 24.0,
+          "spaceBeforePx": 0.0,
+          "spaceAfterPx": 4.0,
+          "bullet": {
+            "type": "char",
+            "char": "•",
+            "level": 0,
+            "indentPx": 18,
+            "color": "2E2E38",
+            "start": 1
+          },
+          "lines": [
+            {
+              "box": {
+                "x": 726,
+                "y": 104,
+                "w": 414,
+                "h": 24
+              },
+              "runs": [
+                {
+                  "text": "Unordered item one",
+                  "font": "Calibri",
+                  "sizePx": 15.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "2E2E38",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "align": "left",
+          "lineHeightPx": 24.0,
+          "spaceBeforePx": 0.0,
+          "spaceAfterPx": 4.0,
+          "bullet": {
+            "type": "char",
+            "char": "•",
+            "level": 0,
+            "indentPx": 18,
+            "color": "2E2E38",
+            "start": 1
+          },
+          "lines": [
+            {
+              "box": {
+                "x": 726,
+                "y": 128,
+                "w": 414,
+                "h": 24
+              },
+              "runs": [
+                {
+                  "text": "Unordered item two",
+                  "font": "Calibri",
+                  "sizePx": 15.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "2E2E38",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "align": "left",
+          "lineHeightPx": 24.0,
+          "spaceBeforePx": 0.0,
+          "spaceAfterPx": 0.0,
+          "bullet": {
+            "type": "char",
+            "char": "•",
+            "level": 0,
+            "indentPx": 18,
+            "color": "2E2E38",
+            "start": 1
+          },
+          "lines": [
+            {
+              "box": {
+                "x": 726,
+                "y": 152,
+                "w": 414,
+                "h": 24
+              },
+              "runs": [
+                {
+                  "text": "Unordered item three",
+                  "font": "Calibri",
+                  "sizePx": 15.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "2E2E38",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "anchor": "top",
+      "writingMode": "horizontal",
+      "wrap": true,
+      "transformCase": null
+    },
+    {
+      "id": "e9",
+      "kind": "text",
+      "box": {
+        "x": 700.0,
+        "y": 190.0,
+        "w": 440.0,
+        "h": 72.0
+      },
+      "z": 8,
+      "name": "bullets-num",
+      "source": {
+        "path": "body > [data-name=bullets-num]",
+        "tag": "div",
+        "svg": null
+      },
+      "paragraphs": [
+        {
+          "align": "left",
+          "lineHeightPx": 24.0,
+          "spaceBeforePx": 0.0,
+          "spaceAfterPx": 4.0,
+          "bullet": {
+            "type": "num",
+            "char": "1.",
+            "level": 0,
+            "indentPx": 18,
+            "color": "2E2E38",
+            "start": 1
+          },
+          "lines": [
+            {
+              "box": {
+                "x": 726,
+                "y": 190,
+                "w": 414,
+                "h": 24
+              },
+              "runs": [
+                {
+                  "text": "Ordered item one",
+                  "font": "Calibri",
+                  "sizePx": 15.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "2E2E38",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "align": "left",
+          "lineHeightPx": 24.0,
+          "spaceBeforePx": 0.0,
+          "spaceAfterPx": 4.0,
+          "bullet": {
+            "type": "num",
+            "char": "2.",
+            "level": 0,
+            "indentPx": 18,
+            "color": "2E2E38",
+            "start": 1
+          },
+          "lines": [
+            {
+              "box": {
+                "x": 726,
+                "y": 214,
+                "w": 414,
+                "h": 24
+              },
+              "runs": [
+                {
+                  "text": "Ordered item two",
+                  "font": "Calibri",
+                  "sizePx": 15.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "2E2E38",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "align": "left",
+          "lineHeightPx": 24.0,
+          "spaceBeforePx": 0.0,
+          "spaceAfterPx": 0.0,
+          "bullet": {
+            "type": "num",
+            "char": "3.",
+            "level": 0,
+            "indentPx": 18,
+            "color": "2E2E38",
+            "start": 1
+          },
+          "lines": [
+            {
+              "box": {
+                "x": 726,
+                "y": 238,
+                "w": 414,
+                "h": 24
+              },
+              "runs": [
+                {
+                  "text": "Ordered item three",
+                  "font": "Calibri",
+                  "sizePx": 15.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "2E2E38",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "anchor": "top",
+      "writingMode": "horizontal",
+      "wrap": true,
+      "transformCase": null
+    },
+    {
+      "id": "e10",
+      "kind": "text",
+      "box": {
+        "x": 700.0,
+        "y": 452.0,
+        "w": 440.0,
+        "h": 120.0
+      },
+      "z": 9,
+      "name": "line-height-3",
+      "source": {
+        "path": "body > [data-name=line-height-3]",
+        "tag": "div",
+        "svg": null
+      },
+      "paragraphs": [
+        {
+          "align": "left",
+          "lineHeightPx": 60.0,
+          "spaceBeforePx": 0.0,
+          "spaceAfterPx": 0.0,
+          "bullet": null,
+          "lines": [
+            {
+              "box": {
+                "x": 700,
+                "y": 472,
+                "w": 440,
+                "h": 24
+              },
+              "runs": [
+                {
+                  "text": "Line height 3.0, first line",
+                  "font": "Calibri",
+                  "sizePx": 20.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "2E2E38",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            },
+            {
+              "box": {
+                "x": 700,
+                "y": 532,
+                "w": 440,
+                "h": 24
+              },
+              "runs": [
+                {
+                  "text": "Line height 3.0, second line",
+                  "font": "Calibri",
+                  "sizePx": 20.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "2E2E38",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "anchor": "top",
+      "writingMode": "horizontal",
+      "wrap": true,
+      "transformCase": null
+    },
+    {
+      "id": "e11",
+      "kind": "text",
+      "box": {
+        "x": 40.0,
+        "y": 492.0,
+        "w": 620.0,
+        "h": 20.0
+      },
+      "z": 10,
+      "name": "caps",
+      "source": {
+        "path": "body > [data-name=caps]",
+        "tag": "div",
+        "svg": null
+      },
+      "paragraphs": [
+        {
+          "align": "left",
+          "lineHeightPx": 20.0,
+          "spaceBeforePx": 0.0,
+          "spaceAfterPx": 0.0,
+          "bullet": null,
+          "lines": [
+            {
+              "box": {
+                "x": 40,
+                "y": 492,
+                "w": 420,
+                "h": 20
+              },
+              "runs": [
+                {
+                  "text": "TRANSFORMED TO UPPER CASE",
+                  "font": "Calibri",
+                  "sizePx": 13.0,
+                  "weight": 700,
+                  "italic": false,
+                  "color": "2E2E38",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 2.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": true,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "anchor": "top",
+      "writingMode": "horizontal",
+      "wrap": true,
+      "transformCase": "upper"
+    },
+    {
+      "id": "e12",
+      "kind": "text",
+      "box": {
+        "x": 1120.0,
+        "y": 389.0,
+        "w": 160.0,
+        "h": 22.0
+      },
+      "z": 11,
+      "rotation": -90.0,
+      "name": "rotated-90",
+      "source": {
+        "path": "body > [data-name=rotated-90]",
+        "tag": "div",
+        "svg": null
+      },
+      "paragraphs": [
+        {
+          "align": "center",
+          "lineHeightPx": 22.0,
+          "spaceBeforePx": 0.0,
+          "spaceAfterPx": 0.0,
+          "bullet": null,
+          "lines": [
+            {
+              "box": {
+                "x": 1120,
+                "y": 389,
+                "w": 160,
+                "h": 22
+              },
+              "runs": [
+                {
+                  "text": "Rotated minus 90 degrees",
+                  "font": "Calibri",
+                  "sizePx": 13.0,
+                  "weight": 700,
+                  "italic": false,
+                  "color": "2E2E38",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "anchor": "top",
+      "writingMode": "horizontal",
+      "wrap": true,
+      "transformCase": null
+    },
+    {
+      "id": "e13",
+      "kind": "text",
+      "box": {
+        "x": 700.0,
+        "y": 600.0,
+        "w": 300.0,
+        "h": 60.0
+      },
+      "z": 12,
+      "name": "anchored-bottom",
+      "source": {
+        "path": "body > [data-name=anchored-bottom]",
+        "tag": "div",
+        "svg": null
+      },
+      "paragraphs": [
+        {
+          "align": "left",
+          "lineHeightPx": 20.0,
+          "spaceBeforePx": 0.0,
+          "spaceAfterPx": 0.0,
+          "bullet": null,
+          "lines": [
+            {
+              "box": {
+                "x": 700,
+                "y": 640,
+                "w": 300,
+                "h": 20
+              },
+              "runs": [
+                {
+                  "text": "Anchored to the bottom of its box.",
+                  "font": "Calibri",
+                  "sizePx": 15.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "2E2E38",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "anchor": "bottom",
+      "writingMode": "horizontal",
+      "wrap": true,
+      "transformCase": null
+    }
+  ],
+  "diagnostics": []
+}

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<!--
+  Torture fixture: the `charts-labels` family (docs/engine/rendercheck/00-PLAN.md §8–§9, the gaps the rebuilt
+  render check's authors worked around), on the 16 × 9 test master's Blank layout (1280 × 720 px canvas).
+
+  The render check's authors laid HTML text over pinned charts because chart labels could not be bold or break
+  onto a second line, and declared every middle subtotal because only the last bar was inferred:
+  G  a column chart with bold own labels broken onto two lines ("$48.2B\n(31.4%)") above the bars, in one ink,
+     and two-line category names on a bold category axis;
+  H  d2_s07's 100 % financing bar with two-line labels, bold and white on every segment;
+  I  d1_s03: a bridge whose middle "2025 EBITDA" equals the running sum and is not declared — it must stand on
+     the axis, and "Pro-forma EBITDA" climb from it (bold labels, two-line categories);
+  J  a pinned `outEnd` bridge whose first and last labels run to two lines, bold at 12 px.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Charts — label styles, line breaks and subtotals</title>
+<style>
+  html, body {
+    margin: 0;
+    width: 1280px;
+    height: 720px;
+    overflow: hidden;
+    background: transparent;
+    font-family: Calibri, Arial, sans-serif;
+    color: #2E2E38;
+  }
+  h1 {
+    position: absolute;
+    left: 40px; top: 24px; width: 1200px; height: 36px;
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 36px;
+    color: #12233B;
+  }
+  .chart { position: absolute; width: 580px; height: 250px; font-size: 11px; color: #333333; }
+  .cap {
+    position: absolute;
+    width: 580px;
+    height: 22px;
+    font-size: 13px;
+    line-height: 22px;
+    color: #516467;
+  }
+</style>
+</head>
+<body>
+
+<h1>Charts — label styles, line breaks and subtotals</h1>
+
+<div class="chart" data-name="G bold two-line labels" style="left:40px;top:84px"
+     data-chart='{"type": "column", "categories": ["FY23\nActual", "FY24\nBudget", "FY25\nPlan"], "series": [{"name": "Revenue ($B)", "values": [48.2, 53.9, 58.4], "dataLabels": ["$48.2B\n(31.4%)", null, "$58.4B\n(+8%)"]}], "colors": ["#00AECF"], "options": {"labelPosition": "outEnd", "numberFormat": "0.0", "legend": false, "gridlines": false, "gapWidth": 80, "labelStyle": {"bold": true, "color": "#021D44"}, "categoryAxis": {"bold": true}, "valueAxis": {"visible": false, "min": 0, "max": 100}}}'></div>
+<div class="cap" style="left:40px;top:340px">G · bold own labels on two lines, two-line categories</div>
+
+<div class="chart" data-name="H financing mix" style="left:660px;top:84px"
+     data-chart='{"type": "bar_stacked_100", "categories": ["Funding"], "series": [{"name": "Equity", "values": [31.4], "dataLabels": ["$48.2B\n(31.4%)"]}, {"name": "Debt", "values": [46.8], "dataLabels": ["$72B\n(46.8%)"]}, {"name": "Cash and other", "values": [21.8], "dataLabels": ["$33.5B\n(21.8%)"]}], "colors": ["#00AECF", "#021D44", "#1A6FB0"], "options": {"labelPosition": "center", "legend": false, "gridlines": false, "gapWidth": 30, "fontSize": 11, "labelStyle": {"bold": true, "color": "#FFFFFF"}, "categoryAxis": {"visible": false}, "valueAxis": {"visible": false, "min": 0, "max": 100}, "plotArea": {"x": 0.01, "y": 0.06, "w": 0.98, "h": 0.88}}}'></div>
+<div class="cap" style="left:660px;top:340px">H · d2_s07: two-line labels, bold, one ink on every segment</div>
+
+<div class="chart" data-name="I middle subtotal" style="left:40px;top:392px"
+     data-chart='{"type": "waterfall", "categories": ["2020\nEBITDA", "Volume", "Input\ncosts", "Overhead", "Pricing", "2025\nEBITDA", "Uplift", "Pro-forma\nEBITDA"], "series": [{"name": "EBITDA ($B)", "values": [12.6, -0.8, -2.1, -1.5, -1.2, 7.0, 8.4, 15.4]}], "colors": ["#18A3D2", "#E5484D", "#0A2350"], "options": {"numberFormat": "0.0", "legend": false, "gridlines": false, "gapWidth": 40, "labelStyle": {"bold": true}, "valueAxis": {"visible": false, "min": 0, "max": 20}}}'></div>
+<div class="cap" style="left:40px;top:648px">I · d1_s03: an undeclared middle subtotal stands on the axis</div>
+
+<div class="chart" data-name="J out-end bridge" style="left:660px;top:392px"
+     data-chart='{"type": "waterfall", "categories": ["Opening", "Wins", "Losses", "Closing"], "series": [{"name": "Cash ($m)", "values": [100, 30, -10, 120], "dataLabels": ["$100m\n(base)", null, null, "$120m\n(+20%)"]}], "colors": ["#021D44", "#00AECF"], "options": {"labelPosition": "outEnd", "numberFormat": "0", "legend": false, "gridlines": false, "gapWidth": 60, "labelStyle": {"bold": true, "fontSize": 12}, "valueAxis": {"visible": false}}}'></div>
+<div class="cap" style="left:660px;top:648px">J · a pinned outEnd bridge with two-line labels</div>
+
+<aside class="notes" hidden>Four authored charts: bold and two-line chart labels, two-line categories, and a middle subtotal the engine infers.</aside>
+
+</body>
+</html>

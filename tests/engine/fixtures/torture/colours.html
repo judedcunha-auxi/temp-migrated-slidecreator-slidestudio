@@ -1,0 +1,25 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><style>
+html,body{margin:0;width:1280px;height:720px;overflow:hidden;background:transparent;font-family:Calibri,Arial,sans-serif;color:#1d2433}
+:root{--accent:#1E9E5A;--brand:#0B5CAD}
+/* the heading reaches the right edge of layout-06's title zone (48 + 864 = 912): see the notes */
+.h{position:absolute;left:40px;top:24px;width:872px;font-size:26px;font-weight:700}
+.sw{position:absolute;width:280px;height:110px;border-radius:6px;font-size:13px;padding:12px;box-sizing:border-box;border:1px solid #BBB}
+.sw b{display:block;font-size:14px;margin-bottom:4px}
+.banner{position:absolute;left:40px;top:560px;width:1200px;height:90px;border-radius:8px;padding:16px;box-sizing:border-box;font-size:15px}
+</style></head><body>
+<div class="h" data-placeholder="title">Tinted fills (probe 4)</div>
+<div class="sw" style="left:40px;top:90px;background:#E3F4EA"><b>1 · hex #E3F4EA</b>control</div>
+<div class="sw" style="left:340px;top:90px;background:rgba(30,158,90,.12)"><b>2 · rgba(…, .12)</b>alpha tint</div>
+<div class="sw" style="left:640px;top:90px;background:color-mix(in srgb,var(--accent) 12%,white)"><b>3 · color-mix srgb</b>very common in LLM CSS</div>
+<div class="sw" style="left:940px;top:90px;background:color-mix(in oklab,var(--brand) 10%,transparent)"><b>4 · color-mix oklab + transparent</b></div>
+<div class="sw" style="left:40px;top:220px;background:oklch(0.95 0.04 150)"><b>5 · oklch()</b></div>
+<div class="sw" style="left:340px;top:220px;background:hsl(150 60% 94%)"><b>6 · hsl()</b></div>
+<div class="sw" style="left:640px;top:220px;background:#1E9E5A1F"><b>7 · 8-digit hex</b></div>
+<div class="sw" style="left:940px;top:220px;background:color(display-p3 0.9 0.97 0.92)"><b>8 · color(display-p3)</b></div>
+<div class="sw" style="left:40px;top:350px;background:linear-gradient(90deg,color-mix(in srgb,var(--brand) 20%,white),white)"><b>9 · gradient of color-mix</b></div>
+<div class="sw" style="left:340px;top:350px;background:rgb(11 92 173 / 8%)"><b>10 · rgb(… / 8%)</b></div>
+<div class="sw" style="left:640px;top:350px;background:#0B2545;color:color-mix(in srgb,white 85%,#0B2545)"><b>11 · dark box, color-mix TEXT</b>text colour from color-mix</div>
+<div class="sw" style="left:940px;top:350px;background:#0B2545;color:oklch(0.98 0 0)"><b>12 · dark box, oklch TEXT</b>white-ish oklch text</div>
+<div class="banner" style="background:color-mix(in srgb,var(--accent) 10%,white);border-left:6px solid var(--accent)"><b>Takeaway banner</b> — tinted emphasis banner with a coloured left edge (color-mix fill).</div>
+</body></html>

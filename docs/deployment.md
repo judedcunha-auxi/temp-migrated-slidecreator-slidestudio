@@ -1,13 +1,11 @@
 # Deployment
 
-> **Hosting is not decided yet.** Where the service runs is decision **D2** in the migration
-> plan: App Service for Containers with a staging slot (recommended), Container Apps, or a zip
-> deploy that installs the browser at startup. A **container is the likely answer**, because the
-> slide engine (Phase 2) needs Chromium, which a plain zip deploy cannot carry well. How secrets
-> reach the app (**D18**, recommended: Key Vault references and a managed identity) and how GitHub
-> signs in to Azure (**D19**, recommended: OIDC) are open too. Until all three are settled, the
-> deploy jobs in CI are disabled stubs and nothing is deployed. This page says what is fixed
-> already, and what the deploy will do.
+> **Hosting: App Service for Containers (decision D2, decided),** on Python 3.11, with a staging
+> slot. A container, because the export engine needs Chromium and fonts that a zip deploy cannot
+> carry well. How secrets reach the app (**D18**, recommended: Key Vault references and a managed
+> identity) and how GitHub signs in to Azure (**D19**, recommended: OIDC) are still open. Until
+> they are settled, the deploy jobs in CI are disabled stubs and nothing is deployed. This page
+> says what is fixed already, and what the deploy will do.
 
 ## Branches and release flow
 

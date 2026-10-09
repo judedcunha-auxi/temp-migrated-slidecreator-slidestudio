@@ -1,0 +1,39 @@
+{
+  "family": "charts-labels",
+  "master": "test-16x9",
+  "layoutId": "layout-07",
+  "canvas": {
+    "w": 1280,
+    "h": 720
+  },
+  "kinds": {
+    "text": 5,
+    "chart": 4
+  },
+  "rasterAllowed": [],
+  "charts": {
+    "authored": 4,
+    "recognised": 0
+  },
+  "gateMaxPx2": 939,
+  "notes": [
+    "Render check follow-up G24 (docs/engine/rendercheck/00-PLAN.md §8-§9): the chart gaps the rebuilt render",
+    "check's authors worked around by laying HTML text over pinned plots, and the middle subtotal they had to",
+    "declare. 5 text elements: the h1 and four captions; no shapes (a waterfall's outEnd text boxes are drawn",
+    "by the emitter, not extracted).",
+    "G: options.labelStyle {bold, color} on outEnd labels whose own texts break with \\n (two a:p in the",
+    "c:dLbl's rich text), two-line category names (the \\n kept in c:pt/c:v; PowerPoint draws it as a break) on a",
+    "bold category axis (b=1 on the catAx txPr).",
+    "H (d2_s07): a 100 % bar whose own two-line labels are bold and white on every segment - labelStyle.color",
+    "replaces the contrast pick, so no per-point colour overrides are written.",
+    "I (d1_s03): nothing declared; '2025 EBITDA' equals the running sum (7.0) and names a subtotal, so it stands",
+    "on the axis (totals [0, 5, 7]); 'Uplift' climbs from it and 'Pro-forma EBITDA' equals the new sum. Before",
+    "G24 the subtotal floated as a step from 7.0 to 14.0 and the last two bars ran off max 20.",
+    "J: a pinned outEnd bridge (the overlay text boxes) whose first and last labels run to two lines, bold at",
+    "12 px; the default plot rect leaves 1.2 em for the second line (LINE_PITCH_EM), and PowerPoint keeps the",
+    "written inner rect (COM, 2026-09-29: w and h to 0.0001, the usual 4 pt chart-area offset).",
+    "gateMaxPx2 939 = max(measured x 1.2, measured + 60) over the measured 782 px2 masked non-chart area on",
+    "2026-09-29: the h1 and captions in Calibri Light vs the file's Calibri (test-16x9's manifest/theme",
+    "mismatch, as in charts-rendercheck). A regression guard, not a target."
+  ]
+}

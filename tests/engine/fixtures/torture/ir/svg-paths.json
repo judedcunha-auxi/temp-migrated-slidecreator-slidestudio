@@ -1,0 +1,881 @@
+{
+  "version": 1,
+  "canvas": {
+    "w": 1280,
+    "h": 720,
+    "pxPerIn": 96
+  },
+  "slide": {
+    "id": "tor_svg_paths",
+    "title": "torture · svg-paths",
+    "layoutId": "layout-06",
+    "notes": null
+  },
+  "fonts": {
+    "forced": {
+      "major": "Calibri Light",
+      "minor": "Calibri"
+    },
+    "used": [
+      "Calibri",
+      "Calibri Light"
+    ],
+    "substituted": []
+  },
+  "groups": [
+    {
+      "id": "svg#1-g-outer",
+      "parent": null,
+      "name": "g-outer",
+      "box": {
+        "x": 348.0,
+        "y": 486.0,
+        "w": 120.0,
+        "h": 152.0
+      }
+    },
+    {
+      "id": "svg#1-g-inner",
+      "parent": "svg#1-g-outer",
+      "name": "g-inner",
+      "box": {
+        "x": 348.0,
+        "y": 486.0,
+        "w": 120.0,
+        "h": 152.0
+      }
+    }
+  ],
+  "elements": [
+    {
+      "id": "e1",
+      "kind": "shape",
+      "box": {
+        "x": 72.0,
+        "y": 80.0,
+        "w": 112.0,
+        "h": 96.0
+      },
+      "z": 0,
+      "name": "path-cubic",
+      "source": {
+        "path": "body > svg#paths",
+        "tag": "svg",
+        "svg": "svg#1 > #path-cubic"
+      },
+      "geometry": {
+        "type": "custom",
+        "fillRule": "nonzero",
+        "path": [
+          [
+            "M",
+            72,
+            176
+          ],
+          [
+            "C",
+            96,
+            80,
+            152,
+            80,
+            184,
+            176
+          ]
+        ]
+      },
+      "fill": {
+        "type": "none"
+      },
+      "stroke": {
+        "color": "1A9AFA",
+        "alpha": 1.0,
+        "width": 6.0,
+        "dash": "solid",
+        "cap": "round",
+        "join": "miter",
+        "headEnd": null,
+        "tailEnd": null
+      },
+      "shadow": null,
+      "flipH": false,
+      "flipV": false
+    },
+    {
+      "id": "e2",
+      "kind": "shape",
+      "box": {
+        "x": 216.0,
+        "y": 72.0,
+        "w": 112.0,
+        "h": 104.0
+      },
+      "z": 1,
+      "name": "path-quad",
+      "source": {
+        "path": "body > svg#paths",
+        "tag": "svg",
+        "svg": "svg#1 > #path-quad"
+      },
+      "geometry": {
+        "type": "custom",
+        "fillRule": "nonzero",
+        "path": [
+          [
+            "M",
+            216,
+            176
+          ],
+          [
+            "Q",
+            272,
+            72,
+            328,
+            176
+          ],
+          [
+            "Z"
+          ]
+        ]
+      },
+      "fill": {
+        "type": "solid",
+        "color": "E8F4FE",
+        "alpha": 1.0
+      },
+      "stroke": {
+        "color": "0B5FA5",
+        "alpha": 1.0,
+        "width": 4.0,
+        "dash": "solid",
+        "cap": "butt",
+        "join": "miter",
+        "headEnd": null,
+        "tailEnd": null
+      },
+      "shadow": null,
+      "flipH": false,
+      "flipV": false
+    },
+    {
+      "id": "e3",
+      "kind": "shape",
+      "box": {
+        "x": 504.0,
+        "y": 80.0,
+        "w": 112.0,
+        "h": 96.0
+      },
+      "z": 2,
+      "name": "path-chevron",
+      "source": {
+        "path": "body > svg#paths",
+        "tag": "svg",
+        "svg": "svg#1 > #path-chevron"
+      },
+      "geometry": {
+        "type": "custom",
+        "fillRule": "nonzero",
+        "path": [
+          [
+            "M",
+            504,
+            80
+          ],
+          [
+            "L",
+            584,
+            80
+          ],
+          [
+            "L",
+            616,
+            128
+          ],
+          [
+            "L",
+            584,
+            176
+          ],
+          [
+            "L",
+            504,
+            176
+          ],
+          [
+            "L",
+            536,
+            128
+          ],
+          [
+            "Z"
+          ]
+        ]
+      },
+      "fill": {
+        "type": "solid",
+        "color": "0B5FA5",
+        "alpha": 1.0
+      },
+      "stroke": null,
+      "shadow": null,
+      "flipH": false,
+      "flipV": false
+    },
+    {
+      "id": "e4",
+      "kind": "shape",
+      "box": {
+        "x": 648.0,
+        "y": 80.0,
+        "w": 112.0,
+        "h": 96.0
+      },
+      "z": 3,
+      "name": "path-as-rect",
+      "source": {
+        "path": "body > [data-name=path-as-rect]",
+        "tag": "div",
+        "svg": null
+      },
+      "geometry": {
+        "type": "rect"
+      },
+      "fill": {
+        "type": "solid",
+        "color": "F5A623",
+        "alpha": 1.0
+      },
+      "stroke": null,
+      "shadow": null,
+      "flipH": false,
+      "flipV": false
+    },
+    {
+      "id": "e5",
+      "kind": "shape",
+      "box": {
+        "x": 800.0,
+        "y": 80.0,
+        "w": 96.0,
+        "h": 96.0
+      },
+      "z": 4,
+      "name": "path-as-circle",
+      "source": {
+        "path": "body > [data-name=path-as-circle]",
+        "tag": "div",
+        "svg": null
+      },
+      "geometry": {
+        "type": "ellipse"
+      },
+      "fill": {
+        "type": "solid",
+        "color": "E2445C",
+        "alpha": 1.0
+      },
+      "stroke": null,
+      "shadow": null,
+      "flipH": false,
+      "flipV": false
+    },
+    {
+      "id": "e6",
+      "kind": "shape",
+      "box": {
+        "x": 944.0,
+        "y": 80.0,
+        "w": 96.0,
+        "h": 96.0
+      },
+      "z": 5,
+      "name": "path-as-blockarc",
+      "source": {
+        "path": "body > svg#paths",
+        "tag": "svg",
+        "svg": "svg#1 > #path-as-blockarc"
+      },
+      "geometry": {
+        "type": "blockArc",
+        "arc": {
+          "cx": 992,
+          "cy": 128,
+          "rOuter": 48,
+          "rInner": 28,
+          "startDeg": 180,
+          "endDeg": 360
+        }
+      },
+      "fill": {
+        "type": "solid",
+        "color": "747480",
+        "alpha": 1.0
+      },
+      "stroke": null,
+      "shadow": null,
+      "flipH": false,
+      "flipV": false
+    },
+    {
+      "id": "e7",
+      "kind": "shape",
+      "box": {
+        "x": 1088.0,
+        "y": 80.0,
+        "w": 96.0,
+        "h": 96.0
+      },
+      "z": 6,
+      "name": "path-as-pie",
+      "source": {
+        "path": "body > svg#paths",
+        "tag": "svg",
+        "svg": "svg#1 > #path-as-pie"
+      },
+      "geometry": {
+        "type": "pie",
+        "arc": {
+          "cx": 1136,
+          "cy": 128,
+          "rOuter": 48,
+          "rInner": 0,
+          "startDeg": 0,
+          "endDeg": 90
+        }
+      },
+      "fill": {
+        "type": "solid",
+        "color": "0B5FA5",
+        "alpha": 1.0
+      },
+      "stroke": null,
+      "shadow": null,
+      "flipH": false,
+      "flipV": false
+    },
+    {
+      "id": "e8",
+      "kind": "shape",
+      "box": {
+        "x": 72.0,
+        "y": 240.0,
+        "w": 96.0,
+        "h": 96.0
+      },
+      "z": 7,
+      "name": "chord-case",
+      "source": {
+        "path": "body > svg#paths",
+        "tag": "svg",
+        "svg": "svg#1 > #chord-case"
+      },
+      "geometry": {
+        "type": "chord",
+        "arc": {
+          "cx": 120,
+          "cy": 288,
+          "rOuter": 48,
+          "rInner": 0,
+          "startDeg": 30,
+          "endDeg": 210
+        }
+      },
+      "fill": {
+        "type": "solid",
+        "color": "2DB757",
+        "alpha": 0.5
+      },
+      "stroke": {
+        "color": "12703A",
+        "alpha": 1.0,
+        "width": 2.0,
+        "dash": "solid",
+        "cap": "butt",
+        "join": "miter",
+        "headEnd": null,
+        "tailEnd": null
+      },
+      "shadow": null,
+      "flipH": false,
+      "flipV": false
+    },
+    {
+      "id": "e9",
+      "kind": "shape",
+      "box": {
+        "x": 70.0,
+        "y": 234.0,
+        "w": 196.0,
+        "h": 196.0
+      },
+      "z": 8,
+      "name": "ring-dash-large",
+      "source": {
+        "path": "body > svg#paths",
+        "tag": "svg",
+        "svg": "svg#1 > #ring-dash-large"
+      },
+      "geometry": {
+        "type": "blockArc",
+        "arc": {
+          "cx": 168,
+          "cy": 332,
+          "rOuter": 98,
+          "rInner": 78,
+          "startDeg": 270,
+          "endDeg": 2.19
+        }
+      },
+      "fill": {
+        "type": "solid",
+        "color": "1A9AFA",
+        "alpha": 1.0
+      },
+      "stroke": null,
+      "shadow": null,
+      "flipH": false,
+      "flipV": false
+    },
+    {
+      "id": "e10",
+      "kind": "shape",
+      "box": {
+        "x": 340.0,
+        "y": 264.0,
+        "w": 136.0,
+        "h": 136.0
+      },
+      "z": 9,
+      "name": "ring-dash-small",
+      "source": {
+        "path": "body > svg#paths",
+        "tag": "svg",
+        "svg": "svg#1 > #ring-dash-small"
+      },
+      "geometry": {
+        "type": "blockArc",
+        "arc": {
+          "cx": 408,
+          "cy": 332,
+          "rOuter": 68,
+          "rInner": 52,
+          "startDeg": 270,
+          "endDeg": 50.38
+        }
+      },
+      "fill": {
+        "type": "solid",
+        "color": "2DB757",
+        "alpha": 1.0
+      },
+      "stroke": null,
+      "shadow": null,
+      "flipH": false,
+      "flipV": false
+    },
+    {
+      "id": "e11",
+      "kind": "shape",
+      "box": {
+        "x": 528.0,
+        "y": 264.0,
+        "w": 180.0,
+        "h": 140.0
+      },
+      "z": 10,
+      "name": "polyline-markers",
+      "source": {
+        "path": "body > [data-name=polyline-markers]",
+        "tag": "div",
+        "svg": null
+      },
+      "geometry": {
+        "type": "polyline",
+        "points": [
+          [
+            528,
+            404
+          ],
+          [
+            588,
+            284
+          ],
+          [
+            648,
+            384
+          ],
+          [
+            708,
+            264
+          ]
+        ]
+      },
+      "fill": {
+        "type": "none"
+      },
+      "stroke": {
+        "color": "1A9AFA",
+        "alpha": 1.0,
+        "width": 4.0,
+        "dash": "solid",
+        "cap": "butt",
+        "join": "miter",
+        "headEnd": {
+          "type": "triangle",
+          "size": "med"
+        },
+        "tailEnd": {
+          "type": "oval",
+          "size": "med"
+        }
+      },
+      "shadow": null,
+      "flipH": false,
+      "flipV": false
+    },
+    {
+      "id": "e12",
+      "kind": "shape",
+      "box": {
+        "x": 748.0,
+        "y": 264.0,
+        "w": 180.0,
+        "h": 150.0
+      },
+      "z": 11,
+      "name": "dash-scaled",
+      "source": {
+        "path": "body > svg#paths",
+        "tag": "svg",
+        "svg": "svg#1 > #dash-scaled"
+      },
+      "geometry": {
+        "type": "custom",
+        "fillRule": "nonzero",
+        "path": [
+          [
+            "M",
+            748,
+            264
+          ],
+          [
+            "L",
+            928,
+            264
+          ],
+          [
+            "L",
+            928,
+            414
+          ]
+        ]
+      },
+      "fill": {
+        "type": "none"
+      },
+      "stroke": {
+        "color": "E2445C",
+        "alpha": 1.0,
+        "width": 6.0,
+        "dash": [
+          12,
+          6
+        ],
+        "cap": "butt",
+        "join": "miter",
+        "headEnd": null,
+        "tailEnd": null
+      },
+      "shadow": null,
+      "flipH": false,
+      "flipV": false
+    },
+    {
+      "id": "e13",
+      "kind": "shape",
+      "box": {
+        "x": 96.0,
+        "y": 486.0,
+        "w": 176.0,
+        "h": 152.0
+      },
+      "z": 12,
+      "name": "transformed-path",
+      "source": {
+        "path": "body > svg#paths",
+        "tag": "svg",
+        "svg": "svg#1 > #transformed-path"
+      },
+      "geometry": {
+        "type": "custom",
+        "fillRule": "nonzero",
+        "path": [
+          [
+            "M",
+            116,
+            486
+          ],
+          [
+            "L",
+            272,
+            543
+          ],
+          [
+            "L",
+            252,
+            638
+          ],
+          [
+            "L",
+            96,
+            581
+          ],
+          [
+            "Z"
+          ]
+        ]
+      },
+      "fill": {
+        "type": "solid",
+        "color": "C9DCEB",
+        "alpha": 1.0
+      },
+      "stroke": {
+        "color": "0B5FA5",
+        "alpha": 1.0,
+        "width": 3.0,
+        "dash": "solid",
+        "cap": "butt",
+        "join": "miter",
+        "headEnd": null,
+        "tailEnd": null
+      },
+      "shadow": null,
+      "flipH": false,
+      "flipV": false
+    },
+    {
+      "id": "e14",
+      "kind": "shape",
+      "box": {
+        "x": 348.0,
+        "y": 486.0,
+        "w": 120.0,
+        "h": 152.0
+      },
+      "z": 13,
+      "opacity": 0.9,
+      "name": "nested-path",
+      "group": "svg#1-g-inner",
+      "source": {
+        "path": "body > svg#paths",
+        "tag": "svg",
+        "svg": "svg#1 > #nested-path"
+      },
+      "geometry": {
+        "type": "custom",
+        "fillRule": "nonzero",
+        "path": [
+          [
+            "M",
+            348,
+            486
+          ],
+          [
+            "C",
+            408,
+            486,
+            408,
+            606,
+            468,
+            606
+          ],
+          [
+            "L",
+            468,
+            638
+          ],
+          [
+            "L",
+            348,
+            638
+          ],
+          [
+            "Z"
+          ]
+        ]
+      },
+      "fill": {
+        "type": "solid",
+        "color": "E6F6EC",
+        "alpha": 1.0
+      },
+      "stroke": {
+        "color": "12703A",
+        "alpha": 1.0,
+        "width": 3.0,
+        "dash": "solid",
+        "cap": "butt",
+        "join": "miter",
+        "headEnd": null,
+        "tailEnd": null
+      },
+      "shadow": null,
+      "flipH": false,
+      "flipV": false
+    },
+    {
+      "id": "e15",
+      "kind": "shape",
+      "box": {
+        "x": 548.0,
+        "y": 486.0,
+        "w": 180.0,
+        "h": 152.0
+      },
+      "z": 14,
+      "name": "path-evenodd",
+      "source": {
+        "path": "body > svg#paths",
+        "tag": "svg",
+        "svg": "svg#1 > #path-evenodd"
+      },
+      "geometry": {
+        "type": "custom",
+        "fillRule": "evenodd",
+        "path": [
+          [
+            "M",
+            548,
+            486
+          ],
+          [
+            "L",
+            728,
+            486
+          ],
+          [
+            "L",
+            728,
+            638
+          ],
+          [
+            "L",
+            548,
+            638
+          ],
+          [
+            "Z"
+          ],
+          [
+            "M",
+            584,
+            522
+          ],
+          [
+            "L",
+            692,
+            522
+          ],
+          [
+            "L",
+            692,
+            602
+          ],
+          [
+            "L",
+            584,
+            602
+          ],
+          [
+            "Z"
+          ]
+        ]
+      },
+      "fill": {
+        "type": "solid",
+        "color": "F5A623",
+        "alpha": 1.0
+      },
+      "stroke": {
+        "color": "8A5A00",
+        "alpha": 1.0,
+        "width": 3.0,
+        "dash": "solid",
+        "cap": "butt",
+        "join": "miter",
+        "headEnd": null,
+        "tailEnd": null
+      },
+      "shadow": null,
+      "flipH": false,
+      "flipV": false
+    },
+    {
+      "id": "e16",
+      "kind": "shape",
+      "box": {
+        "x": 788.0,
+        "y": 486.0,
+        "w": 112.0,
+        "h": 96.0
+      },
+      "z": 15,
+      "name": "use-chevron-a",
+      "source": {
+        "path": "body > svg#paths",
+        "tag": "svg",
+        "svg": "svg#1 > #use-chevron-a"
+      },
+      "geometry": {
+        "type": "custom",
+        "fillRule": "nonzero",
+        "path": [
+          [
+            "M",
+            788,
+            486
+          ],
+          [
+            "L",
+            868,
+            486
+          ],
+          [
+            "L",
+            900,
+            534
+          ],
+          [
+            "L",
+            868,
+            582
+          ],
+          [
+            "L",
+            788,
+            582
+          ],
+          [
+            "L",
+            820,
+            534
+          ],
+          [
+            "Z"
+          ]
+        ]
+      },
+      "fill": {
+        "type": "solid",
+        "color": "516467",
+        "alpha": 1.0
+      },
+      "stroke": null,
+      "shadow": null,
+      "flipH": false,
+      "flipV": false
+    }
+  ],
+  "diagnostics": []
+}

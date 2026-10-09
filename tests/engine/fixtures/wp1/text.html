@@ -1,0 +1,81 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><style>
+html,body{margin:0;width:1280px;height:720px;overflow:hidden;background:transparent;
+  font-family:Arial,Helvetica,sans-serif;color:#2E2E38}
+
+/* one element, three paragraphs, measured spacing between them */
+.stack{position:absolute;left:64px;top:40px;width:400px}
+.stack .a{font-size:24px;font-weight:bold;line-height:1;color:#1A9AFA}
+.stack .b{font-size:12px;font-weight:bold;margin-top:7px;line-height:1.25}
+.stack .c{font-size:10px;color:#747480;margin-top:4px;line-height:1.5}
+
+/* a long paragraph that wraps, with a run that spans the break */
+.long{position:absolute;left:64px;top:200px;width:300px;font-size:14px;line-height:1.5}
+
+/* an explicit <br> inside one paragraph */
+.broken{position:absolute;left:420px;top:200px;width:300px;font-size:14px;line-height:3}
+
+/* line-height exactly the block height: the operator case */
+.op{position:absolute;left:760px;top:200px;width:40px;height:60px;line-height:60px;
+  text-align:center;font-size:20px;color:#1A9AFA;font-weight:bold}
+
+/* inline-block chip with its own background */
+.head{position:absolute;left:64px;top:320px;width:500px;font-size:14px;font-weight:bold}
+.chip{display:inline-block;font-size:9px;font-weight:bold;padding:2px 5px;vertical-align:2px;
+  margin-left:6px;background:#FFE600;color:#2E2E38;letter-spacing:.3px}
+
+/* bullets */
+.list{position:absolute;left:64px;top:380px;width:400px;font-size:13px;line-height:1.4}
+.list ul{margin:0;padding-left:24px}
+
+/* text-transform, letter-spacing, decorations, super/sub */
+.marks{position:absolute;left:560px;top:380px;width:500px;font-size:14px;line-height:1.4}
+.marks .up{text-transform:uppercase;letter-spacing:1.5px}
+
+/* rotation: a block turned on its side */
+.rot{position:absolute;left:1100px;top:300px;width:200px;height:24px;font-size:14px;
+  transform:rotate(-90deg);transform-origin:center;color:#747480}
+
+/* nowrap */
+.nowrap{position:absolute;left:64px;top:520px;width:80px;font-size:12px;white-space:nowrap}
+
+/* clipped text: an error diagnostic, not a silent truncation */
+.clipbox{position:absolute;left:64px;top:600px;width:120px;height:20px;overflow:hidden}
+.clipbox div{font-size:14px;line-height:1.2;width:400px}
+aside.notes{display:none}
+</style></head><body>
+
+<div class="stack" id="stack">
+  <div class="a">120k</div>
+  <div class="b">Partner ambition by 2030</div>
+  <div class="c">Raised from 90k after the first goal was met</div>
+</div>
+
+<div class="long" id="long">The binding constraint is shifting from <b>volume to value</b> per partner across every segment of the market.</div>
+
+<div class="broken" id="broken">First line here<br>second line here</div>
+
+<div class="op" id="op">&times;</div>
+
+<div class="head" id="head">Size and spend compound<span class="chip">ILLUSTRATIVE</span></div>
+
+<div class="list" id="list">
+  <ul>
+    <li>Multi-region product roadmaps</li>
+    <li>Off-season demand programming</li>
+  </ul>
+</div>
+
+<div class="marks" id="marks">
+  <span class="up">shouted label</span> plus <u>underline</u>, <s>strike</s>, <i>italic</i>,
+  H<sub>2</sub>O and E=mc<sup>2</sup>.
+</div>
+
+<div class="rot" id="rot">Strategic attractiveness</div>
+
+<div class="nowrap" id="nowrap">This never wraps</div>
+
+<div class="clipbox" id="clipbox"><div>This sentence is much wider than its clipping parent box</div></div>
+
+<aside class="notes">Speaker notes: the value chain has been built.</aside>
+</body></html>

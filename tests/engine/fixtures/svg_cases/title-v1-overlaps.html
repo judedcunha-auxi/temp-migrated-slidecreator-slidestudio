@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>synthetic title case v1</title>
+<style>
+html,body{margin:0;width:1280px;height:720px;overflow:hidden;background:transparent;
+  font-family:Arial,Helvetica,sans-serif;color:#2E2E38}
+.title{position:absolute;left:64px;top:28px;width:1152px;height:62px;font-size:22pt;font-weight:bold;line-height:1.18;margin:0}
+.sub{position:absolute;left:64px;top:104px;width:1152px;font-size:10.5pt;line-height:1.35;margin:0;color:#4A4A55}
+</style></head><body>
+<!-- Synthetic. v1 wraps the headline to three lines in a 62 px box, so it runs into .sub; v2 moves
+     the <br> so it takes two lines, which still exceeds the box by a few px (healthy leading). -->
+<div class="title" data-placeholder="title">Every channel grew and the partner programme now carries a third of new revenue, so the next step is<br>durable growth</div>
+<p class="sub">Partner revenue rose in every region, with the fastest growth in markets opened in the last two years
+and a steady contribution from the online channel across the whole period.</p>
+</body></html>

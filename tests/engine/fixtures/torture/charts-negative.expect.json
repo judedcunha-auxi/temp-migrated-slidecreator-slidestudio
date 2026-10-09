@@ -1,0 +1,32 @@
+{
+  "family": "charts-negative",
+  "master": "test-16x9",
+  "layoutId": "layout-07",
+  "canvas": {
+    "w": 1280,
+    "h": 720
+  },
+  "kinds": {
+    "text": 6,
+    "chart": 5
+  },
+  "rasterAllowed": [],
+  "charts": {
+    "authored": 5,
+    "recognised": 0
+  },
+  "gateMaxPx2": 261,
+  "notes": [
+    "WP-C (docs/archive/engine/fidelity/12-WPC-charts.md §8.1): everything below or across zero. 6 text",
+    "elements: the h1 plus one caption per chart. 5 chart elements, one authored data-chart each.",
+    "D: probe p05-D verbatim — a bridge that crosses zero: four series (Base, EBITDA, Base−, EBITDA−),",
+    "blank cells on the side a bar does not occupy, frozen labels -35 and +25 on the crossing bars.",
+    "F: probe p11-B verbatim — horizontal bars with one negative: invertIfNegative 0 on the series and",
+    "the category labels at the plot's low edge (tickLblPos low), not on the zero line.",
+    "J: the worked example of WP-C §3.2 — Internal [30, -25, -10], Partner [0, -15, 0]; Internal",
+    "straddles zero in Q1 and carries the frozen -25.",
+    "K: a bridge entirely below zero — the + series are blank, Base− and EBIT− hold every bar.",
+    "L: a zero step (+0, a 0 cell at level 20) and a fall that lands on zero; no bar dips below zero.",
+    "gateMaxPx2 261 = max(measured x 1.2, measured + 60) over the measured 201 px2 masked non-chart area on fidelity-w3 (2314d7f), 2026-09-25 (plan §11; Peter #16: measured + 20 %, with the 60 px2 per-slide noise tolerance as the floor). A regression guard, not a target."
+  ]
+}

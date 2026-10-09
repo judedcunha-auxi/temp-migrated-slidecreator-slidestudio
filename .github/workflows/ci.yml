@@ -55,6 +55,16 @@ jobs:
           pip install -r requirements.txt
           pip install -r requirements-dev.txt
 
+      # The export engine measures slides in a real browser (app/engine/extract). Playwright's
+      # bundled Chromium, at the version requirements.txt pins, with its system libraries; plus
+      # the metric-compatible fonts the container ships (docs/deployment.md): Carlito for
+      # Calibri, Liberation for Arial / Times New Roman / Courier New, DejaVu as the last resort.
+      - name: Install Playwright Chromium and fonts
+        id: install-browser
+        run: |
+          python -m playwright install --with-deps chromium
+          sudo apt-get install -y --no-install-recommends fonts-crosextra-carlito fonts-liberation fonts-dejavu-core
+
       - name: Verify dependency set is consistent
         id: dependency-check
         run: pip check

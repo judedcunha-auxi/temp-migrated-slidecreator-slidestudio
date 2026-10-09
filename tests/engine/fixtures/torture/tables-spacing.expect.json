@@ -1,0 +1,52 @@
+{
+  "family": "tables-spacing",
+  "master": "test-16x9",
+  "layoutId": "layout-06",
+  "canvas": {"w": 1280, "h": 720},
+  "kinds": {"table": 4, "text": 1, "shape": 1},
+  "groups": 0,
+  "rasterAllowed": [],
+  "charts": {"authored": 0, "recognised": 0},
+  "gateMaxPx2": 1671,
+  "lineage": "render check 2026-09-29 (docs/engine/rendercheck/00-PLAN.md section 9: 'border-spacing gaps are filled by the cell paint'; the render check's authors rebuilt scorecards from positioned divs to avoid it)",
+  "notes": [
+    "border-collapse: separate with a border-spacing. A PowerPoint table has no cell spacing, so before this family the",
+    "native table's cells ran over the gaps and a scorecard lost its white lines. Now every gap between cells that paint",
+    "(a fill, a gradient, a border) is an empty, unfilled, borderless spacer row or column of the native table, and the",
+    "table's edge moves to the painted cells' edge: what shows through a gap is the table's surface or the slide, as in",
+    "the browser (row, row-group and column backgrounds paint only under cells in separate mode - measured on Edge).",
+    "PowerPoint lays out no row or column under 2 pt (2.667 px, measured through COM): a gap from 1 pt to 2 pt is drawn",
+    "2.667 px, the cells beside it giving up the difference (info); a gap under 1 pt is closed (warn).",
+    "A scorecard: border-spacing 2px 4px, a navy header, tinted body cells, a 'Growth' rowspan. 9 x 9 physical: spacer",
+    "rows 1, 3, 5, 7 (4 px, exact) and spacer columns 1, 3, 5, 7 (2 px widened to 2.667 px, each neighbour 0.333 px",
+    "narrower). 'Growth' is merged across physical rows 2-4, the spacer row between its two rows included.",
+    "B cards: border-spacing 6px on the table's own rounded, stroked F3F5F9 surface (the 1 shape); 1 px C9D2DF cell",
+    "borders, a colspan header, a rowspan cell with a 4 px left accent. 5 x 5 physical, grid lines half the widest",
+    "border inside each band (PowerPoint strokes a cell rule centred on its grid line). PowerPoint draws a lower cell's",
+    "lnT / a right cell's lnL on an interior line only where the neighbour is a merge continuation (measured): so a",
+    "cell's top and left rules move onto the spacer cells above and to its left as lnB / lnR, and the spacer cells",
+    "under the header's continuation columns carry its bottom rule as lnT (beside the rowspan's continuation rows, lnL).",
+    "The header's 1 px left rule shares column 0's line with the accent's 4 px one: it lands 1.5 px inside the cell.",
+    "C hairline: border-spacing 1px between filled cells - under 1 pt, closed: the one warn below. The gate's only",
+    "table defect is this closed 1 px line through the navy column (818 px2).",
+    "D plain: the default 2 px spacing around cells that paint nothing - invisible gaps, no spacer, the table as before.",
+    "text 1: the title. Cell text is inside the tables and not counted.",
+    "gateMaxPx2 1671 = max(measured x 1.2, measured + 60) over 1,392 px2 masked, measured 2026-09-29 on claude/table-border-spacing",
+    "(PptxRender): 818 px2 the closed hairline (C, by design) + 574 px2 the title - test-16x9's manifest/theme mismatch",
+    "(tables-cells' notes). The scorecard and the cards are clean at the gate's settings."
+  ],
+  "elements": [
+    {"name": null, "kind": "text", "paragraphs": 1, "lines": 1, "placeholder": {"type": "title", "idx": 0}, "note": "the heading", "startsWith": "Scorecards"},
+    {"name": "scorecard", "kind": "table", "rows": 9, "cols": 9, "note": "5 x 5 logical + 4 spacer rows (4 px) + 4 spacer columns (2.667 px); Growth rowspan over a spacer row"},
+    {"name": "cards", "kind": "table", "rows": 5, "cols": 5, "note": "3 x 3 logical + 2 spacer rows + 2 spacer columns (7 px = 6 + two half borders); colspan header, rowspan accent cell"},
+    {"name": "hairline", "kind": "table", "rows": 2, "cols": 3, "note": "1 px spacing closed (warn); edges trimmed to the cells"},
+    {"name": "plain", "kind": "table", "rows": 2, "cols": 3, "note": "nothing painted: unchanged, no spacers"}
+  ],
+  "expectedDiagnostics": [
+    {"level": "info", "match": "border-spacing 2 4 px: the gaps between painted cells are 4 spacer row(s) and 4 spacer column(s)"},
+    {"level": "info", "match": "border-spacing 2 px is drawn 2.67 px wide"},
+    {"level": "info", "match": "border-spacing 6 px: the gaps between painted cells are 2 spacer row(s) and 2 spacer column(s)"},
+    {"level": "warn", "match": "border-spacing 1 px between painted cells is narrower than 1 pt"}
+  ],
+  "expectedLint": []
+}

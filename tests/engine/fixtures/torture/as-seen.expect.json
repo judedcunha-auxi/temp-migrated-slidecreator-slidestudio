@@ -1,0 +1,47 @@
+{
+  "family": "as-seen",
+  "master": "test-16x9",
+  "layoutId": "layout-07",
+  "canvas": {"w": 1280, "h": 720},
+  "kinds": {"shape": 7, "text": 18, "raster": 1},
+  "groups": 0,
+  "rasterAllowed": ["svg foreignObject"],
+  "charts": {"authored": 0, "recognised": 0},
+  "elements": [
+    {"name": "card1", "kind": "shape", "box": {"x": 40, "y": 130, "w": 130, "h": 100}, "note": "measured at rest: y 130, opacity 1 (mid-flight it was up to 16 px low and transparent)"},
+    {"name": "card4", "kind": "text", "note": "the last card to animate (0.9 s delay); its text box starts at 144 = 130 + padding 14"},
+    {"name": "dot", "kind": "shape", "note": "a looping pulse is cancelled to its base state, opacity 1, with a warn"},
+    {"name": "reveal", "kind": "shape", "note": "base opacity 0, animation to 1 with fill: forwards — exported at 1"},
+    {"kind": "raster", "reason": "svg foreignObject", "note": "a picture of its text: > 200 inked pixels, no pixel of the #FF4136 sibling rect"},
+    {"name": "cols col 1", "kind": "text", "extras": {"x-wpf-column": {"index": 0, "count": 2}}, "note": "x 40, w 248, 6 lines"},
+    {"name": "cols col 2", "kind": "text", "extras": {"x-wpf-column": {"index": 1, "count": 2}}, "note": "x 312, w 248, 5 lines"},
+    {"name": "cols3 col 1", "kind": "text", "note": "the first paragraph straddles the break: its first 3 lines here, the rest in col 2"},
+    {"name": "clamp", "kind": "text", "note": "-webkit-line-clamp: 2 on a 5-line paragraph: 2 lines, the second ending in the browser's ellipsis"},
+    {"name": "ell", "kind": "text", "note": "nowrap + text-overflow: ellipsis: 1 line ending in the ellipsis"},
+    {"name": "shows2", "kind": "text", "note": "a 5-line paragraph in a box that shows 2: 2 lines, no ellipsis"},
+    {"name": "narrow", "kind": "text", "note": "a nowrap line in a 120 px box: cut by the x-centre rule, no ellipsis"}
+  ],
+  "expectedDiagnostics": [
+    {"level": "info", "match": "settled"},
+    {"level": "warn", "match": "looping animation"},
+    {"level": "info", "match": "CSS columns"},
+    {"level": "error", "match": "text is clipped"}
+  ],
+  "gateMaxPx2": 60,
+  "notes": [
+    "WP-F (15-WPF-as-seen.md): the page measured as the reader sees it. Counts measured in Edge with the",
+    "master's theme fonts forced (Calibri / Calibri Light); re-taken after the rebase onto B (plan D14), under",
+    "master brief §11 as B amends it: unchanged (every block here is out of flow or one paragraph run).",
+    "Labels: 4 text elements (A, B, C, D), each an absolutely positioned block of its own.",
+    "A: 4 card shapes + 4 card texts (2 paragraphs each), the dot (shape), the reveal (shape + text) —",
+    "all at rest: settle reports 6 animations, 5 at their end state, 1 looping one cancelled. 6 shapes, 5 texts.",
+    "B: the svg's #FF4136 rect is a native shape; its foreignObject is the one raster. 1 shape, 1 raster.",
+    "C: a multicol block yields one text element per column box that received a line, in column order:",
+    "'.cols' (2 columns, one paragraph) is 2 texts; '.cols3' (3 columns, two paragraphs, the first straddling",
+    "a break) is 3 texts — the straddling paragraph is one paragraph in each of the first two. 5 texts.",
+    "D: each of the four clipped/clamped blocks is 1 text element holding only what the reader sees, and each",
+    "is an error diagnostic starting 'text is clipped' (every error this family produces is that one). 4 texts.",
+    "Totals: text 4 + 5 + 5 + 4 = 18; shape 6 + 1 (the 4 card fills, dot, reveal; the svg rect) = 7; raster 1.",
+    "gateMaxPx2 60 = max(measured x 1.2, measured + 60) over the measured 0 px2 masked non-chart area on fidelity-w3 (2314d7f), 2026-09-25 (plan §11; Peter #16: measured + 20 %, with the 60 px2 per-slide noise tolerance as the floor). A regression guard, not a target."
+  ]
+}

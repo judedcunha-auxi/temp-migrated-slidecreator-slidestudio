@@ -1,0 +1,51 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><style>
+html,body{margin:0;width:1280px;height:720px;overflow:hidden;background:transparent;font-family:Calibri,Arial,sans-serif;color:#1d2433}
+/* the heading reaches the right edge of layout-06's title zone (48 + 864 = 912): see the notes */
+.h{position:absolute;left:40px;top:16px;width:872px;font-size:24px;font-weight:700}
+.cap{position:absolute;font-size:12px;font-weight:700}
+.chart{position:absolute;width:380px;height:250px;font-size:11px;color:#333}
+</style></head><body>
+<div class="h" data-placeholder="title">Chart specs a model plausibly writes (probe 8)</div>
+
+<div class="cap" style="left:40px;top:58px">A · "column_clustered", 5 series (grouped)</div>
+<div class="chart" style="left:40px;top:78px" data-chart='{"type":"column_clustered",
+ "categories":["Strategy","Talent","Compute","Data","Adoption"],
+ "series":[{"name":"UAE","values":[72.4,68,81,59,70]},{"name":"KSA","values":[61.3,55,70,52,58]},
+           {"name":"Qatar","values":[58,50,62,49,55]},{"name":"Bahrain","values":[49,47,44,41,52]},{"name":"Oman","values":[44,40,39,38,46]}],
+ "colors":["#0B2545","#0B5CAD","#1E9E5A","#F59E0B","#D64545"],
+ "options":{"dataLabels":true,"numberFormat":"0.0","legend":"bottom","gridlines":false}}'></div>
+
+<div class="cap" style="left:450px;top:58px">B · "grouped_bar" (not a known name)</div>
+<div class="chart" style="left:450px;top:78px" data-chart='{"type":"grouped_bar",
+ "categories":["Strategy","Talent","Compute"],
+ "series":[{"name":"UAE","values":[72.4,68,81]},{"name":"GCC","values":[61.3,55,70]}],
+ "colors":["#0B2545","#0B5CAD"],"options":{"dataLabels":true,"legend":"bottom"}}'></div>
+
+<div class="cap" style="left:860px;top:58px">C · one series per bar, overlap 100 (colour trick)</div>
+<div class="chart" style="left:860px;top:78px" data-chart='{"type":"column",
+ "categories":["FY21","FY22","FY23","FY24","FY25","FY26"],
+ "series":[{"name":"a","values":[12,null,null,null,null,null]},{"name":"b","values":[null,15,null,null,null,null]},
+           {"name":"c","values":[null,null,19,null,null,null]},{"name":"d","values":[null,null,null,22,null,null]},
+           {"name":"e","values":[null,null,null,null,27,null]},{"name":"f","values":[null,null,null,null,null,31]}],
+ "colors":["#D64545","#0B2545","#D64545","#0B2545","#D64545","#0B2545"],
+ "options":{"dataLabels":true,"legend":false,"overlap":100,"gapWidth":60}}'></div>
+
+<div class="cap" style="left:40px;top:372px">D · values written as strings</div>
+<div class="chart" style="left:40px;top:392px" data-chart='{"type":"column",
+ "categories":["2022","2023","2024","2025E"],
+ "series":[{"name":"Revenue","values":["4.2","4.9","5.6","6.2"]}],
+ "colors":["#0B5CAD"],"options":{"dataLabels":true,"legend":false}}'></div>
+
+<div class="cap" style="left:450px;top:372px">E · radar (not allowed on Path A)</div>
+<div class="chart" style="left:450px;top:392px" data-chart='{"type":"radar",
+ "categories":["Capital","Cost","Speed","Flexibility","Reach"],
+ "series":[{"name":"Banks","values":[5,4,2,2,4]},{"name":"Private credit","values":[3,2,5,5,3]}],
+ "colors":["#0B2545","#D64545"],"options":{"legend":"bottom"}}'></div>
+
+<div class="cap" style="left:860px;top:372px">F · 24 monthly bars, labels on</div>
+<div class="chart" style="left:860px;top:392px" data-chart='{"type":"column",
+ "categories":["J","F","M","A","M","J","J","A","S","O","N","D","J","F","M","A","M","J","J","A","S","O","N","D"],
+ "series":[{"name":"Tokens","values":[3,4,4,5,6,6,7,8,9,9,10,12,13,13,14,16,17,18,20,21,23,25,26,28]}],
+ "colors":["#D64545"],"options":{"dataLabels":true,"legend":false,"gapWidth":40}}'></div>
+</body></html>

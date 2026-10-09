@@ -1,0 +1,71 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><style>
+html,body{margin:0;width:1280px;height:720px;overflow:hidden;background:transparent;font-family:Calibri,Arial,sans-serif;color:#1d2433}
+/* the heading reaches the right edge of layout-06's title zone (48 + 864 = 912): see the notes */
+.h{position:absolute;left:40px;top:24px;width:872px;font-size:26px;font-weight:700}
+/* A: label/value rows in a flex container (very common in LLM HTML) */
+.panel{position:absolute;left:40px;top:90px;width:340px;background:#F3F5F9;border-radius:8px;padding:16px}
+.panel .t{font-size:15px;font-weight:700;margin-bottom:10px}
+.row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #D8DDE6;font-size:13px}
+.row .v{font-weight:700;color:#0B5CAD}
+/* B: CSS grid of stat cards */
+.grid{position:absolute;left:410px;top:90px;width:480px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.card{background:#0B2545;color:#fff;border-radius:8px;padding:12px;height:96px;box-sizing:border-box}
+.card .num{font-size:24px;font-weight:700}
+.card .lbl{font-size:11px;opacity:.85;margin-top:4px}
+/* C: takeaway list: icon badge + text, flex row with gap */
+.list{position:absolute;left:920px;top:90px;width:320px;display:flex;flex-direction:column;gap:10px}
+.item{display:flex;gap:10px;align-items:flex-start;background:#FFF7E6;border-left:4px solid #F59E0B;padding:10px;border-radius:4px}
+.badge{width:22px;height:22px;border-radius:50%;background:#F59E0B;color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none}
+.item .txt{font-size:12px;line-height:1.35}
+.item .txt b{display:block;font-size:13px;margin-bottom:2px}
+/* D: KPI strip, flex row of columns */
+.kpis{position:absolute;left:40px;top:430px;width:1200px;display:flex;gap:16px}
+.kpi{flex:1;display:flex;flex-direction:column;align-items:center;background:#E8F1FB;border-radius:8px;padding:14px 8px}
+.kpi .n{font-size:28px;font-weight:700;color:#0B5CAD}
+.kpi .l{font-size:12px;color:#445}
+/* E: two-column "label | description" grid, like a panel table built from divs */
+.dl{position:absolute;left:40px;top:560px;width:1200px;display:grid;grid-template-columns:160px 1fr 160px 1fr;column-gap:12px;row-gap:6px;font-size:12px}
+.dl .k{font-weight:700;color:#0B2545}
+</style></head><body>
+<div class="h" data-placeholder="title">Flex and grid layouts (probe 1)</div>
+
+<div class="panel">
+  <div class="t">Key metrics</div>
+  <div class="row"><span>Revenue 2023</span><span class="v">$15.2B</span></div>
+  <div class="row"><span>EBITDA margin</span><span class="v">21.4%</span></div>
+  <div class="row"><span>Headcount</span><span class="v">5.1M</span></div>
+  <div class="row"><span>Market share</span><span class="v">34%</span></div>
+  <div class="row"><span>Deals closed</span><span class="v">412</span></div>
+</div>
+
+<div class="grid">
+  <div class="card"><div class="num">72.4</div><div class="lbl">UAE readiness score</div></div>
+  <div class="card"><div class="num">61.3</div><div class="lbl">GCC average</div></div>
+  <div class="card"><div class="num">+11.1</div><div class="lbl">Gap to average</div></div>
+  <div class="card"><div class="num">$6.2B</div><div class="lbl">SOM, 2030</div></div>
+  <div class="card"><div class="num">36 mo</div><div class="lbl">Journey 2019–2023</div></div>
+  <div class="card"><div class="num">5</div><div class="lbl">Priority sectors</div></div>
+</div>
+
+<div class="list">
+  <div class="item"><div class="badge">1</div><div class="txt"><b>Key takeaway</b>Concentrate capital on two platforms where the right to win is proven.</div></div>
+  <div class="item"><div class="badge">2</div><div class="txt"><b>Design guardrail</b>Keep governance light until the second wave of adopters is live.</div></div>
+  <div class="item"><div class="badge">3</div><div class="txt"><b>Best bet</b>Sovereign cloud plus applied AI in energy and logistics.</div></div>
+</div>
+
+<div class="kpis">
+  <div class="kpi"><div class="n">$3.8B</div><div class="l">Deal value</div></div>
+  <div class="kpi"><div class="n">412</div><div class="l">Locations</div></div>
+  <div class="kpi"><div class="n">11,200</div><div class="l">Employees</div></div>
+  <div class="kpi"><div class="n">94%</div><div class="l">Retention</div></div>
+  <div class="kpi"><div class="n">+147M</div><div class="l">Synergies</div></div>
+</div>
+
+<div class="dl">
+  <div class="k">Adoption mechanism</div><div>Regulatory sandbox with a 12-month fast track for pilots</div>
+  <div class="k">GCC applicability</div><div>High — mirrors the ADGM and DIFC frameworks already in place</div>
+  <div class="k">Funding model</div><div>Co-investment fund matched 1:1 by the sovereign vehicle</div>
+  <div class="k">Talent lever</div><div>Golden visa for AI researchers and a national PhD programme</div>
+</div>
+</body></html>

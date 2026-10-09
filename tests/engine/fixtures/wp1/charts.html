@@ -1,0 +1,19 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><style>
+html,body{margin:0;width:1280px;height:720px;overflow:hidden;background:transparent;
+  font-family:Arial,Helvetica,sans-serif;color:#516467;font-size:11px}
+</style></head><body>
+<div class="chart" style="position:absolute;left:96px;top:330px;width:560px;height:250px"
+     data-chart='{
+       "type": "column_stacked",
+       "categories": ["FY20", "FY21", "FY22", "FY23", "", "FY27E"],
+       "series": [{"name":"Internal","values":[40, 52, 57, 71, null, 88]},
+                  {"name":"Partner","values":[12, 9, 21, 18, null, 55]}],
+       "colors": ["#B9C7C9","#1A9AFB"],
+       "options": {"dataLabels": true, "numberFormat": "0", "gridlines": false, "legend": false,
+                   "plotArea": {"x": 0.1, "y": 0.05, "w": 0.8, "h": 0.8}}
+     }'><span>preview children are ignored</span></div>
+
+<div class="chart" style="position:absolute;left:700px;top:330px;width:400px;height:250px"
+     data-chart='{"type":"pie","categories":["A","B"],"series":[{"name":"s","values":[1,2]}]}'></div>
+</body></html>

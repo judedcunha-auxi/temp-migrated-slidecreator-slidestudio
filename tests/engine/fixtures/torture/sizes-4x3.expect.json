@@ -1,0 +1,159 @@
+{
+  "family": "sizes-4x3",
+  "master": "test-4x3",
+  "layoutId": "layout-01",
+  "canvas": {
+    "w": 960,
+    "h": 720
+  },
+  "kinds": {
+    "text": 4,
+    "shape": 7,
+    "image": 1,
+    "table": 1,
+    "chart": 1
+  },
+  "groups": 0,
+  "rasterAllowed": [],
+  "charts": {
+    "authored": 1,
+    "recognised": 0
+  },
+  "gateMaxPx2": 339,
+  "notes": [
+    "The size-generality case (01-MASTER-BRIEF.md §9, last row): a cross-section of every construct on a",
+    "10 x 7.5 in master, i.e. a 960 x 720 canvas, with the same px/in ratio as the 16:9 families.",
+    "layout-01 is the default template's Title Slide, which is where the two placeholder aliases that",
+    "placeholders.html cannot reach are exercised: data-placeholder='title' onto a ctrTitle zone and",
+    "data-placeholder='subtitle' onto a subTitle zone.",
+    "The two corner shapes sit flush against (0, 0) and (936, 696): nothing may be pushed outside the",
+    "slide by a rounding step, and the fit check must report zero out-of-canvas boxes.",
+    "charts.recognised is 0: the only <svg> here is `mini-diagram` (one rect, one circle and the label 'Native on both'). It has no aligned series and no numeric labels, so the recogniser refuses it — correctly, by the rule that it never guesses values.",
+    "gateMaxPx2 2,403 = max(measured x 1.2, measured + 60) over the measured 2,002 px2 masked non-chart area on fidelity-w3 (2314d7f), 2026-09-25 (plan §11; Peter #16: measured + 20 %, with the 60 px2 per-slide noise tolerance as the floor). A regression guard, not a target.",
+    "gateMaxPx2 339 = max(measured x 1.2, measured + 60) over 279 px2 on fidelity/r3-image-crops (r3, plan §16 #30, 2026-09-26, on main 2e29f53): the hero image's cover crop is no longer fitted a second time by the emitter (-1,723 px2); what is left is the title's text"
+  ],
+  "elements": [
+    {
+      "name": "corner-top-left",
+      "kind": "shape",
+      "box": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 24
+      }
+    },
+    {
+      "name": "corner-bottom-right",
+      "kind": "shape",
+      "box": {
+        "x": 936,
+        "y": 696,
+        "w": 24,
+        "h": 24
+      }
+    },
+    {
+      "name": "eyebrow",
+      "kind": "text",
+      "paragraphs": 1,
+      "note": "transformCase upper, letterSpacingPx 1.5"
+    },
+    {
+      "name": "swatch-a",
+      "kind": "shape",
+      "geometry": "rect"
+    },
+    {
+      "name": "swatch-b",
+      "kind": "shape",
+      "geometry": "rect"
+    },
+    {
+      "name": "swatch-c",
+      "kind": "shape",
+      "geometry": "roundRect"
+    },
+    {
+      "name": "hero-image",
+      "kind": "image",
+      "fit": "cover",
+      "box": {
+        "x": 620,
+        "y": 40,
+        "w": 300,
+        "h": 150
+      },
+      "note": "400x300 source in a 300x150 frame: cover crops the top and bottom"
+    },
+    {
+      "name": "deck-title",
+      "kind": "text",
+      "paragraphs": 1,
+      "placeholder": {
+        "type": "ctrTitle",
+        "idx": 0
+      },
+      "note": "data-placeholder='title' aliases onto ctrTitle (manifest.PLACEHOLDER_ALIASES)"
+    },
+    {
+      "name": "deck-subtitle",
+      "kind": "text",
+      "paragraphs": 1,
+      "placeholder": {
+        "type": "subTitle",
+        "idx": 1
+      }
+    },
+    {
+      "name": "diagram-box",
+      "kind": "shape",
+      "geometry": "roundRect"
+    },
+    {
+      "name": "diagram-dot",
+      "kind": "shape",
+      "geometry": "ellipse",
+      "note": "fill-opacity 0.35"
+    },
+    {
+      "name": "diagram-label",
+      "kind": "text",
+      "paragraphs": 1
+    },
+    {
+      "name": "mini-table",
+      "kind": "table",
+      "rows": 3,
+      "cols": 2,
+      "cells": 6,
+      "colWidthsPx": [
+        130,
+        120
+      ]
+    },
+    {
+      "name": "mini-chart",
+      "kind": "chart",
+      "origin": "authored",
+      "type": "column",
+      "box": {
+        "x": 630,
+        "y": 496,
+        "w": 290,
+        "h": 180
+      }
+    }
+  ],
+  "placeholdersUsed": [
+    {
+      "type": "ctrTitle",
+      "idx": 0
+    },
+    {
+      "type": "subTitle",
+      "idx": 1
+    }
+  ],
+  "expectedDiagnostics": []
+}

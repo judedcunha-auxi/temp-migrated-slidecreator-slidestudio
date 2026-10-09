@@ -1,0 +1,37 @@
+{
+  "family": "charts-hardening",
+  "master": "test-16x9",
+  "layoutId": "layout-07",
+  "canvas": {
+    "w": 1280,
+    "h": 720
+  },
+  "kinds": {
+    "text": 8,
+    "chart": 7
+  },
+  "rasterAllowed": [],
+  "charts": {
+    "authored": 7,
+    "recognised": 0
+  },
+  "gateMaxPx2": 860,
+  "notes": [
+    "WP-C (docs/archive/engine/fidelity/12-WPC-charts.md §8.1): spellings the chart model now reads one way,",
+    "and the specs a model writes. 8 text elements: the h1 plus one caption per chart, each its own",
+    "absolutely positioned block. 7 chart elements, one authored data-chart each.",
+    "A, B, C: probe p05's A-C verbatim — the same bridge with its totals given as indices, as",
+    "series.types and as per-point booleans. All three must emit the same bars (int(True) was 1).",
+    "A has no plotArea, so its connectors pin chart_model.layout's default rect.",
+    "E: a two-series stacked waterfall; no bar crosses zero, so Internal is the bottom colour in every",
+    "bar and the legend lists the two authored series only (c:legendEntry deletes the rest).",
+    "G: the Sonnet waterfall of prj_844d2914db (sld_124e333385 v001), copied verbatim: a list of",
+    "pointColors (WP3a raised on it and left a half-built chart), a hidden value axis, its own plotArea.",
+    "H: probe p11-A's bridge near 3,400 (#,##0), whose connectors PowerPoint misplaced (F3f).",
+    "I: a clustered column with a reference line at exactly the third bar's value (61), for the",
+    "reference-line measurement; valueAxis min/max are given because a reference line needs a pinned",
+    "value axis to be placed at all (a non-waterfall keeps PowerPoint's automatic axis otherwise).",
+    "Every spec lints without errors; G's list of pointColors is a chart-advisory warning.",
+    "gateMaxPx2 860 = max(measured x 1.2, measured + 60) over the measured 716 px2 masked non-chart area on fidelity-w3 (2314d7f), 2026-09-25 (plan §11; Peter #16: measured + 20 %, with the 60 px2 per-slide noise tolerance as the floor). A regression guard, not a target."
+  ]
+}

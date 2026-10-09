@@ -1,0 +1,876 @@
+{
+  "version": 1,
+  "canvas": {
+    "w": 1280,
+    "h": 720,
+    "pxPerIn": 96
+  },
+  "slide": {
+    "id": "tor_svg_shapes",
+    "title": "torture · svg-shapes",
+    "layoutId": "layout-06",
+    "notes": null
+  },
+  "fonts": {
+    "forced": {
+      "major": "Calibri Light",
+      "minor": "Calibri"
+    },
+    "used": [
+      "Calibri",
+      "Calibri Light"
+    ],
+    "substituted": []
+  },
+  "groups": [
+    {
+      "id": "svg#1-g-inherit",
+      "parent": null,
+      "name": "g-inherit",
+      "box": {
+        "x": 72.0,
+        "y": 224.0,
+        "w": 120.0,
+        "h": 96.0
+      }
+    }
+  ],
+  "elements": [
+    {
+      "id": "e1",
+      "kind": "shape",
+      "box": {
+        "x": 72.0,
+        "y": 80.0,
+        "w": 112.0,
+        "h": 96.0
+      },
+      "z": 0,
+      "name": "rect-plain",
+      "source": {
+        "path": "body > svg#grid",
+        "tag": "svg",
+        "svg": "svg#1 > #rect-plain"
+      },
+      "geometry": {
+        "type": "rect"
+      },
+      "fill": {
+        "type": "solid",
+        "color": "1A9AFA",
+        "alpha": 1.0
+      },
+      "stroke": null,
+      "shadow": null,
+      "flipH": false,
+      "flipV": false
+    },
+    {
+      "id": "e2",
+      "kind": "shape",
+      "box": {
+        "x": 216.0,
+        "y": 80.0,
+        "w": 112.0,
+        "h": 96.0
+      },
+      "z": 1,
+      "name": "rect-rounded",
+      "source": {
+        "path": "body > svg#grid",
+        "tag": "svg",
+        "svg": "svg#1 > #rect-rounded"
+      },
+      "geometry": {
+        "type": "roundRect",
+        "radius": {
+          "tl": 16,
+          "tr": 16,
+          "br": 16,
+          "bl": 16
+        }
+      },
+      "fill": {
+        "type": "solid",
+        "color": "2DB757",
+        "alpha": 1.0
+      },
+      "stroke": null,
+      "shadow": null,
+      "flipH": false,
+      "flipV": false
+    },
+    {
+      "id": "e3",
+      "kind": "shape",
+      "box": {
+        "x": 512.0,
+        "y": 80.0,
+        "w": 96.0,
+        "h": 96.0
+      },
+      "z": 2,
+      "name": "circle-plain",
+      "source": {
+        "path": "body > svg#grid",
+        "tag": "svg",
+        "svg": "svg#1 > #circle-plain"
+      },
+      "geometry": {
+        "type": "ellipse"
+      },
+      "fill": {
+        "type": "solid",
+        "color": "E2445C",
+        "alpha": 1.0
+      },
+      "stroke": null,
+      "shadow": null,
+      "flipH": false,
+      "flipV": false
+    },
+    {
+      "id": "e4",
+      "kind": "shape",
+      "box": {
+        "x": 648.0,
+        "y": 92.0,
+        "w": 112.0,
+        "h": 72.0
+      },
+      "z": 3,
+      "name": "ellipse-plain",
+      "source": {
+        "path": "body > svg#grid",
+        "tag": "svg",
+        "svg": "svg#1 > #ellipse-plain"
+      },
+      "geometry": {
+        "type": "ellipse"
+      },
+      "fill": {
+        "type": "solid",
+        "color": "0B5FA5",
+        "alpha": 1.0
+      },
+      "stroke": null,
+      "shadow": null,
+      "flipH": false,
+      "flipV": false
+    },
+    {
+      "id": "e5",
+      "kind": "shape",
+      "box": {
+        "x": 792.0,
+        "y": 88.0,
+        "w": 112.0,
+        "h": 88.0
+      },
+      "z": 4,
+      "name": "line-arrow",
+      "source": {
+        "path": "body > svg#grid",
+        "tag": "svg",
+        "svg": "svg#1 > #line-arrow"
+      },
+      "geometry": {
+        "type": "line",
+        "points": [
+          [
+            792,
+            176
+          ],
+          [
+            904,
+            88
+          ]
+        ]
+      },
+      "fill": {
+        "type": "none"
+      },
+      "stroke": {
+        "color": "2E2E38",
+        "alpha": 1.0,
+        "width": 4.0,
+        "dash": "solid",
+        "cap": "butt",
+        "join": "miter",
+        "headEnd": {
+          "type": "triangle",
+          "size": "med"
+        },
+        "tailEnd": null
+      },
+      "shadow": null,
+      "flipH": false,
+      "flipV": false
+    },
+    {
+      "id": "e6",
+      "kind": "shape",
+      "box": {
+        "x": 936.0,
+        "y": 80.0,
+        "w": 112.0,
+        "h": 88.0
+      },
+      "z": 5,
+      "name": "polyline-open",
+      "source": {
+        "path": "body > svg#grid",
+        "tag": "svg",
+        "svg": "svg#1 > #polyline-open"
+      },
+      "geometry": {
+        "type": "polyline",
+        "points": [
+          [
+            936,
+            168
+          ],
+          [
+            964,
+            96
+          ],
+          [
+            992,
+            144
+          ],
+          [
+            1020,
+            80
+          ],
+          [
+            1048,
+            128
+          ]
+        ]
+      },
+      "fill": {
+        "type": "none"
+      },
+      "stroke": {
+        "color": "1A9AFA",
+        "alpha": 1.0,
+        "width": 4.0,
+        "dash": "solid",
+        "cap": "butt",
+        "join": "round",
+        "headEnd": null,
+        "tailEnd": null
+      },
+      "shadow": null,
+      "flipH": false,
+      "flipV": false
+    },
+    {
+      "id": "e7",
+      "kind": "shape",
+      "box": {
+        "x": 1088.0,
+        "y": 80.0,
+        "w": 96.0,
+        "h": 92.0
+      },
+      "z": 6,
+      "name": "polygon-closed",
+      "source": {
+        "path": "body > svg#grid",
+        "tag": "svg",
+        "svg": "svg#1 > #polygon-closed"
+      },
+      "geometry": {
+        "type": "custom",
+        "fillRule": "nonzero",
+        "path": [
+          [
+            "M",
+            1136,
+            80
+          ],
+          [
+            "L",
+            1184,
+            116
+          ],
+          [
+            "L",
+            1166,
+            172
+          ],
+          [
+            "L",
+            1106,
+            172
+          ],
+          [
+            "L",
+            1088,
+            116
+          ],
+          [
+            "Z"
+          ]
+        ]
+      },
+      "fill": {
+        "type": "solid",
+        "color": "747480",
+        "alpha": 1.0
+      },
+      "stroke": null,
+      "shadow": null,
+      "flipH": false,
+      "flipV": false
+    },
+    {
+      "id": "e8",
+      "kind": "shape",
+      "box": {
+        "x": 72.0,
+        "y": 224.0,
+        "w": 52.0,
+        "h": 96.0
+      },
+      "z": 7,
+      "name": "inherit-a",
+      "group": "svg#1-g-inherit",
+      "source": {
+        "path": "body > svg#grid",
+        "tag": "svg",
+        "svg": "svg#1 > #inherit-a"
+      },
+      "geometry": {
+        "type": "rect"
+      },
+      "fill": {
+        "type": "solid",
+        "color": "E8F4FE",
+        "alpha": 1.0
+      },
+      "stroke": {
+        "color": "0B5FA5",
+        "alpha": 1.0,
+        "width": 4.0,
+        "dash": "solid",
+        "cap": "butt",
+        "join": "miter",
+        "headEnd": null,
+        "tailEnd": null
+      },
+      "shadow": null,
+      "flipH": false,
+      "flipV": false
+    },
+    {
+      "id": "e9",
+      "kind": "shape",
+      "box": {
+        "x": 132.0,
+        "y": 224.0,
+        "w": 52.0,
+        "h": 96.0
+      },
+      "z": 8,
+      "name": "inherit-b",
+      "group": "svg#1-g-inherit",
+      "source": {
+        "path": "body > svg#grid",
+        "tag": "svg",
+        "svg": "svg#1 > #inherit-b"
+      },
+      "geometry": {
+        "type": "rect"
+      },
+      "fill": {
+        "type": "solid",
+        "color": "E8F4FE",
+        "alpha": 1.0
+      },
+      "stroke": {
+        "color": "0B5FA5",
+        "alpha": 1.0,
+        "width": 4.0,
+        "dash": "solid",
+        "cap": "butt",
+        "join": "miter",
+        "headEnd": null,
+        "tailEnd": null
+      },
+      "shadow": null,
+      "flipH": false,
+      "flipV": false
+    },
+    {
+      "id": "e10",
+      "kind": "shape",
+      "box": {
+        "x": 360.0,
+        "y": 224.0,
+        "w": 112.0,
+        "h": 96.0
+      },
+      "z": 9,
+      "name": "grad-linear",
+      "source": {
+        "path": "body > svg#grid",
+        "tag": "svg",
+        "svg": "svg#1 > #grad-linear"
+      },
+      "geometry": {
+        "type": "rect"
+      },
+      "fill": {
+        "type": "gradient",
+        "kind": "linear",
+        "angle": 90,
+        "stops": [
+          {
+            "pos": 0.0,
+            "color": "1A9AFA",
+            "alpha": 1.0
+          },
+          {
+            "pos": 1.0,
+            "color": "0B5FA5",
+            "alpha": 1.0
+          }
+        ]
+      },
+      "stroke": null,
+      "shadow": null,
+      "flipH": false,
+      "flipV": false
+    },
+    {
+      "id": "e11",
+      "kind": "shape",
+      "box": {
+        "x": 648.0,
+        "y": 272.0,
+        "w": 112.0,
+        "h": 0.0
+      },
+      "z": 10,
+      "name": "line-dashed",
+      "source": {
+        "path": "body > svg#grid",
+        "tag": "svg",
+        "svg": "svg#1 > #line-dashed"
+      },
+      "geometry": {
+        "type": "line",
+        "points": [
+          [
+            648,
+            272
+          ],
+          [
+            760,
+            272
+          ]
+        ]
+      },
+      "fill": {
+        "type": "none"
+      },
+      "stroke": {
+        "color": "516467",
+        "alpha": 1.0,
+        "width": 6.0,
+        "dash": [
+          12,
+          6
+        ],
+        "cap": "round",
+        "join": "miter",
+        "headEnd": null,
+        "tailEnd": null
+      },
+      "shadow": null,
+      "flipH": false,
+      "flipV": false
+    },
+    {
+      "id": "e12",
+      "kind": "shape",
+      "box": {
+        "x": 936.0,
+        "y": 224.0,
+        "w": 112.0,
+        "h": 96.0
+      },
+      "z": 11,
+      "opacity": 0.8,
+      "name": "alpha-rect",
+      "source": {
+        "path": "body > svg#grid",
+        "tag": "svg",
+        "svg": "svg#1 > #alpha-rect"
+      },
+      "geometry": {
+        "type": "rect"
+      },
+      "fill": {
+        "type": "solid",
+        "color": "1A9AFA",
+        "alpha": 0.4
+      },
+      "stroke": {
+        "color": "0B5FA5",
+        "alpha": 0.8,
+        "width": 6.0,
+        "dash": "solid",
+        "cap": "butt",
+        "join": "miter",
+        "headEnd": null,
+        "tailEnd": null
+      },
+      "shadow": null,
+      "flipH": false,
+      "flipV": false
+    },
+    {
+      "id": "e13",
+      "kind": "shape",
+      "box": {
+        "x": 1080.0,
+        "y": 224.0,
+        "w": 112.0,
+        "h": 96.0
+      },
+      "z": 12,
+      "clip": {
+        "x": 1108.0,
+        "y": 224.0,
+        "w": 84.0,
+        "h": 68.0
+      },
+      "name": "clipped-rect",
+      "source": {
+        "path": "body > svg#grid",
+        "tag": "svg",
+        "svg": "svg#1 > #clipped-rect"
+      },
+      "geometry": {
+        "type": "rect"
+      },
+      "fill": {
+        "type": "solid",
+        "color": "F5A623",
+        "alpha": 1.0
+      },
+      "stroke": null,
+      "shadow": null,
+      "flipH": false,
+      "flipV": false
+    },
+    {
+      "id": "e14",
+      "kind": "image",
+      "box": {
+        "x": 504.0,
+        "y": 376.0,
+        "w": 112.0,
+        "h": 112.0
+      },
+      "z": 13,
+      "name": "svg-image",
+      "source": {
+        "path": "body > svg#grid",
+        "tag": "image",
+        "svg": "svg#1 > #svg-image"
+      },
+      "src": "tests/engine/fixtures/torture/assets/logo-160x160.png",
+      "fit": "cover",
+      "crop": {
+        "l": 0.0,
+        "t": 0.0,
+        "r": 0.0,
+        "b": 0.0
+      },
+      "radius": 0.0,
+      "circle": false
+    },
+    {
+      "id": "e15",
+      "kind": "text",
+      "box": {
+        "x": 648.0,
+        "y": 360.0,
+        "w": 130.0,
+        "h": 30.0
+      },
+      "z": 14,
+      "name": "text-pt",
+      "source": {
+        "path": "body > [data-name=text-pt]",
+        "tag": "div",
+        "svg": null
+      },
+      "paragraphs": [
+        {
+          "align": "left",
+          "lineHeightPx": 30.0,
+          "spaceBeforePx": 0.0,
+          "spaceAfterPx": 0.0,
+          "bullet": null,
+          "lines": [
+            {
+              "box": {
+                "x": 648,
+                "y": 360,
+                "w": 130,
+                "h": 30
+              },
+              "runs": [
+                {
+                  "text": "9 pt text",
+                  "font": "Calibri",
+                  "sizePx": 24.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "2E2E38",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "anchor": "top",
+      "writingMode": "horizontal",
+      "wrap": true,
+      "transformCase": null
+    },
+    {
+      "id": "e16",
+      "kind": "text",
+      "box": {
+        "x": 792.0,
+        "y": 352.0,
+        "w": 150.0,
+        "h": 30.0
+      },
+      "z": 15,
+      "name": "text-tspans",
+      "source": {
+        "path": "body > [data-name=text-tspans]",
+        "tag": "div",
+        "svg": null
+      },
+      "paragraphs": [
+        {
+          "align": "left",
+          "lineHeightPx": 30.0,
+          "spaceBeforePx": 0.0,
+          "spaceAfterPx": 0.0,
+          "bullet": null,
+          "lines": [
+            {
+              "box": {
+                "x": 792,
+                "y": 352,
+                "w": 150,
+                "h": 30
+              },
+              "runs": [
+                {
+                  "text": "Base",
+                  "font": "Calibri",
+                  "sizePx": 22.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "2E2E38",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                },
+                {
+                  "text": "sup",
+                  "font": "Calibri",
+                  "sizePx": 16.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "1A9AFA",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "super",
+                  "baselineShiftPx": -10.0,
+                  "caps": false,
+                  "href": null
+                },
+                {
+                  "text": "bold",
+                  "font": "Calibri",
+                  "sizePx": 22.0,
+                  "weight": 700,
+                  "italic": false,
+                  "color": "2E2E38",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "anchor": "top",
+      "writingMode": "horizontal",
+      "wrap": true,
+      "transformCase": null
+    },
+    {
+      "id": "e17",
+      "kind": "text",
+      "box": {
+        "x": 900.0,
+        "y": 360.0,
+        "w": 120.0,
+        "h": 24.0
+      },
+      "z": 16,
+      "rotation": -90.0,
+      "name": "text-rot",
+      "source": {
+        "path": "body > [data-name=text-rot]",
+        "tag": "div",
+        "svg": null
+      },
+      "paragraphs": [
+        {
+          "align": "center",
+          "lineHeightPx": 24.0,
+          "spaceBeforePx": 0.0,
+          "spaceAfterPx": 0.0,
+          "bullet": null,
+          "lines": [
+            {
+              "box": {
+                "x": 900,
+                "y": 360,
+                "w": 120,
+                "h": 24
+              },
+              "runs": [
+                {
+                  "text": "Rotated",
+                  "font": "Calibri",
+                  "sizePx": 20.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "516467",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "anchor": "top",
+      "writingMode": "horizontal",
+      "wrap": true,
+      "transformCase": null
+    },
+    {
+      "id": "e18",
+      "kind": "shape",
+      "box": {
+        "x": 936.0,
+        "y": 516.0,
+        "w": 112.0,
+        "h": 88.0
+      },
+      "z": 17,
+      "name": "shadow-fedropshadow",
+      "source": {
+        "path": "body > [data-name=shadow-fedropshadow]",
+        "tag": "div",
+        "svg": null
+      },
+      "geometry": {
+        "type": "rect"
+      },
+      "fill": {
+        "type": "solid",
+        "color": "FFFFFF",
+        "alpha": 1.0
+      },
+      "stroke": {
+        "color": "E6E6EC",
+        "alpha": 1.0,
+        "width": 2.0,
+        "dash": "solid",
+        "cap": "butt",
+        "join": "miter",
+        "headEnd": null,
+        "tailEnd": null
+      },
+      "shadow": {
+        "color": "2E2E38",
+        "alpha": 0.35,
+        "blur": 6.4,
+        "dx": 0,
+        "dy": 4
+      },
+      "flipH": false,
+      "flipV": false
+    },
+    {
+      "id": "e19",
+      "kind": "raster",
+      "box": {
+        "x": 72.0,
+        "y": 512.0,
+        "w": 112.0,
+        "h": 96.0
+      },
+      "z": 18,
+      "name": "raster-filter",
+      "source": {
+        "path": "body > svg#grid",
+        "tag": "rect",
+        "svg": "svg#1 > #raster-filter"
+      },
+      "src": "tests/engine/fixtures/torture/assets/photo-400x300.png",
+      "reason": "svg filter: feGaussianBlur"
+    }
+  ],
+  "diagnostics": [
+    {
+      "level": "warn",
+      "source": "svg#1 > #raster-filter",
+      "message": "svg filter feGaussianBlur rasterised",
+      "elementId": "e19"
+    }
+  ]
+}

@@ -1,0 +1,1145 @@
+{
+  "version": 1,
+  "canvas": {
+    "w": 1280,
+    "h": 720,
+    "pxPerIn": 96
+  },
+  "slide": {
+    "id": "torture-charts",
+    "title": "Charts — torture fixture",
+    "layoutId": "layout-07",
+    "notes": "Eight authored charts, one per option group WP3a implements."
+  },
+  "fonts": {
+    "forced": {
+      "major": "Calibri Light",
+      "minor": "Calibri"
+    },
+    "used": [
+      "Calibri"
+    ],
+    "substituted": []
+  },
+  "groups": [],
+  "elements": [
+    {
+      "id": "e1",
+      "kind": "text",
+      "box": {
+        "x": 40.0,
+        "y": 28.0,
+        "w": 1200.0,
+        "h": 40.0
+      },
+      "z": 0,
+      "name": "h1",
+      "source": {
+        "path": "body > h1",
+        "tag": "div"
+      },
+      "placeholder": {
+        "type": "title",
+        "idx": 0
+      },
+      "paragraphs": [
+        {
+          "align": "left",
+          "lineHeightPx": 40.0,
+          "spaceBeforePx": 0,
+          "spaceAfterPx": 0,
+          "bullet": null,
+          "lines": [
+            {
+              "box": {
+                "x": 40.0,
+                "y": 28.0,
+                "w": 1200.0,
+                "h": 40.0
+              },
+              "runs": [
+                {
+                  "text": "Native charts — every option the emitter supports",
+                  "font": "Calibri",
+                  "sizePx": 28.0,
+                  "weight": 700,
+                  "italic": false,
+                  "color": "12233B",
+                  "alpha": 1,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "anchor": "top",
+      "writingMode": "horizontal",
+      "wrap": true,
+      "transformCase": null
+    },
+    {
+      "id": "e2",
+      "kind": "chart",
+      "box": {
+        "x": 40.0,
+        "y": 90.0,
+        "w": 285.0,
+        "h": 220.0
+      },
+      "z": 1,
+      "name": "Stacked column with a gap slot",
+      "source": {
+        "path": "body > div.chart:nth-of-type(1)",
+        "tag": "div"
+      },
+      "spec": {
+        "type": "column_stacked",
+        "categories": [
+          "FY20",
+          "FY21",
+          "FY22",
+          "FY23",
+          "",
+          "FY27E"
+        ],
+        "series": [
+          {
+            "name": "Internal",
+            "values": [
+              40,
+              52,
+              57,
+              71,
+              null,
+              88
+            ]
+          },
+          {
+            "name": "Partner",
+            "values": [
+              12,
+              9,
+              21,
+              18,
+              null,
+              55
+            ]
+          }
+        ],
+        "colors": [
+          "#B9C7C9",
+          "#1A9AFB"
+        ],
+        "options": {
+          "dataLabels": true,
+          "labelPosition": "inEnd",
+          "numberFormat": "0",
+          "gridlines": false,
+          "legend": false,
+          "gapWidth": 60,
+          "valueAxis": {
+            "min": 0,
+            "max": 160,
+            "majorUnit": 40,
+            "visible": true
+          },
+          "categoryAxis": {
+            "visible": true
+          },
+          "plotArea": {
+            "x": 0.08,
+            "y": 0.05,
+            "w": 0.9,
+            "h": 0.78
+          },
+          "referenceLines": [
+            {
+              "value": 90,
+              "color": "#516467",
+              "dash": [
+                4,
+                3
+              ],
+              "label": "90k goal"
+            }
+          ],
+          "pointColors": {
+            "1": {
+              "5": "#7FC6FF"
+            }
+          }
+        }
+      },
+      "style": {
+        "font": "Calibri",
+        "sizePx": 13.0,
+        "color": "516467"
+      },
+      "origin": "authored",
+      "confidence": 1.0,
+      "plotRect": null,
+      "overlay": []
+    },
+    {
+      "id": "e3",
+      "kind": "text",
+      "box": {
+        "x": 40.0,
+        "y": 316.0,
+        "w": 285.0,
+        "h": 22.0
+      },
+      "z": 2,
+      "name": "cap1",
+      "source": {
+        "path": "body > cap1",
+        "tag": "div"
+      },
+      "paragraphs": [
+        {
+          "align": "left",
+          "lineHeightPx": 22.0,
+          "spaceBeforePx": 0,
+          "spaceAfterPx": 0,
+          "bullet": null,
+          "lines": [
+            {
+              "box": {
+                "x": 40.0,
+                "y": 316.0,
+                "w": 285.0,
+                "h": 22.0
+              },
+              "runs": [
+                {
+                  "text": "Gap slot, reference line, point colour",
+                  "font": "Calibri",
+                  "sizePx": 13.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "516467",
+                  "alpha": 1,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "anchor": "top",
+      "writingMode": "horizontal",
+      "wrap": true,
+      "transformCase": null
+    },
+    {
+      "id": "e4",
+      "kind": "chart",
+      "box": {
+        "x": 345.0,
+        "y": 90.0,
+        "w": 285.0,
+        "h": 220.0
+      },
+      "z": 3,
+      "name": "Waterfall",
+      "source": {
+        "path": "body > div.chart:nth-of-type(2)",
+        "tag": "div"
+      },
+      "spec": {
+        "type": "waterfall",
+        "categories": [
+          "2023",
+          "Partner",
+          "Internal",
+          "Leakage",
+          "",
+          "2030"
+        ],
+        "series": [
+          {
+            "name": "Partners",
+            "values": [
+              300,
+              120,
+              -45,
+              215,
+              null,
+              590
+            ]
+          }
+        ],
+        "colors": [
+          "#1A9AFB",
+          "#E4573D",
+          "#516467"
+        ],
+        "options": {
+          "numberFormat": "0",
+          "legend": false,
+          "gapWidth": 40,
+          "totals": [
+            0,
+            5
+          ],
+          "connectors": {
+            "color": "#8A9699",
+            "width": 0.75,
+            "dash": [
+              3,
+              2
+            ]
+          },
+          "valueAxis": {
+            "min": 0,
+            "max": 600,
+            "majorUnit": 200
+          },
+          "plotArea": {
+            "x": 0.1,
+            "y": 0.06,
+            "w": 0.86,
+            "h": 0.76
+          }
+        }
+      },
+      "style": {
+        "font": "Calibri",
+        "sizePx": 13.0,
+        "color": "516467"
+      },
+      "origin": "authored",
+      "confidence": 1.0,
+      "plotRect": null,
+      "overlay": []
+    },
+    {
+      "id": "e5",
+      "kind": "text",
+      "box": {
+        "x": 345.0,
+        "y": 316.0,
+        "w": 285.0,
+        "h": 22.0
+      },
+      "z": 4,
+      "name": "cap2",
+      "source": {
+        "path": "body > cap2",
+        "tag": "div"
+      },
+      "paragraphs": [
+        {
+          "align": "left",
+          "lineHeightPx": 22.0,
+          "spaceBeforePx": 0,
+          "spaceAfterPx": 0,
+          "bullet": null,
+          "lines": [
+            {
+              "box": {
+                "x": 345.0,
+                "y": 316.0,
+                "w": 285.0,
+                "h": 22.0
+              },
+              "runs": [
+                {
+                  "text": "Floating bars, signed steps, connectors",
+                  "font": "Calibri",
+                  "sizePx": 13.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "516467",
+                  "alpha": 1,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "anchor": "top",
+      "writingMode": "horizontal",
+      "wrap": true,
+      "transformCase": null
+    },
+    {
+      "id": "e6",
+      "kind": "chart",
+      "box": {
+        "x": 650.0,
+        "y": 90.0,
+        "w": 285.0,
+        "h": 220.0
+      },
+      "z": 5,
+      "name": "Doughnut",
+      "source": {
+        "path": "body > div.chart:nth-of-type(3)",
+        "tag": "div"
+      },
+      "spec": {
+        "type": "doughnut",
+        "categories": [
+          "Upsell",
+          "Business",
+          "Referral"
+        ],
+        "series": [
+          {
+            "name": "Share",
+            "values": [
+              61,
+              27,
+              12
+            ]
+          }
+        ],
+        "colors": [
+          "#1A9AFB",
+          "#B9C7C9",
+          "#516467"
+        ],
+        "options": {
+          "holeSize": 62,
+          "dataLabels": true,
+          "numberFormat": "0\"%\"",
+          "legend": "topRight",
+          "fontSize": 11
+        }
+      },
+      "style": {
+        "font": "Calibri",
+        "sizePx": 13.0,
+        "color": "516467"
+      },
+      "origin": "authored",
+      "confidence": 1.0,
+      "plotRect": null,
+      "overlay": []
+    },
+    {
+      "id": "e7",
+      "kind": "text",
+      "box": {
+        "x": 650.0,
+        "y": 316.0,
+        "w": 285.0,
+        "h": 22.0
+      },
+      "z": 6,
+      "name": "cap3",
+      "source": {
+        "path": "body > cap3",
+        "tag": "div"
+      },
+      "paragraphs": [
+        {
+          "align": "left",
+          "lineHeightPx": 22.0,
+          "spaceBeforePx": 0,
+          "spaceAfterPx": 0,
+          "bullet": null,
+          "lines": [
+            {
+              "box": {
+                "x": 650.0,
+                "y": 316.0,
+                "w": 285.0,
+                "h": 22.0
+              },
+              "runs": [
+                {
+                  "text": "Hole size, per-slice colours, legend",
+                  "font": "Calibri",
+                  "sizePx": 13.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "516467",
+                  "alpha": 1,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "anchor": "top",
+      "writingMode": "horizontal",
+      "wrap": true,
+      "transformCase": null
+    },
+    {
+      "id": "e8",
+      "kind": "chart",
+      "box": {
+        "x": 955.0,
+        "y": 90.0,
+        "w": 285.0,
+        "h": 220.0
+      },
+      "z": 7,
+      "name": "Line with markers",
+      "source": {
+        "path": "body > div.chart:nth-of-type(4)",
+        "tag": "div"
+      },
+      "spec": {
+        "type": "line_markers",
+        "categories": [
+          "Q1",
+          "Q2",
+          "Q3",
+          "Q4"
+        ],
+        "series": [
+          {
+            "name": "Actual",
+            "values": [
+              12,
+              15,
+              14,
+              19
+            ],
+            "lineWidth": 2.25
+          },
+          {
+            "name": "Plan",
+            "values": [
+              11,
+              13,
+              16,
+              18
+            ],
+            "dash": [
+              6,
+              3
+            ],
+            "lineWidth": 1.5
+          }
+        ],
+        "colors": [
+          "#1A9AFB",
+          "#B9C7C9"
+        ],
+        "options": {
+          "markers": "circle",
+          "markerSize": 6,
+          "smooth": false,
+          "dataLabels": [
+            true,
+            false
+          ],
+          "labelPosition": "above",
+          "gridlines": {
+            "color": "#E4E9F0",
+            "width": 0.75,
+            "dash": "sysDash"
+          },
+          "valueAxis": {
+            "min": 0,
+            "max": 20,
+            "majorUnit": 5,
+            "title": "Orders (k)"
+          },
+          "legend": "bottom"
+        }
+      },
+      "style": {
+        "font": "Calibri",
+        "sizePx": 13.0,
+        "color": "516467"
+      },
+      "origin": "authored",
+      "confidence": 1.0,
+      "plotRect": null,
+      "overlay": []
+    },
+    {
+      "id": "e9",
+      "kind": "text",
+      "box": {
+        "x": 955.0,
+        "y": 316.0,
+        "w": 285.0,
+        "h": 22.0
+      },
+      "z": 8,
+      "name": "cap4",
+      "source": {
+        "path": "body > cap4",
+        "tag": "div"
+      },
+      "paragraphs": [
+        {
+          "align": "left",
+          "lineHeightPx": 22.0,
+          "spaceBeforePx": 0,
+          "spaceAfterPx": 0,
+          "bullet": null,
+          "lines": [
+            {
+              "box": {
+                "x": 955.0,
+                "y": 316.0,
+                "w": 285.0,
+                "h": 22.0
+              },
+              "runs": [
+                {
+                  "text": "Markers, per-series dash, gridlines, axis title",
+                  "font": "Calibri",
+                  "sizePx": 13.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "516467",
+                  "alpha": 1,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "anchor": "top",
+      "writingMode": "horizontal",
+      "wrap": true,
+      "transformCase": null
+    },
+    {
+      "id": "e10",
+      "kind": "chart",
+      "box": {
+        "x": 40.0,
+        "y": 380.0,
+        "w": 285.0,
+        "h": 220.0
+      },
+      "z": 9,
+      "name": "Bar with a reversed category axis",
+      "source": {
+        "path": "body > div.chart:nth-of-type(5)",
+        "tag": "div"
+      },
+      "spec": {
+        "type": "bar",
+        "categories": [
+          "Rail",
+          "Ads",
+          "Road",
+          "Sea"
+        ],
+        "series": [
+          {
+            "name": "2023",
+            "values": [
+              29,
+              24,
+              17,
+              9
+            ]
+          }
+        ],
+        "colors": [
+          "#1A9AFB"
+        ],
+        "options": {
+          "dataLabels": true,
+          "labelPosition": "outEnd",
+          "labelFormat": "0.0",
+          "gapWidth": 40,
+          "overlap": 0,
+          "legend": false,
+          "categoryAxis": {
+            "reverse": true
+          },
+          "valueAxis": {
+            "min": 0,
+            "max": 40,
+            "majorUnit": 10,
+            "visible": false
+          },
+          "referenceLines": [
+            {
+              "value": 25,
+              "color": "#E4573D",
+              "dash": "dash"
+            }
+          ]
+        }
+      },
+      "style": {
+        "font": "Calibri",
+        "sizePx": 13.0,
+        "color": "516467"
+      },
+      "origin": "authored",
+      "confidence": 1.0,
+      "plotRect": {
+        "x": 74.2,
+        "y": 397.6,
+        "w": 239.4,
+        "h": 171.6
+      },
+      "overlay": []
+    },
+    {
+      "id": "e11",
+      "kind": "text",
+      "box": {
+        "x": 40.0,
+        "y": 606.0,
+        "w": 285.0,
+        "h": 22.0
+      },
+      "z": 10,
+      "name": "cap5",
+      "source": {
+        "path": "body > cap5",
+        "tag": "div"
+      },
+      "paragraphs": [
+        {
+          "align": "left",
+          "lineHeightPx": 22.0,
+          "spaceBeforePx": 0,
+          "spaceAfterPx": 0,
+          "bullet": null,
+          "lines": [
+            {
+              "box": {
+                "x": 40.0,
+                "y": 606.0,
+                "w": 285.0,
+                "h": 22.0
+              },
+              "runs": [
+                {
+                  "text": "Horizontal value axis, reversed categories",
+                  "font": "Calibri",
+                  "sizePx": 13.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "516467",
+                  "alpha": 1,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "anchor": "top",
+      "writingMode": "horizontal",
+      "wrap": true,
+      "transformCase": null
+    },
+    {
+      "id": "e12",
+      "kind": "chart",
+      "box": {
+        "x": 345.0,
+        "y": 380.0,
+        "w": 285.0,
+        "h": 220.0
+      },
+      "z": 11,
+      "name": "Stacked area",
+      "source": {
+        "path": "body > div.chart:nth-of-type(6)",
+        "tag": "div"
+      },
+      "spec": {
+        "type": "area_stacked",
+        "categories": [
+          "2021",
+          "2022",
+          "2023",
+          "2024"
+        ],
+        "series": [
+          {
+            "name": "Internal",
+            "values": [
+              36,
+              41,
+              47,
+              55
+            ]
+          },
+          {
+            "name": "Partner",
+            "values": [
+              10,
+              15,
+              22,
+              27
+            ]
+          }
+        ],
+        "colors": [
+          "#B9C7C9",
+          "#1A9AFB"
+        ],
+        "options": {
+          "dataLabels": false,
+          "legend": "bottom",
+          "gridlines": true,
+          "font": "Calibri",
+          "fontSize": 11,
+          "fontColor": "#516467",
+          "valueAxis": {
+            "min": 0,
+            "max": 100,
+            "majorUnit": 25
+          }
+        }
+      },
+      "style": {
+        "font": "Calibri",
+        "sizePx": 13.0,
+        "color": "516467"
+      },
+      "origin": "authored",
+      "confidence": 1.0,
+      "plotRect": null,
+      "overlay": []
+    },
+    {
+      "id": "e13",
+      "kind": "text",
+      "box": {
+        "x": 345.0,
+        "y": 606.0,
+        "w": 285.0,
+        "h": 22.0
+      },
+      "z": 12,
+      "name": "cap6",
+      "source": {
+        "path": "body > cap6",
+        "tag": "div"
+      },
+      "paragraphs": [
+        {
+          "align": "left",
+          "lineHeightPx": 22.0,
+          "spaceBeforePx": 0,
+          "spaceAfterPx": 0,
+          "bullet": null,
+          "lines": [
+            {
+              "box": {
+                "x": 345.0,
+                "y": 606.0,
+                "w": 285.0,
+                "h": 22.0
+              },
+              "runs": [
+                {
+                  "text": "Labels off, legend, chart font and colour",
+                  "font": "Calibri",
+                  "sizePx": 13.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "516467",
+                  "alpha": 1,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "anchor": "top",
+      "writingMode": "horizontal",
+      "wrap": true,
+      "transformCase": null
+    },
+    {
+      "id": "e14",
+      "kind": "chart",
+      "box": {
+        "x": 650.0,
+        "y": 380.0,
+        "w": 285.0,
+        "h": 220.0
+      },
+      "z": 13,
+      "name": "Scatter",
+      "source": {
+        "path": "body > div.chart:nth-of-type(7)",
+        "tag": "div"
+      },
+      "spec": {
+        "type": "scatter",
+        "series": [
+          {
+            "name": "Cities",
+            "x": [
+              1,
+              2.5,
+              4,
+              5.5
+            ],
+            "y": [
+              3,
+              4.5,
+              4,
+              6
+            ],
+            "marker": "circle",
+            "markerSize": 7
+          }
+        ],
+        "colors": [
+          "#1A9AFB"
+        ],
+        "options": {
+          "dataLabels": true,
+          "labelPosition": "right",
+          "numberFormat": "0.0",
+          "legend": false,
+          "valueAxis": {
+            "min": 0,
+            "max": 8,
+            "majorUnit": 2
+          },
+          "categoryAxis": {
+            "min": 0,
+            "max": 6,
+            "majorUnit": 2
+          }
+        }
+      },
+      "style": {
+        "font": "Calibri",
+        "sizePx": 13.0,
+        "color": "516467"
+      },
+      "origin": "authored",
+      "confidence": 1.0,
+      "plotRect": null,
+      "overlay": []
+    },
+    {
+      "id": "e15",
+      "kind": "text",
+      "box": {
+        "x": 650.0,
+        "y": 606.0,
+        "w": 285.0,
+        "h": 22.0
+      },
+      "z": 14,
+      "name": "cap7",
+      "source": {
+        "path": "body > cap7",
+        "tag": "div"
+      },
+      "paragraphs": [
+        {
+          "align": "left",
+          "lineHeightPx": 22.0,
+          "spaceBeforePx": 0,
+          "spaceAfterPx": 0,
+          "bullet": null,
+          "lines": [
+            {
+              "box": {
+                "x": 650.0,
+                "y": 606.0,
+                "w": 285.0,
+                "h": 22.0
+              },
+              "runs": [
+                {
+                  "text": "XY pairs, marker style, both axes numeric",
+                  "font": "Calibri",
+                  "sizePx": 13.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "516467",
+                  "alpha": 1,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "anchor": "top",
+      "writingMode": "horizontal",
+      "wrap": true,
+      "transformCase": null
+    },
+    {
+      "id": "e16",
+      "kind": "chart",
+      "box": {
+        "x": 955.0,
+        "y": 380.0,
+        "w": 285.0,
+        "h": 220.0
+      },
+      "z": 15,
+      "name": "Exploded pie",
+      "source": {
+        "path": "body > div.chart:nth-of-type(8)",
+        "tag": "div"
+      },
+      "spec": {
+        "type": "pie_exploded",
+        "categories": [
+          "North",
+          "South",
+          "East",
+          "West"
+        ],
+        "series": [
+          {
+            "name": "Mix",
+            "values": [
+              35,
+              25,
+              22,
+              18
+            ],
+            "explosion": 8
+          }
+        ],
+        "colors": [
+          "#1A9AFB",
+          "#B9C7C9",
+          "#516467",
+          "#7FC6FF"
+        ],
+        "options": {
+          "dataLabels": true,
+          "labelPosition": "bestFit",
+          "numberFormat": "0\"%\"",
+          "legend": false,
+          "varyColors": true,
+          "title": "Regional mix"
+        }
+      },
+      "style": {
+        "font": "Calibri",
+        "sizePx": 13.0,
+        "color": "516467"
+      },
+      "origin": "authored",
+      "confidence": 1.0,
+      "plotRect": null,
+      "overlay": []
+    },
+    {
+      "id": "e17",
+      "kind": "text",
+      "box": {
+        "x": 955.0,
+        "y": 606.0,
+        "w": 285.0,
+        "h": 22.0
+      },
+      "z": 16,
+      "name": "cap8",
+      "source": {
+        "path": "body > cap8",
+        "tag": "div"
+      },
+      "paragraphs": [
+        {
+          "align": "left",
+          "lineHeightPx": 22.0,
+          "spaceBeforePx": 0,
+          "spaceAfterPx": 0,
+          "bullet": null,
+          "lines": [
+            {
+              "box": {
+                "x": 955.0,
+                "y": 606.0,
+                "w": 285.0,
+                "h": 22.0
+              },
+              "runs": [
+                {
+                  "text": "Explosion, vary colours, chart title",
+                  "font": "Calibri",
+                  "sizePx": 13.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "516467",
+                  "alpha": 1,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "anchor": "top",
+      "writingMode": "horizontal",
+      "wrap": true,
+      "transformCase": null
+    }
+  ],
+  "diagnostics": []
+}

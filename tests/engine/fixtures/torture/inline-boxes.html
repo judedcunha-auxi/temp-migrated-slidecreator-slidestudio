@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>torture · inline-boxes</title>
+<style>
+html,body{margin:0;width:1280px;height:720px;overflow:hidden;background:transparent;
+  font-family:Calibri,Arial,sans-serif;color:#021D44;font-size:14px}
+p{margin:0}
+.abs{position:absolute}
+.lbl{position:absolute;font-size:12px;font-weight:700;color:#0B5CAD}
+
+/* A: the render check's chevron (d3_s13): a circled number and a currentColor icon span in one run */
+.chev{position:absolute;top:190px;width:175px;height:104px;background:#021D44;color:#fff;
+  clip-path:polygon(0% 0%,88.6% 0%,100% 50%,88.6% 100%,0% 100%)}
+.chv-in{padding:9px 0 0 12px}
+.num{display:inline-block;width:20px;height:20px;border:1.5px solid #fff;border-radius:50%;
+  font-size:11px;font-weight:700;line-height:19px;text-align:center;vertical-align:-4px}
+.cico{display:inline-block;width:24px;height:24px;margin-left:14px;vertical-align:-6px;color:#fff}
+.ctitle{margin-top:14px;font-size:15px;font-weight:700}
+
+/* B: an SVG alone in a span */
+.tile{position:absolute;top:190px;width:104px;height:104px;background:#0B5CAD;color:#fff}
+.ring{display:inline-block;width:40px;height:40px;border-radius:50%;background:#E8F1FB;color:#0B5CAD;
+  margin:32px 0 0 32px}
+.ring svg{display:block;margin:8px}
+
+/* C: inline-flex icon + label */
+.pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:14px;
+  background:#E8F1FB;color:#0B5CAD;font-size:13px;font-weight:700}
+.ico{display:inline-flex;align-items:center;gap:6px;font-size:14px}
+
+/* F: rows of empty inline-block dots (d1_s07), and G: one in a table cell */
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block;background:#021D44}
+.dot.o{background:#fff;border:1.5px solid #021D44;box-sizing:border-box}
+table{position:absolute;left:720px;top:520px;border-collapse:collapse;font-size:13px}
+td{border:1px solid #C9D3DE;padding:6px 10px}
+</style></head><body>
+
+<div class="lbl" style="left:40px;top:166px">A · chevrons: number + icon span</div>
+<div class="chev" style="left:40px"><div class="chv-in"><span class="num">1</span>
+  <span class="cico"><svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><polygon points="12,2 23,8 1,8"/><rect x="3" y="10" width="2.6" height="9"/><rect x="8" y="10" width="2.6" height="9"/><rect x="13.4" y="10" width="2.6" height="9"/><rect x="18.4" y="10" width="2.6" height="9"/><rect x="1" y="20" width="22" height="2.4"/></svg></span>
+  <div class="ctitle">Governance</div></div></div>
+<div class="chev" style="left:225px"><div class="chv-in"><span class="num">2</span>
+  <span class="cico"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9.5" stroke-width="2"/><line x1="2.5" y1="12" x2="21.5" y2="12" stroke-width="1.8"/><line x1="12" y1="2.5" x2="12" y2="21.5" stroke-width="1.8"/></svg></span>
+  <div class="ctitle">Reach</div></div></div>
+
+<div class="lbl" style="left:440px;top:166px">B · SVG alone in a span</div>
+<div class="tile" style="left:440px"><span><svg viewBox="0 0 24 24" width="40" height="40" fill="currentColor" style="margin:32px"><rect x="2" y="2" width="20" height="20" rx="4"/></svg></span></div>
+<div class="tile" style="left:560px;background:#1E9E5A"><span class="ring"><svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M4 12l5 5L20 6" fill="none" stroke="currentColor" stroke-width="3"/></svg></span></div>
+
+<div class="lbl" style="left:720px;top:166px">C · inline-flex icon + label</div>
+<div class="abs" style="left:720px;top:196px"><span class="ico"><svg viewBox="0 0 24 24" width="24" height="24"><rect x="1" y="1" width="22" height="22" rx="3" fill="#D64545"/></svg>Label one</span></div>
+<div class="abs" style="left:720px;top:236px"><span class="pill"><svg viewBox="0 0 24 24" width="14" height="14"><circle cx="12" cy="12" r="10" fill="#0B5CAD"/></svg>On track</span></div>
+
+<div class="lbl" style="left:40px;top:330px">D · a span-wrapped SVG mid-sentence</div>
+<p class="abs" style="left:40px;top:354px;width:560px">Revenue grew <span><svg viewBox="0 0 24 24" width="18" height="18" style="vertical-align:-3px"><polygon points="12,3 22,21 2,21" fill="#1E9E5A"/></svg></span> twelve per cent on the year</p>
+
+<div class="lbl" style="left:720px;top:330px">E · an image in a span</div>
+<p class="abs" style="left:720px;top:354px;width:480px">Rated <span><img src="/api/projects/prj_torture/assets/logo-160x160.png" alt="" style="width:18px;height:18px;vertical-align:-3px"></span> by analysts</p>
+
+<div class="lbl" style="left:40px;top:410px">F · rows of empty dots</div>
+<div class="abs" style="left:40px;top:436px"><div><span class="dot"></span><span class="dot"></span><span class="dot"></span></div></div>
+<div class="abs" style="left:200px;top:436px"><div>
+  <span class="dot o"></span>
+  <span class="dot o"></span>
+  <span class="dot o"></span>
+</div></div>
+<div class="abs" style="left:360px;top:436px;width:160px;text-align:center"><div>
+  <span class="dot"></span>
+  <span class="dot"></span>
+  <span class="dot o"></span>
+  <span class="dot o"></span>
+</div><div style="font-size:12px;font-weight:700;margin-top:4px">Low</div></div>
+
+<div class="lbl" style="left:720px;top:496px">G · a dots-only row in a table cell</div>
+<table><tr><td>Resilience</td><td><span class="dot"></span> <span class="dot"></span> <span class="dot o"></span></td></tr></table>
+</body></html>

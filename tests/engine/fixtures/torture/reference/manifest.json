@@ -1,0 +1,226 @@
+{
+  "as-seen": {
+    "htmlSha256": "4212dd8d02f2a77d73047310a9e7247e974bd9760ac62197278e18f0b5028e3b",
+    "fonts": {
+      "major": "Calibri Light",
+      "minor": "Calibri"
+    },
+    "renderedAt": "2026-09-25"
+  },
+  "boxes": {
+    "htmlSha256": "e930b6039ec0c4c73ebe14dcad355b419ea17b14c2a9412feb8a62a2677ba55c",
+    "fonts": {
+      "major": "Calibri Light",
+      "minor": "Calibri"
+    },
+    "renderedAt": "2026-09-25"
+  },
+  "chart-specs": {
+    "htmlSha256": "bd72a4569aaf709aa48d814d1d780b8b5d835775679ebde615af0485a623fb6e",
+    "fonts": {
+      "major": "Calibri Light",
+      "minor": "Calibri"
+    },
+    "renderedAt": "2026-09-25"
+  },
+  "charts": {
+    "htmlSha256": "c2409706e49e46d9fc20575e43b60e9bfd37ccdc9c80c6627177f28e2892b14d",
+    "fonts": {
+      "major": "Calibri Light",
+      "minor": "Calibri"
+    },
+    "renderedAt": "2026-10-09"
+  },
+  "charts-hardening": {
+    "htmlSha256": "1a3207bbf6c2e27a2e1a915843e569fb6618c5ebac28251e9d342d01cf1a8d0f",
+    "fonts": {
+      "major": "Calibri Light",
+      "minor": "Calibri"
+    },
+    "renderedAt": "2026-10-09"
+  },
+  "charts-labels": {
+    "htmlSha256": "aacad270bc3890461a467e625328685a688b8701e027c2f1e3533a798f89407b",
+    "fonts": {
+      "major": "Calibri Light",
+      "minor": "Calibri"
+    },
+    "renderedAt": "2026-10-02"
+  },
+  "charts-negative": {
+    "htmlSha256": "62cb2d2b8dce2e60e9f4e844f36ae26e595f106dabbbdeb0588794c1517d2133",
+    "fonts": {
+      "major": "Calibri Light",
+      "minor": "Calibri"
+    },
+    "renderedAt": "2026-10-09"
+  },
+  "charts-rendercheck": {
+    "htmlSha256": "6ac3b477f77131d40b662b8f2e4e9ed35f3677cedb31ab2fca080318ec4df8a0",
+    "fonts": {
+      "major": "Calibri Light",
+      "minor": "Calibri"
+    },
+    "renderedAt": "2026-10-09"
+  },
+  "colours": {
+    "htmlSha256": "369f59ba2c3166fe059caa7d09ec87b7e045c9cee05c568ada54dd1b0282b5e2",
+    "fonts": {
+      "major": "Calibri Light",
+      "minor": "Calibri"
+    },
+    "renderedAt": "2026-09-25"
+  },
+  "flexgrid": {
+    "htmlSha256": "c901c93a733152c06cfd5fc408e9809608524cb663119c00c186b8900425f7cb",
+    "fonts": {
+      "major": "Calibri Light",
+      "minor": "Calibri"
+    },
+    "renderedAt": "2026-09-25"
+  },
+  "images": {
+    "htmlSha256": "eeb6f293366f14201247bec13140dcd798411f75bf5f790c70269a0d9cd740df",
+    "fonts": {
+      "major": "Calibri Light",
+      "minor": "Calibri"
+    },
+    "renderedAt": "2026-09-26"
+  },
+  "inline-boxes": {
+    "htmlSha256": "1f85e1793f3cacebb76190f6949d79c30c30f02e86c82a2bf586ab4b4df9750e",
+    "fonts": {
+      "major": "Calibri Light",
+      "minor": "Calibri"
+    },
+    "renderedAt": "2026-09-29"
+  },
+  "layout-misc": {
+    "htmlSha256": "630a5c0bfa59f6c6f6b1a8335b7db09984366016c47611e1aba13a6e2bb28747",
+    "fonts": {
+      "major": "Calibri Light",
+      "minor": "Calibri"
+    },
+    "renderedAt": "2026-09-25"
+  },
+  "media": {
+    "htmlSha256": "2a7c0bdfaf8acefc866a6c3825e982b50786cf80889ae1e8fff603624af743a9",
+    "fonts": {
+      "major": "Calibri Light",
+      "minor": "Calibri"
+    },
+    "renderedAt": "2026-09-25"
+  },
+  "paint": {
+    "htmlSha256": "a144d29f68d7777d12cbf98c6695d1adb25db9fec70fa9e84c5f74407a60c189",
+    "fonts": {
+      "major": "Calibri Light",
+      "minor": "Calibri"
+    },
+    "renderedAt": "2026-09-25"
+  },
+  "placeholders": {
+    "htmlSha256": "18e9e569ce4f9948c0bc99067f1c3e88ceeb7aa23fe050a0f698e5215a66a424",
+    "fonts": {
+      "major": "Calibri Light",
+      "minor": "Calibri"
+    },
+    "renderedAt": "2026-09-25"
+  },
+  "pseudo": {
+    "htmlSha256": "29cb51c9daf22e7018f9056dee1fa498d4221d1ff198a92e9774a552055dfcd4",
+    "fonts": {
+      "major": "Calibri Light",
+      "minor": "Calibri"
+    },
+    "renderedAt": "2026-09-25"
+  },
+  "rows": {
+    "htmlSha256": "c387218d1b97261634a50c2d03551dee96d65a03f7618feeda9b52dc2ddfd9ce",
+    "fonts": {
+      "major": "Calibri Light",
+      "minor": "Calibri"
+    },
+    "renderedAt": "2026-10-09"
+  },
+  "sizes-4x3": {
+    "htmlSha256": "fddd2f1e3ba5eecb299b51dbd3ae95f69e8bbab832cd57377b7c20f1f8b94e39",
+    "fonts": {
+      "major": "Calibri Light",
+      "minor": "Calibri"
+    },
+    "renderedAt": "2026-09-25"
+  },
+  "svg-charts": {
+    "htmlSha256": "12e5b733f2f304ccf6b1d572650b0f133d3ee4c01247f1178294721162e7bc60",
+    "fonts": {
+      "major": "Calibri Light",
+      "minor": "Calibri"
+    },
+    "renderedAt": "2026-10-09"
+  },
+  "svg-paths": {
+    "htmlSha256": "fadc9aa57ce6112849a031795bfb0c23e9cee348d3735d4d0fcc4eeea5cfd832",
+    "fonts": {
+      "major": "Calibri Light",
+      "minor": "Calibri"
+    },
+    "renderedAt": "2026-09-25"
+  },
+  "svg-shapes": {
+    "htmlSha256": "1a9a6ece33d449064543a52aeb8705938594d086530512866e4f85815c57843c",
+    "fonts": {
+      "major": "Calibri Light",
+      "minor": "Calibri"
+    },
+    "renderedAt": "2026-10-09"
+  },
+  "tables": {
+    "htmlSha256": "d82cfca6e655ae900e61c41487a670b2887ab1d894646ada7a30657796642cc4",
+    "fonts": {
+      "major": "Calibri Light",
+      "minor": "Calibri"
+    },
+    "renderedAt": "2026-10-09"
+  },
+  "tables-cells": {
+    "htmlSha256": "746383638e0abd33f82882a72acf14f8dc96a71006837c5bcb22e46f0648c4f0",
+    "fonts": {
+      "major": "Calibri Light",
+      "minor": "Calibri"
+    },
+    "renderedAt": "2026-09-25"
+  },
+  "tables-spacing": {
+    "htmlSha256": "7f7ed920fe78583e59147bef6f5ffceb7279a55606bcaef833cd2585ead7ec37",
+    "fonts": {
+      "major": "Calibri Light",
+      "minor": "Calibri"
+    },
+    "renderedAt": "2026-09-29"
+  },
+  "text": {
+    "htmlSha256": "33f2a1e54146227d0c23ec1ee3d34f12e25e5ae908fc3b84aad9cf2286c78042",
+    "fonts": {
+      "major": "Calibri Light",
+      "minor": "Calibri"
+    },
+    "renderedAt": "2026-10-09"
+  },
+  "text-misc": {
+    "htmlSha256": "690e16889fe8f0cae059f1dab7d4e7a6413c997ec45b68a5c1c8783606be93e9",
+    "fonts": {
+      "major": "Calibri Light",
+      "minor": "Calibri"
+    },
+    "renderedAt": "2026-09-25"
+  },
+  "weights": {
+    "htmlSha256": "150496f6442338d6acd3926e8ec9418a76bf3eefb2b036186b801debe706a995",
+    "fonts": {
+      "major": "Calibri Light",
+      "minor": "Calibri"
+    },
+    "renderedAt": "2026-09-25"
+  }
+}

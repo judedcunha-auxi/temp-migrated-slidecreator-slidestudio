@@ -1,0 +1,57 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><style>
+html,body{margin:0;width:1280px;height:720px;overflow:hidden;background:transparent;font-family:Calibri,Arial,sans-serif;color:#1d2433}
+/* the heading reaches the right edge of layout-06's title zone (48 + 864 = 912): see the notes */
+.h{position:absolute;left:40px;top:24px;width:872px;font-size:26px;font-weight:700}
+/* A: timeline — axis line and milestone dots drawn with pseudo-elements */
+.tl{position:absolute;left:40px;top:100px;width:1200px;height:150px;counter-reset:ms}
+.tl::before{content:"";position:absolute;left:0;right:0;top:40px;height:3px;background:#0B5CAD}
+.ms{position:absolute;top:0;width:200px;counter-increment:ms}
+.ms::before{content:counter(ms);position:absolute;left:0;top:28px;width:26px;height:26px;border-radius:50%;background:#0B5CAD;color:#fff;font-weight:700;font-size:13px;text-align:center;line-height:26px}
+.ms .yr{font-size:13px;font-weight:700;color:#0B5CAD}
+.ms .d{position:absolute;top:66px;font-size:12px;width:190px}
+/* B: flow with CSS-triangle arrows (zero-size element, borders only) */
+.flow{position:absolute;left:40px;top:300px;width:1200px;height:80px}
+.box{position:absolute;top:0;width:220px;height:70px;background:#E8F1FB;border:1px solid #0B5CAD;border-radius:6px;font-size:13px;text-align:center;box-sizing:border-box;padding-top:24px}
+.tri{position:absolute;top:27px;width:0;height:0;border-top:8px solid transparent;border-bottom:8px solid transparent;border-left:14px solid #0B5CAD}
+.box.arrow::after{content:"";position:absolute;right:-24px;top:26px;border-top:8px solid transparent;border-bottom:8px solid transparent;border-left:14px solid #D64545}
+/* C: chevron stepper — clip-path (supported) vs ::after tip (pseudo) */
+.chev{position:absolute;top:420px;height:56px;width:240px;background:#0B2545;color:#fff;font-size:14px;font-weight:700;line-height:56px;padding-left:30px;box-sizing:border-box;clip-path:polygon(0 0,88% 0,100% 50%,88% 100%,0 100%,12% 50%)}
+.chev2{position:absolute;top:510px;height:56px;width:210px;background:#1E9E5A;color:#fff;font-size:14px;font-weight:700;line-height:56px;padding-left:20px;box-sizing:border-box}
+.chev2::after{content:"";position:absolute;right:-28px;top:0;border-top:28px solid transparent;border-bottom:28px solid transparent;border-left:28px solid #1E9E5A}
+/* D: colour-edge label cells three ways */
+.edge{position:absolute;top:600px;width:280px;height:60px;background:#FFF;border:1px solid #D8DDE6;font-size:13px;padding:10px 10px 10px 18px;box-sizing:border-box}
+.e1{border-left:6px solid #D64545}
+.e2::before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:#D64545}
+.e3{box-shadow:inset 6px 0 0 #D64545}
+/* E: bullet made with ::before */
+.bl{position:absolute;left:1010px;top:420px;width:230px;font-size:13px}
+.bl div{position:relative;padding-left:16px;margin-bottom:6px}
+.bl div::before{content:"";position:absolute;left:0;top:6px;width:7px;height:7px;background:#D64545;border-radius:50%}
+</style></head><body>
+<div class="h" data-placeholder="title">Pseudo-elements and CSS tricks (probe 3)</div>
+<div class="tl">
+  <div class="ms" style="left:0"><div class="yr" style="padding-left:34px">2019</div><div class="d">Strategy launched; national AI office created</div></div>
+  <div class="ms" style="left:300px"><div class="yr" style="padding-left:34px">2020</div><div class="d">Sandbox opens for 40 pilots</div></div>
+  <div class="ms" style="left:600px"><div class="yr" style="padding-left:34px">2021</div><div class="d">Talent visa; 5.1M upskilled</div></div>
+  <div class="ms" style="left:900px"><div class="yr" style="padding-left:34px">2023</div><div class="d">$15B committed; NAIS 2.0</div></div>
+</div>
+<div class="flow">
+  <div class="box" style="left:0">Transaction flow</div>
+  <div class="tri" style="left:232px"></div>
+  <div class="box" style="left:260px">Sources &amp; uses</div>
+  <div class="tri" style="left:492px"></div>
+  <div class="box arrow" style="left:520px">Valuation</div>
+  <div class="box" style="left:780px">Investor comps</div>
+</div>
+<div class="chev" style="left:40px">1 · Diagnose</div>
+<div class="chev" style="left:270px">2 · Design</div>
+<div class="chev" style="left:500px">3 · Deliver</div>
+<div class="chev2" style="left:40px">1 · Diagnose</div>
+<div class="chev2" style="left:290px">2 · Design</div>
+<div class="chev2" style="left:540px">3 · Deliver</div>
+<div class="edge e1" style="left:40px">border-left edge</div>
+<div class="edge e2" style="left:340px">::before edge</div>
+<div class="edge e3" style="left:640px">inset box-shadow edge</div>
+<div class="bl"><div>Bullet dot via ::before</div><div>Second bullet</div><div>Third bullet</div></div>
+</body></html>

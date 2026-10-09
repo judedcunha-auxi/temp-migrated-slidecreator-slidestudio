@@ -1,0 +1,665 @@
+{
+  "version": 1,
+  "canvas": {
+    "w": 1280,
+    "h": 720,
+    "pxPerIn": 96
+  },
+  "slide": {
+    "id": "tor_charts_negative",
+    "title": "Charts — below and across zero",
+    "layoutId": "layout-07",
+    "notes": "Five authored charts: bars and bridges below and across zero."
+  },
+  "fonts": {
+    "forced": {
+      "major": "Calibri Light",
+      "minor": "Calibri"
+    },
+    "used": [
+      "Calibri",
+      "Calibri Light"
+    ],
+    "substituted": []
+  },
+  "groups": [],
+  "elements": [
+    {
+      "id": "e1",
+      "kind": "text",
+      "box": {
+        "x": 40.0,
+        "y": 24.0,
+        "w": 1200.0,
+        "h": 36.0
+      },
+      "z": 0,
+      "name": "title",
+      "source": {
+        "path": "body > [data-name=title]",
+        "tag": "div",
+        "svg": null
+      },
+      "paragraphs": [
+        {
+          "align": "left",
+          "lineHeightPx": 36.0,
+          "spaceBeforePx": 0.0,
+          "spaceAfterPx": 0.0,
+          "bullet": null,
+          "lines": [
+            {
+              "box": {
+                "x": 40,
+                "y": 24,
+                "w": 1200,
+                "h": 36
+              },
+              "runs": [
+                {
+                  "text": "Charts — below and across zero",
+                  "font": "Calibri",
+                  "sizePx": 24.0,
+                  "weight": 700,
+                  "italic": false,
+                  "color": "12233B",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "anchor": "top",
+      "writingMode": "horizontal",
+      "wrap": true,
+      "transformCase": null
+    },
+    {
+      "id": "e2",
+      "kind": "chart",
+      "box": {
+        "x": 40.0,
+        "y": 84.0,
+        "w": 590.0,
+        "h": 250.0
+      },
+      "z": 1,
+      "name": "D bridge crosses zero",
+      "source": {
+        "path": "body > [data-name=D bridge crosses zero]",
+        "tag": "div",
+        "svg": null
+      },
+      "spec": {
+        "type": "waterfall",
+        "categories": [
+          "FY23",
+          "Price",
+          "Volume",
+          "Mix",
+          "Cost out",
+          "FY24"
+        ],
+        "series": [
+          {
+            "name": "EBITDA",
+            "values": [
+              20,
+              -35,
+              10,
+              -8,
+              25,
+              12
+            ]
+          }
+        ],
+        "colors": [
+          "#1E9E5A",
+          "#D64545",
+          "#0B2545"
+        ],
+        "options": {
+          "dataLabels": true,
+          "numberFormat": "0",
+          "gridlines": false,
+          "legend": false,
+          "totals": [
+            0,
+            5
+          ]
+        }
+      },
+      "style": {
+        "font": "Calibri",
+        "sizePx": 11.0,
+        "color": "333333"
+      },
+      "origin": "authored",
+      "confidence": 1.0,
+      "plotRect": null,
+      "overlay": []
+    },
+    {
+      "id": "e3",
+      "kind": "text",
+      "box": {
+        "x": 40.0,
+        "y": 340.0,
+        "w": 590.0,
+        "h": 22.0
+      },
+      "z": 2,
+      "name": "cap1",
+      "source": {
+        "path": "body > [data-name=cap1]",
+        "tag": "div",
+        "svg": null
+      },
+      "paragraphs": [
+        {
+          "align": "left",
+          "lineHeightPx": 22.0,
+          "spaceBeforePx": 0.0,
+          "spaceAfterPx": 0.0,
+          "bullet": null,
+          "lines": [
+            {
+              "box": {
+                "x": 40,
+                "y": 340,
+                "w": 590,
+                "h": 22
+              },
+              "runs": [
+                {
+                  "text": "D · p05-D: a bridge that crosses zero",
+                  "font": "Calibri",
+                  "sizePx": 13.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "516467",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "anchor": "top",
+      "writingMode": "horizontal",
+      "wrap": true,
+      "transformCase": null
+    },
+    {
+      "id": "e4",
+      "kind": "chart",
+      "box": {
+        "x": 650.0,
+        "y": 84.0,
+        "w": 590.0,
+        "h": 250.0
+      },
+      "z": 3,
+      "name": "F negative bar",
+      "source": {
+        "path": "body > [data-name=F negative bar]",
+        "tag": "div",
+        "svg": null
+      },
+      "spec": {
+        "type": "bar",
+        "categories": [
+          "Bear case",
+          "Base case",
+          "Bull case"
+        ],
+        "series": [
+          {
+            "name": "FY2 EPS impact",
+            "values": [
+              -2.0,
+              2.3,
+              6.2
+            ]
+          }
+        ],
+        "colors": [
+          "#0B3D2E"
+        ],
+        "options": {
+          "dataLabels": true,
+          "numberFormat": "0.0\"%\"",
+          "gridlines": false,
+          "legend": false
+        }
+      },
+      "style": {
+        "font": "Calibri",
+        "sizePx": 11.0,
+        "color": "333333"
+      },
+      "origin": "authored",
+      "confidence": 1.0,
+      "plotRect": null,
+      "overlay": []
+    },
+    {
+      "id": "e5",
+      "kind": "text",
+      "box": {
+        "x": 650.0,
+        "y": 340.0,
+        "w": 590.0,
+        "h": 22.0
+      },
+      "z": 4,
+      "name": "cap2",
+      "source": {
+        "path": "body > [data-name=cap2]",
+        "tag": "div",
+        "svg": null
+      },
+      "paragraphs": [
+        {
+          "align": "left",
+          "lineHeightPx": 22.0,
+          "spaceBeforePx": 0.0,
+          "spaceAfterPx": 0.0,
+          "bullet": null,
+          "lines": [
+            {
+              "box": {
+                "x": 650,
+                "y": 340,
+                "w": 590,
+                "h": 22
+              },
+              "runs": [
+                {
+                  "text": "F · p11-B: horizontal bars, one negative",
+                  "font": "Calibri",
+                  "sizePx": 13.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "516467",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "anchor": "top",
+      "writingMode": "horizontal",
+      "wrap": true,
+      "transformCase": null
+    },
+    {
+      "id": "e6",
+      "kind": "chart",
+      "box": {
+        "x": 40.0,
+        "y": 392.0,
+        "w": 386.0,
+        "h": 250.0
+      },
+      "z": 5,
+      "name": "J stacked crossing",
+      "source": {
+        "path": "body > [data-name=J stacked crossing]",
+        "tag": "div",
+        "svg": null
+      },
+      "spec": {
+        "type": "waterfall",
+        "categories": [
+          "FY23",
+          "Q1",
+          "FY24"
+        ],
+        "series": [
+          {
+            "name": "Internal",
+            "values": [
+              30,
+              -25,
+              -10
+            ]
+          },
+          {
+            "name": "Partner",
+            "values": [
+              0,
+              -15,
+              0
+            ]
+          }
+        ],
+        "colors": [
+          "#0B2545",
+          "#1A9AFA"
+        ],
+        "options": {
+          "numberFormat": "0",
+          "gridlines": false,
+          "totals": [
+            0,
+            2
+          ]
+        }
+      },
+      "style": {
+        "font": "Calibri",
+        "sizePx": 11.0,
+        "color": "333333"
+      },
+      "origin": "authored",
+      "confidence": 1.0,
+      "plotRect": null,
+      "overlay": []
+    },
+    {
+      "id": "e7",
+      "kind": "text",
+      "box": {
+        "x": 40.0,
+        "y": 648.0,
+        "w": 386.0,
+        "h": 22.0
+      },
+      "z": 6,
+      "name": "cap3",
+      "source": {
+        "path": "body > [data-name=cap3]",
+        "tag": "div",
+        "svg": null
+      },
+      "paragraphs": [
+        {
+          "align": "left",
+          "lineHeightPx": 22.0,
+          "spaceBeforePx": 0.0,
+          "spaceAfterPx": 0.0,
+          "bullet": null,
+          "lines": [
+            {
+              "box": {
+                "x": 40,
+                "y": 648,
+                "w": 386,
+                "h": 22
+              },
+              "runs": [
+                {
+                  "text": "J · stacked, a bar across zero",
+                  "font": "Calibri",
+                  "sizePx": 13.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "516467",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "anchor": "top",
+      "writingMode": "horizontal",
+      "wrap": true,
+      "transformCase": null
+    },
+    {
+      "id": "e8",
+      "kind": "chart",
+      "box": {
+        "x": 447.0,
+        "y": 392.0,
+        "w": 386.0,
+        "h": 250.0
+      },
+      "z": 7,
+      "name": "K below zero",
+      "source": {
+        "path": "body > [data-name=K below zero]",
+        "tag": "div",
+        "svg": null
+      },
+      "spec": {
+        "type": "waterfall",
+        "categories": [
+          "FY23",
+          "Opex",
+          "FY24"
+        ],
+        "series": [
+          {
+            "name": "EBIT",
+            "values": [
+              -20,
+              -10,
+              -30
+            ]
+          }
+        ],
+        "options": {
+          "numberFormat": "0",
+          "gridlines": false,
+          "legend": false,
+          "totals": [
+            0,
+            2
+          ]
+        }
+      },
+      "style": {
+        "font": "Calibri",
+        "sizePx": 11.0,
+        "color": "333333"
+      },
+      "origin": "authored",
+      "confidence": 1.0,
+      "plotRect": null,
+      "overlay": []
+    },
+    {
+      "id": "e9",
+      "kind": "text",
+      "box": {
+        "x": 447.0,
+        "y": 648.0,
+        "w": 386.0,
+        "h": 22.0
+      },
+      "z": 8,
+      "name": "cap4",
+      "source": {
+        "path": "body > [data-name=cap4]",
+        "tag": "div",
+        "svg": null
+      },
+      "paragraphs": [
+        {
+          "align": "left",
+          "lineHeightPx": 22.0,
+          "spaceBeforePx": 0.0,
+          "spaceAfterPx": 0.0,
+          "bullet": null,
+          "lines": [
+            {
+              "box": {
+                "x": 447,
+                "y": 648,
+                "w": 386,
+                "h": 22
+              },
+              "runs": [
+                {
+                  "text": "K · entirely below zero",
+                  "font": "Calibri",
+                  "sizePx": 13.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "516467",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "anchor": "top",
+      "writingMode": "horizontal",
+      "wrap": true,
+      "transformCase": null
+    },
+    {
+      "id": "e10",
+      "kind": "chart",
+      "box": {
+        "x": 854.0,
+        "y": 392.0,
+        "w": 386.0,
+        "h": 250.0
+      },
+      "z": 9,
+      "name": "L zero step",
+      "source": {
+        "path": "body > [data-name=L zero step]",
+        "tag": "div",
+        "svg": null
+      },
+      "spec": {
+        "type": "waterfall",
+        "categories": [
+          "Start",
+          "Flat",
+          "Fall",
+          "Rise"
+        ],
+        "series": [
+          {
+            "name": "Cash",
+            "values": [
+              20,
+              0,
+              -20,
+              5
+            ]
+          }
+        ],
+        "options": {
+          "gridlines": false,
+          "legend": false,
+          "totals": [
+            0
+          ]
+        }
+      },
+      "style": {
+        "font": "Calibri",
+        "sizePx": 11.0,
+        "color": "333333"
+      },
+      "origin": "authored",
+      "confidence": 1.0,
+      "plotRect": null,
+      "overlay": []
+    },
+    {
+      "id": "e11",
+      "kind": "text",
+      "box": {
+        "x": 854.0,
+        "y": 648.0,
+        "w": 386.0,
+        "h": 22.0
+      },
+      "z": 10,
+      "name": "cap5",
+      "source": {
+        "path": "body > [data-name=cap5]",
+        "tag": "div",
+        "svg": null
+      },
+      "paragraphs": [
+        {
+          "align": "left",
+          "lineHeightPx": 22.0,
+          "spaceBeforePx": 0.0,
+          "spaceAfterPx": 0.0,
+          "bullet": null,
+          "lines": [
+            {
+              "box": {
+                "x": 854,
+                "y": 648,
+                "w": 386,
+                "h": 22
+              },
+              "runs": [
+                {
+                  "text": "L · a zero step, then landing on zero",
+                  "font": "Calibri",
+                  "sizePx": 13.0,
+                  "weight": 400,
+                  "italic": false,
+                  "color": "516467",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "anchor": "top",
+      "writingMode": "horizontal",
+      "wrap": true,
+      "transformCase": null
+    }
+  ],
+  "diagnostics": []
+}

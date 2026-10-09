@@ -1,0 +1,1186 @@
+{
+  "version": 1,
+  "canvas": {
+    "w": 1280,
+    "h": 720,
+    "pxPerIn": 96
+  },
+  "slide": {
+    "id": "tor_tables",
+    "title": "torture · tables",
+    "layoutId": "layout-07",
+    "notes": null
+  },
+  "fonts": {
+    "forced": {
+      "major": "Calibri Light",
+      "minor": "Calibri"
+    },
+    "used": [
+      "Calibri",
+      "Calibri Light"
+    ],
+    "substituted": []
+  },
+  "groups": [],
+  "elements": [
+    {
+      "id": "e1",
+      "kind": "text",
+      "box": {
+        "x": 48.0,
+        "y": 80.0,
+        "w": 560.0,
+        "h": 22.0
+      },
+      "z": 0,
+      "name": "caption",
+      "source": {
+        "path": "body > [data-name=caption]",
+        "tag": "div",
+        "svg": null
+      },
+      "paragraphs": [
+        {
+          "align": "left",
+          "lineHeightPx": 22.0,
+          "spaceBeforePx": 0.0,
+          "spaceAfterPx": 0.0,
+          "bullet": null,
+          "lines": [
+            {
+              "box": {
+                "x": 48,
+                "y": 80,
+                "w": 300,
+                "h": 22
+              },
+              "runs": [
+                {
+                  "text": "Partners by segment, millions",
+                  "font": "Calibri",
+                  "sizePx": 16.0,
+                  "weight": 700,
+                  "italic": false,
+                  "color": "2E2E38",
+                  "alpha": 1.0,
+                  "underline": false,
+                  "strike": false,
+                  "letterSpacingPx": 0.0,
+                  "baseline": "normal",
+                  "baselineShiftPx": 0.0,
+                  "caps": false,
+                  "href": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "anchor": "top",
+      "writingMode": "horizontal",
+      "wrap": true,
+      "transformCase": null
+    },
+    {
+      "id": "e2",
+      "kind": "table",
+      "box": {
+        "x": 48.0,
+        "y": 112.0,
+        "w": 560.0,
+        "h": 170.0
+      },
+      "z": 1,
+      "name": "segments",
+      "source": {
+        "path": "body > div > table.t1",
+        "tag": "table",
+        "svg": null
+      },
+      "rows": 5,
+      "cols": 4,
+      "colWidthsPx": [
+        130.0,
+        170.0,
+        130.0,
+        130.0
+      ],
+      "rowHeightsPx": [
+        34.0,
+        34.0,
+        34.0,
+        34.0,
+        34.0
+      ],
+      "cells": [
+        {
+          "r": 0,
+          "c": 0,
+          "rowSpan": 1,
+          "colSpan": 2,
+          "fill": {
+            "type": "solid",
+            "color": "2E2E38",
+            "alpha": 1.0
+          },
+          "borders": {
+            "top": null,
+            "right": null,
+            "bottom": {
+              "width": 2.0,
+              "color": "1A9AFA",
+              "dash": "solid"
+            },
+            "left": null
+          },
+          "paddingPx": {
+            "t": 7,
+            "r": 10,
+            "b": 7,
+            "l": 10
+          },
+          "valign": "top",
+          "paragraphs": [
+            {
+              "align": "left",
+              "lineHeightPx": 20.0,
+              "spaceBeforePx": 0.0,
+              "spaceAfterPx": 0.0,
+              "bullet": null,
+              "lines": [
+                {
+                  "box": {
+                    "x": 0,
+                    "y": 0,
+                    "w": 100,
+                    "h": 20
+                  },
+                  "runs": [
+                    {
+                      "text": "Market",
+                      "font": "Calibri",
+                      "sizePx": 15.0,
+                      "weight": 700,
+                      "italic": false,
+                      "color": "FFFFFF",
+                      "alpha": 1.0,
+                      "underline": false,
+                      "strike": false,
+                      "letterSpacingPx": 0.0,
+                      "baseline": "normal",
+                      "baselineShiftPx": 0.0,
+                      "caps": false,
+                      "href": null
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "r": 0,
+          "c": 2,
+          "rowSpan": 1,
+          "colSpan": 1,
+          "fill": {
+            "type": "solid",
+            "color": "2E2E38",
+            "alpha": 1.0
+          },
+          "borders": {
+            "top": null,
+            "right": null,
+            "bottom": {
+              "width": 2.0,
+              "color": "1A9AFA",
+              "dash": "solid"
+            },
+            "left": null
+          },
+          "paddingPx": {
+            "t": 7,
+            "r": 10,
+            "b": 7,
+            "l": 10
+          },
+          "valign": "top",
+          "paragraphs": [
+            {
+              "align": "right",
+              "lineHeightPx": 20.0,
+              "spaceBeforePx": 0.0,
+              "spaceAfterPx": 0.0,
+              "bullet": null,
+              "lines": [
+                {
+                  "box": {
+                    "x": 0,
+                    "y": 0,
+                    "w": 100,
+                    "h": 20
+                  },
+                  "runs": [
+                    {
+                      "text": "2023",
+                      "font": "Calibri",
+                      "sizePx": 15.0,
+                      "weight": 700,
+                      "italic": false,
+                      "color": "FFFFFF",
+                      "alpha": 1.0,
+                      "underline": false,
+                      "strike": false,
+                      "letterSpacingPx": 0.0,
+                      "baseline": "normal",
+                      "baselineShiftPx": 0.0,
+                      "caps": false,
+                      "href": null
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "r": 0,
+          "c": 3,
+          "rowSpan": 1,
+          "colSpan": 1,
+          "fill": {
+            "type": "solid",
+            "color": "2E2E38",
+            "alpha": 1.0
+          },
+          "borders": {
+            "top": null,
+            "right": null,
+            "bottom": {
+              "width": 2.0,
+              "color": "1A9AFA",
+              "dash": "solid"
+            },
+            "left": null
+          },
+          "paddingPx": {
+            "t": 7,
+            "r": 10,
+            "b": 7,
+            "l": 10
+          },
+          "valign": "top",
+          "paragraphs": [
+            {
+              "align": "right",
+              "lineHeightPx": 20.0,
+              "spaceBeforePx": 0.0,
+              "spaceAfterPx": 0.0,
+              "bullet": null,
+              "lines": [
+                {
+                  "box": {
+                    "x": 0,
+                    "y": 0,
+                    "w": 100,
+                    "h": 20
+                  },
+                  "runs": [
+                    {
+                      "text": "FY27E",
+                      "font": "Calibri",
+                      "sizePx": 15.0,
+                      "weight": 700,
+                      "italic": false,
+                      "color": "FFFFFF",
+                      "alpha": 1.0,
+                      "underline": false,
+                      "strike": false,
+                      "letterSpacingPx": 0.0,
+                      "baseline": "normal",
+                      "baselineShiftPx": 0.0,
+                      "caps": false,
+                      "href": null
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "r": 1,
+          "c": 0,
+          "rowSpan": 2,
+          "colSpan": 1,
+          "fill": {
+            "type": "solid",
+            "color": "F2F8FE",
+            "alpha": 1.0
+          },
+          "borders": {
+            "top": null,
+            "right": {
+              "width": 1.0,
+              "color": "C9DCEB",
+              "dash": "solid"
+            },
+            "bottom": {
+              "width": 1.0,
+              "color": "E6E6EC",
+              "dash": "solid"
+            },
+            "left": null
+          },
+          "paddingPx": {
+            "t": 7,
+            "r": 10,
+            "b": 7,
+            "l": 10
+          },
+          "valign": "middle",
+          "paragraphs": [
+            {
+              "align": "left",
+              "lineHeightPx": 20.0,
+              "spaceBeforePx": 0.0,
+              "spaceAfterPx": 0.0,
+              "bullet": null,
+              "lines": [
+                {
+                  "box": {
+                    "x": 0,
+                    "y": 0,
+                    "w": 100,
+                    "h": 20
+                  },
+                  "runs": [
+                    {
+                      "text": "Partner",
+                      "font": "Calibri",
+                      "sizePx": 15.0,
+                      "weight": 700,
+                      "italic": false,
+                      "color": "2E2E38",
+                      "alpha": 1.0,
+                      "underline": false,
+                      "strike": false,
+                      "letterSpacingPx": 0.0,
+                      "baseline": "normal",
+                      "baselineShiftPx": 0.0,
+                      "caps": false,
+                      "href": null
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "r": 1,
+          "c": 1,
+          "rowSpan": 1,
+          "colSpan": 1,
+          "fill": null,
+          "borders": {
+            "top": null,
+            "right": null,
+            "bottom": {
+              "width": 1.0,
+              "color": "E6E6EC",
+              "dash": "solid"
+            },
+            "left": null
+          },
+          "paddingPx": {
+            "t": 7,
+            "r": 10,
+            "b": 7,
+            "l": 10
+          },
+          "valign": "top",
+          "paragraphs": [
+            {
+              "align": "left",
+              "lineHeightPx": 20.0,
+              "spaceBeforePx": 0.0,
+              "spaceAfterPx": 0.0,
+              "bullet": null,
+              "lines": [
+                {
+                  "box": {
+                    "x": 0,
+                    "y": 0,
+                    "w": 100,
+                    "h": 20
+                  },
+                  "runs": [
+                    {
+                      "text": "Upsell and referred customers",
+                      "font": "Calibri",
+                      "sizePx": 15.0,
+                      "weight": 400,
+                      "italic": false,
+                      "color": "2E2E38",
+                      "alpha": 1.0,
+                      "underline": false,
+                      "strike": false,
+                      "letterSpacingPx": 0.0,
+                      "baseline": "normal",
+                      "baselineShiftPx": 0.0,
+                      "caps": false,
+                      "href": null
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "r": 1,
+          "c": 2,
+          "rowSpan": 1,
+          "colSpan": 1,
+          "fill": null,
+          "borders": {
+            "top": null,
+            "right": null,
+            "bottom": {
+              "width": 1.0,
+              "color": "E6E6EC",
+              "dash": "solid"
+            },
+            "left": null
+          },
+          "paddingPx": {
+            "t": 7,
+            "r": 10,
+            "b": 7,
+            "l": 10
+          },
+          "valign": "top",
+          "paragraphs": [
+            {
+              "align": "right",
+              "lineHeightPx": 20.0,
+              "spaceBeforePx": 0.0,
+              "spaceAfterPx": 0.0,
+              "bullet": null,
+              "lines": [
+                {
+                  "box": {
+                    "x": 0,
+                    "y": 0,
+                    "w": 100,
+                    "h": 20
+                  },
+                  "runs": [
+                    {
+                      "text": "12.4",
+                      "font": "Calibri",
+                      "sizePx": 15.0,
+                      "weight": 400,
+                      "italic": false,
+                      "color": "2E2E38",
+                      "alpha": 1.0,
+                      "underline": false,
+                      "strike": false,
+                      "letterSpacingPx": 0.0,
+                      "baseline": "normal",
+                      "baselineShiftPx": 0.0,
+                      "caps": false,
+                      "href": null
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "r": 1,
+          "c": 3,
+          "rowSpan": 1,
+          "colSpan": 1,
+          "fill": null,
+          "borders": {
+            "top": null,
+            "right": null,
+            "bottom": {
+              "width": 1.0,
+              "color": "E6E6EC",
+              "dash": "solid"
+            },
+            "left": null
+          },
+          "paddingPx": {
+            "t": 7,
+            "r": 10,
+            "b": 7,
+            "l": 10
+          },
+          "valign": "top",
+          "paragraphs": [
+            {
+              "align": "right",
+              "lineHeightPx": 20.0,
+              "spaceBeforePx": 0.0,
+              "spaceAfterPx": 0.0,
+              "bullet": null,
+              "lines": [
+                {
+                  "box": {
+                    "x": 0,
+                    "y": 0,
+                    "w": 100,
+                    "h": 20
+                  },
+                  "runs": [
+                    {
+                      "text": "31.0",
+                      "font": "Calibri",
+                      "sizePx": 15.0,
+                      "weight": 400,
+                      "italic": false,
+                      "color": "2E2E38",
+                      "alpha": 1.0,
+                      "underline": false,
+                      "strike": false,
+                      "letterSpacingPx": 0.0,
+                      "baseline": "normal",
+                      "baselineShiftPx": 0.0,
+                      "caps": false,
+                      "href": null
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "r": 2,
+          "c": 1,
+          "rowSpan": 1,
+          "colSpan": 1,
+          "fill": null,
+          "borders": {
+            "top": null,
+            "right": null,
+            "bottom": {
+              "width": 1.0,
+              "color": "E6E6EC",
+              "dash": "solid"
+            },
+            "left": null
+          },
+          "paddingPx": {
+            "t": 7,
+            "r": 10,
+            "b": 7,
+            "l": 10
+          },
+          "valign": "top",
+          "paragraphs": [
+            {
+              "align": "left",
+              "lineHeightPx": 20.0,
+              "spaceBeforePx": 0.0,
+              "spaceAfterPx": 0.0,
+              "bullet": null,
+              "lines": [
+                {
+                  "box": {
+                    "x": 0,
+                    "y": 0,
+                    "w": 100,
+                    "h": 20
+                  },
+                  "runs": [
+                    {
+                      "text": "Business and events",
+                      "font": "Calibri",
+                      "sizePx": 15.0,
+                      "weight": 400,
+                      "italic": false,
+                      "color": "2E2E38",
+                      "alpha": 1.0,
+                      "underline": false,
+                      "strike": false,
+                      "letterSpacingPx": 0.0,
+                      "baseline": "normal",
+                      "baselineShiftPx": 0.0,
+                      "caps": false,
+                      "href": null
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "r": 2,
+          "c": 2,
+          "rowSpan": 1,
+          "colSpan": 1,
+          "fill": null,
+          "borders": {
+            "top": null,
+            "right": null,
+            "bottom": {
+              "width": 1.0,
+              "color": "E6E6EC",
+              "dash": "solid"
+            },
+            "left": null
+          },
+          "paddingPx": {
+            "t": 7,
+            "r": 10,
+            "b": 7,
+            "l": 10
+          },
+          "valign": "top",
+          "paragraphs": [
+            {
+              "align": "right",
+              "lineHeightPx": 20.0,
+              "spaceBeforePx": 0.0,
+              "spaceAfterPx": 0.0,
+              "bullet": null,
+              "lines": [
+                {
+                  "box": {
+                    "x": 0,
+                    "y": 0,
+                    "w": 100,
+                    "h": 20
+                  },
+                  "runs": [
+                    {
+                      "text": "8.1",
+                      "font": "Calibri",
+                      "sizePx": 15.0,
+                      "weight": 400,
+                      "italic": false,
+                      "color": "2E2E38",
+                      "alpha": 1.0,
+                      "underline": false,
+                      "strike": false,
+                      "letterSpacingPx": 0.0,
+                      "baseline": "normal",
+                      "baselineShiftPx": 0.0,
+                      "caps": false,
+                      "href": null
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "r": 2,
+          "c": 3,
+          "rowSpan": 1,
+          "colSpan": 1,
+          "fill": null,
+          "borders": {
+            "top": null,
+            "right": null,
+            "bottom": {
+              "width": 1.0,
+              "color": "E6E6EC",
+              "dash": "solid"
+            },
+            "left": null
+          },
+          "paddingPx": {
+            "t": 7,
+            "r": 10,
+            "b": 7,
+            "l": 10
+          },
+          "valign": "top",
+          "paragraphs": [
+            {
+              "align": "right",
+              "lineHeightPx": 20.0,
+              "spaceBeforePx": 0.0,
+              "spaceAfterPx": 0.0,
+              "bullet": null,
+              "lines": [
+                {
+                  "box": {
+                    "x": 0,
+                    "y": 0,
+                    "w": 100,
+                    "h": 20
+                  },
+                  "runs": [
+                    {
+                      "text": "17.5",
+                      "font": "Calibri",
+                      "sizePx": 15.0,
+                      "weight": 400,
+                      "italic": false,
+                      "color": "2E2E38",
+                      "alpha": 1.0,
+                      "underline": false,
+                      "strike": false,
+                      "letterSpacingPx": 0.0,
+                      "baseline": "normal",
+                      "baselineShiftPx": 0.0,
+                      "caps": false,
+                      "href": null
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "r": 3,
+          "c": 0,
+          "rowSpan": 1,
+          "colSpan": 1,
+          "fill": {
+            "type": "solid",
+            "color": "F2F8FE",
+            "alpha": 1.0
+          },
+          "borders": {
+            "top": null,
+            "right": {
+              "width": 1.0,
+              "color": "C9DCEB",
+              "dash": "solid"
+            },
+            "bottom": {
+              "width": 1.0,
+              "color": "E6E6EC",
+              "dash": "solid"
+            },
+            "left": null
+          },
+          "paddingPx": {
+            "t": 7,
+            "r": 10,
+            "b": 7,
+            "l": 10
+          },
+          "valign": "middle",
+          "paragraphs": [
+            {
+              "align": "left",
+              "lineHeightPx": 20.0,
+              "spaceBeforePx": 0.0,
+              "spaceAfterPx": 0.0,
+              "bullet": null,
+              "lines": [
+                {
+                  "box": {
+                    "x": 0,
+                    "y": 0,
+                    "w": 100,
+                    "h": 20
+                  },
+                  "runs": [
+                    {
+                      "text": "Internal",
+                      "font": "Calibri",
+                      "sizePx": 15.0,
+                      "weight": 700,
+                      "italic": false,
+                      "color": "2E2E38",
+                      "alpha": 1.0,
+                      "underline": false,
+                      "strike": false,
+                      "letterSpacingPx": 0.0,
+                      "baseline": "normal",
+                      "baselineShiftPx": 0.0,
+                      "caps": false,
+                      "href": null
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "r": 3,
+          "c": 1,
+          "rowSpan": 1,
+          "colSpan": 1,
+          "fill": null,
+          "borders": {
+            "top": null,
+            "right": null,
+            "bottom": {
+              "width": 1.0,
+              "color": "E6E6EC",
+              "dash": "solid"
+            },
+            "left": null
+          },
+          "paddingPx": {
+            "t": 7,
+            "r": 10,
+            "b": 7,
+            "l": 10
+          },
+          "valign": "top",
+          "paragraphs": [
+            {
+              "align": "left",
+              "lineHeightPx": 20.0,
+              "spaceBeforePx": 0.0,
+              "spaceAfterPx": 0.0,
+              "bullet": null,
+              "lines": [
+                {
+                  "box": {
+                    "x": 0,
+                    "y": 0,
+                    "w": 100,
+                    "h": 20
+                  },
+                  "runs": [
+                    {
+                      "text": "Upsell",
+                      "font": "Calibri",
+                      "sizePx": 15.0,
+                      "weight": 400,
+                      "italic": false,
+                      "color": "2E2E38",
+                      "alpha": 1.0,
+                      "underline": false,
+                      "strike": false,
+                      "letterSpacingPx": 0.0,
+                      "baseline": "normal",
+                      "baselineShiftPx": 0.0,
+                      "caps": false,
+                      "href": null
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "r": 3,
+          "c": 2,
+          "rowSpan": 1,
+          "colSpan": 1,
+          "fill": null,
+          "borders": {
+            "top": null,
+            "right": null,
+            "bottom": {
+              "width": 1.0,
+              "color": "E6E6EC",
+              "dash": "solid"
+            },
+            "left": null
+          },
+          "paddingPx": {
+            "t": 7,
+            "r": 10,
+            "b": 7,
+            "l": 10
+          },
+          "valign": "top",
+          "paragraphs": [
+            {
+              "align": "right",
+              "lineHeightPx": 20.0,
+              "spaceBeforePx": 0.0,
+              "spaceAfterPx": 0.0,
+              "bullet": null,
+              "lines": [
+                {
+                  "box": {
+                    "x": 0,
+                    "y": 0,
+                    "w": 100,
+                    "h": 20
+                  },
+                  "runs": [
+                    {
+                      "text": "51.2",
+                      "font": "Calibri",
+                      "sizePx": 15.0,
+                      "weight": 400,
+                      "italic": false,
+                      "color": "2E2E38",
+                      "alpha": 1.0,
+                      "underline": false,
+                      "strike": false,
+                      "letterSpacingPx": 0.0,
+                      "baseline": "normal",
+                      "baselineShiftPx": 0.0,
+                      "caps": false,
+                      "href": null
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "r": 3,
+          "c": 3,
+          "rowSpan": 1,
+          "colSpan": 1,
+          "fill": null,
+          "borders": {
+            "top": null,
+            "right": null,
+            "bottom": {
+              "width": 1.0,
+              "color": "E6E6EC",
+              "dash": "solid"
+            },
+            "left": null
+          },
+          "paddingPx": {
+            "t": 7,
+            "r": 10,
+            "b": 7,
+            "l": 10
+          },
+          "valign": "top",
+          "paragraphs": [
+            {
+              "align": "right",
+              "lineHeightPx": 20.0,
+              "spaceBeforePx": 0.0,
+              "spaceAfterPx": 0.0,
+              "bullet": null,
+              "lines": [
+                {
+                  "box": {
+                    "x": 0,
+                    "y": 0,
+                    "w": 100,
+                    "h": 20
+                  },
+                  "runs": [
+                    {
+                      "text": "62.0",
+                      "font": "Calibri",
+                      "sizePx": 15.0,
+                      "weight": 400,
+                      "italic": false,
+                      "color": "2E2E38",
+                      "alpha": 1.0,
+                      "underline": false,
+                      "strike": false,
+                      "letterSpacingPx": 0.0,
+                      "baseline": "normal",
+                      "baselineShiftPx": 0.0,
+                      "caps": false,
+                      "href": null
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "r": 4,
+          "c": 1,
+          "rowSpan": 1,
+          "colSpan": 1,
+          "fill": null,
+          "borders": {
+            "top": {
+              "width": 2.0,
+              "color": "2E2E38",
+              "dash": "solid"
+            },
+            "right": null,
+            "bottom": null,
+            "left": null
+          },
+          "paddingPx": {
+            "t": 7,
+            "r": 10,
+            "b": 7,
+            "l": 10
+          },
+          "valign": "bottom",
+          "paragraphs": [
+            {
+              "align": "left",
+              "lineHeightPx": 20.0,
+              "spaceBeforePx": 0.0,
+              "spaceAfterPx": 0.0,
+              "bullet": null,
+              "lines": [
+                {
+                  "box": {
+                    "x": 0,
+                    "y": 0,
+                    "w": 100,
+                    "h": 20
+                  },
+                  "runs": [
+                    {
+                      "text": "Other purposes",
+                      "font": "Calibri",
+                      "sizePx": 15.0,
+                      "weight": 700,
+                      "italic": false,
+                      "color": "2E2E38",
+                      "alpha": 1.0,
+                      "underline": false,
+                      "strike": false,
+                      "letterSpacingPx": 0.0,
+                      "baseline": "normal",
+                      "baselineShiftPx": 0.0,
+                      "caps": false,
+                      "href": null
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "r": 4,
+          "c": 2,
+          "rowSpan": 1,
+          "colSpan": 1,
+          "fill": null,
+          "borders": {
+            "top": {
+              "width": 2.0,
+              "color": "2E2E38",
+              "dash": "solid"
+            },
+            "right": null,
+            "bottom": null,
+            "left": null
+          },
+          "paddingPx": {
+            "t": 7,
+            "r": 10,
+            "b": 7,
+            "l": 10
+          },
+          "valign": "bottom",
+          "paragraphs": [
+            {
+              "align": "right",
+              "lineHeightPx": 20.0,
+              "spaceBeforePx": 0.0,
+              "spaceAfterPx": 0.0,
+              "bullet": null,
+              "lines": [
+                {
+                  "box": {
+                    "x": 0,
+                    "y": 0,
+                    "w": 100,
+                    "h": 20
+                  },
+                  "runs": [
+                    {
+                      "text": "27.8",
+                      "font": "Calibri",
+                      "sizePx": 15.0,
+                      "weight": 700,
+                      "italic": false,
+                      "color": "2E2E38",
+                      "alpha": 1.0,
+                      "underline": false,
+                      "strike": false,
+                      "letterSpacingPx": 0.0,
+                      "baseline": "normal",
+                      "baselineShiftPx": 0.0,
+                      "caps": false,
+                      "href": null
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "r": 4,
+          "c": 3,
+          "rowSpan": 1,
+          "colSpan": 1,
+          "fill": null,
+          "borders": {
+            "top": {
+              "width": 2.0,
+              "color": "2E2E38",
+              "dash": "solid"
+            },
+            "right": null,
+            "bottom": null,
+            "left": null
+          },
+          "paddingPx": {
+            "t": 7,
+            "r": 10,
+            "b": 7,
+            "l": 10
+          },
+          "valign": "bottom",
+          "paragraphs": [
+            {
+              "align": "right",
+              "lineHeightPx": 20.0,
+              "spaceBeforePx": 0.0,
+              "spaceAfterPx": 0.0,
+              "bullet": null,
+              "lines": [
+                {
+                  "box": {
+                    "x": 0,
+                    "y": 0,
+                    "w": 100,
+                    "h": 20
+                  },
+                  "runs": [
+                    {
+                      "text": "18.0",
+                      "font": "Calibri",
+                      "sizePx": 15.0,
+                      "weight": 700,
+                      "italic": false,
+                      "color": "2E2E38",
+                      "alpha": 1.0,
+                      "underline": false,
+                      "strike": false,
+                      "letterSpacingPx": 0.0,
+                      "baseline": "normal",
+                      "baselineShiftPx": 0.0,
+                      "caps": false,
+                      "href": null
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "diagnostics": []
+}

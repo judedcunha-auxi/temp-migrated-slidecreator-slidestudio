@@ -1,0 +1,1552 @@
+{
+  "version": 2,
+  "importer": "deterministic",
+  "sourceHash": "3c67f053c67a47f4c6a20d6bb986ac634ead8bf0d97da2e1bb0760ce8440529b",
+  "slideWidthEmu": 12192000,
+  "slideHeightEmu": 6858000,
+  "canvas": {
+    "w": 1280,
+    "h": 720,
+    "pxPerIn": 96
+  },
+  "masters": [
+    {
+      "index": 0,
+      "name": "master-1",
+      "partName": "/ppt/slideMasters/slideMaster1.xml",
+      "theme": {
+        "colors": {},
+        "fonts": {
+          "major": "Calibri Light",
+          "minor": "Calibri"
+        }
+      }
+    }
+  ],
+  "theme": {
+    "colors": {},
+    "fonts": {
+      "major": "Calibri Light",
+      "minor": "Calibri"
+    }
+  },
+  "textStyles": {},
+  "bullets": [],
+  "layouts": [
+    {
+      "id": "layout-01",
+      "name": "Title Slide",
+      "masterIndex": 0,
+      "layoutIndex": 0,
+      "partName": "/ppt/slideLayouts/slideLayout1.xml",
+      "background": "layout-01.png",
+      "usage": "title + subtitle",
+      "placeholders": [
+        {
+          "type": "ctrTitle",
+          "idx": 0,
+          "name": "Title 1",
+          "x": 72.0,
+          "y": 223.667,
+          "w": 816.0,
+          "h": 154.333,
+          "emu": {
+            "x": 685800,
+            "y": 2130425,
+            "w": 7772400,
+            "h": 1470025
+          },
+          "style": {
+            "font": "+mn-lt",
+            "sizePt": 18,
+            "bold": false,
+            "color": "000000",
+            "align": "left",
+            "anchor": "top",
+            "autofit": "none"
+          }
+        },
+        {
+          "type": "subTitle",
+          "idx": 1,
+          "name": "Subtitle 2",
+          "x": 144.0,
+          "y": 408.0,
+          "w": 672.0,
+          "h": 184.0,
+          "emu": {
+            "x": 1371600,
+            "y": 3886200,
+            "w": 6400800,
+            "h": 1752600
+          },
+          "style": {
+            "font": "+mn-lt",
+            "sizePt": 18,
+            "bold": false,
+            "color": "000000",
+            "align": "left",
+            "anchor": "top",
+            "autofit": "none"
+          }
+        },
+        {
+          "type": "dt",
+          "idx": 10,
+          "name": "Date Placeholder 3",
+          "x": 48.0,
+          "y": 667.333,
+          "w": 224.0,
+          "h": 38.333,
+          "emu": {
+            "x": 457200,
+            "y": 6356350,
+            "w": 2133600,
+            "h": 365125
+          },
+          "style": {
+            "font": "+mn-lt",
+            "sizePt": 18,
+            "bold": false,
+            "color": "000000",
+            "align": "left",
+            "anchor": "top",
+            "autofit": "none"
+          }
+        },
+        {
+          "type": "ftr",
+          "idx": 11,
+          "name": "Footer Placeholder 4",
+          "x": 328.0,
+          "y": 667.333,
+          "w": 304.0,
+          "h": 38.333,
+          "emu": {
+            "x": 3124200,
+            "y": 6356350,
+            "w": 2895600,
+            "h": 365125
+          },
+          "style": {
+            "font": "+mn-lt",
+            "sizePt": 18,
+            "bold": false,
+            "color": "000000",
+            "align": "left",
+            "anchor": "top",
+            "autofit": "none"
+          }
+        },
+        {
+          "type": "sldNum",
+          "idx": 12,
+          "name": "Slide Number Placeholder 5",
+          "x": 688.0,
+          "y": 667.333,
+          "w": 224.0,
+          "h": 38.333,
+          "emu": {
+            "x": 6553200,
+            "y": 6356350,
+            "w": 2133600,
+            "h": 365125
+          },
+          "style": {
+            "font": "+mn-lt",
+            "sizePt": 18,
+            "bold": false,
+            "color": "000000",
+            "align": "left",
+            "anchor": "top",
+            "autofit": "none"
+          }
+        }
+      ]
+    },
+    {
+      "id": "layout-02",
+      "name": "Title and Content",
+      "masterIndex": 0,
+      "layoutIndex": 1,
+      "partName": "/ppt/slideLayouts/slideLayout2.xml",
+      "background": "layout-02.png",
+      "usage": "title + body",
+      "placeholders": [
+        {
+          "type": "title",
+          "idx": 0,
+          "name": "Title 1",
+          "x": 48.0,
+          "y": 28.833,
+          "w": 864.0,
+          "h": 120.0,
+          "emu": {
+            "x": 457200,
+            "y": 274638,
+            "w": 8229600,
+            "h": 1143000
+          },
+          "style": {
+            "font": "+mn-lt",
+            "sizePt": 18,
+            "bold": false,
+            "color": "000000",
+            "align": "left",
+            "anchor": "top",
+            "autofit": "none"
+          }
+        },
+        {
+          "type": "obj",
+          "idx": 1,
+          "name": "Content Placeholder 2",
+          "x": 48.0,
+          "y": 168.0,
+          "w": 864.0,
+          "h": 475.167,
+          "emu": {
+            "x": 457200,
+            "y": 1600200,
+            "w": 8229600,
+            "h": 4525963
+          },
+          "style": {
+            "font": "+mn-lt",
+            "sizePt": 18,
+            "bold": false,
+            "color": "000000",
+            "align": "left",
+            "anchor": "top",
+            "autofit": "none"
+          }
+        },
+        {
+          "type": "dt",
+          "idx": 10,
+          "name": "Date Placeholder 3",
+          "x": 48.0,
+          "y": 667.333,
+          "w": 224.0,
+          "h": 38.333,
+          "emu": {
+            "x": 457200,
+            "y": 6356350,
+            "w": 2133600,
+            "h": 365125
+          },
+          "style": {
+            "font": "+mn-lt",
+            "sizePt": 18,
+            "bold": false,
+            "color": "000000",
+            "align": "left",
+            "anchor": "top",
+            "autofit": "none"
+          }
+        },
+        {
+          "type": "ftr",
+          "idx": 11,
+          "name": "Footer Placeholder 4",
+          "x": 328.0,
+          "y": 667.333,
+          "w": 304.0,
+          "h": 38.333,
+          "emu": {
+            "x": 3124200,
+            "y": 6356350,
+            "w": 2895600,
+            "h": 365125
+          },
+          "style": {
+            "font": "+mn-lt",
+            "sizePt": 18,
+            "bold": false,
+            "color": "000000",
+            "align": "left",
+            "anchor": "top",
+            "autofit": "none"
+          }
+        },
+        {
+          "type": "sldNum",
+          "idx": 12,
+          "name": "Slide Number Placeholder 5",
+          "x": 688.0,
+          "y": 667.333,
+          "w": 224.0,
+          "h": 38.333,
+          "emu": {
+            "x": 6553200,
+            "y": 6356350,
+            "w": 2133600,
+            "h": 365125
+          },
+          "style": {
+            "font": "+mn-lt",
+            "sizePt": 18,
+            "bold": false,
+            "color": "000000",
+            "align": "left",
+            "anchor": "top",
+            "autofit": "none"
+          }
+        }
+      ]
+    },
+    {
+      "id": "layout-03",
+      "name": "Section Header",
+      "masterIndex": 0,
+      "layoutIndex": 2,
+      "partName": "/ppt/slideLayouts/slideLayout3.xml",
+      "background": "layout-03.png",
+      "usage": "title + body",
+      "placeholders": [
+        {
+          "type": "title",
+          "idx": 0,
+          "name": "Title 1",
+          "x": 75.833,
+          "y": 462.667,
+          "w": 816.0,
+          "h": 143.0,
+          "emu": {
+            "x": 722313,
+            "y": 4406900,
+            "w": 7772400,
+            "h": 1362075
+          },
+          "style": {
+            "font": "+mn-lt",
+            "sizePt": 18,
+            "bold": false,
+            "color": "000000",
+            "align": "left",
+            "anchor": "top",
+            "autofit": "none"
+          }
+        },
+        {
+          "type": "body",
+          "idx": 1,
+          "name": "Text Placeholder 2",
+          "x": 75.833,
+          "y": 305.167,
+          "w": 816.0,
+          "h": 157.5,
+          "emu": {
+            "x": 722313,
+            "y": 2906713,
+            "w": 7772400,
+            "h": 1500187
+          },
+          "style": {
+            "font": "+mn-lt",
+            "sizePt": 18,
+            "bold": false,
+            "color": "000000",
+            "align": "left",
+            "anchor": "top",
+            "autofit": "none"
+          }
+        },
+        {
+          "type": "dt",
+          "idx": 10,
+          "name": "Date Placeholder 3",
+          "x": 48.0,
+          "y": 667.333,
+          "w": 224.0,
+          "h": 38.333,
+          "emu": {
+            "x": 457200,
+            "y": 6356350,
+            "w": 2133600,
+            "h": 365125
+          },
+          "style": {
+            "font": "+mn-lt",
+            "sizePt": 18,
+            "bold": false,
+            "color": "000000",
+            "align": "left",
+            "anchor": "top",
+            "autofit": "none"
+          }
+        },
+        {
+          "type": "ftr",
+          "idx": 11,
+          "name": "Footer Placeholder 4",
+          "x": 328.0,
+          "y": 667.333,
+          "w": 304.0,
+          "h": 38.333,
+          "emu": {
+            "x": 3124200,
+            "y": 6356350,
+            "w": 2895600,
+            "h": 365125
+          },
+          "style": {
+            "font": "+mn-lt",
+            "sizePt": 18,
+            "bold": false,
+            "color": "000000",
+            "align": "left",
+            "anchor": "top",
+            "autofit": "none"
+          }
+        },
+        {
+          "type": "sldNum",
+          "idx": 12,
+          "name": "Slide Number Placeholder 5",
+          "x": 688.0,
+          "y": 667.333,
+          "w": 224.0,
+          "h": 38.333,
+          "emu": {
+            "x": 6553200,
+            "y": 6356350,
+            "w": 2133600,
+            "h": 365125
+          },
+          "style": {
+            "font": "+mn-lt",
+            "sizePt": 18,
+            "bold": false,
+            "color": "000000",
+            "align": "left",
+            "anchor": "top",
+            "autofit": "none"
+          }
+        }
+      ]
+    },
+    {
+      "id": "layout-04",
+      "name": "Two Content",
+      "masterIndex": 0,
+      "layoutIndex": 3,
+      "partName": "/ppt/slideLayouts/slideLayout4.xml",
+      "background": "layout-04.png",
+      "usage": "title + body",
+      "placeholders": [
+        {
+          "type": "title",
+          "idx": 0,
+          "name": "Title 1",
+          "x": 48.0,
+          "y": 28.833,
+          "w": 864.0,
+          "h": 120.0,
+          "emu": {
+            "x": 457200,
+            "y": 274638,
+            "w": 8229600,
+            "h": 1143000
+          },
+          "style": {
+            "font": "+mn-lt",
+            "sizePt": 18,
+            "bold": false,
+            "color": "000000",
+            "align": "left",
+            "anchor": "top",
+            "autofit": "none"
+          }
+        },
+        {
+          "type": "obj",
+          "idx": 1,
+          "name": "Content Placeholder 2",
+          "x": 48.0,
+          "y": 168.0,
+          "w": 424.0,
+          "h": 475.167,
+          "emu": {
+            "x": 457200,
+            "y": 1600200,
+            "w": 4038600,
+            "h": 4525963
+          },
+          "style": {
+            "font": "+mn-lt",
+            "sizePt": 18,
+            "bold": false,
+            "color": "000000",
+            "align": "left",
+            "anchor": "top",
+            "autofit": "none"
+          }
+        },
+        {
+          "type": "obj",
+          "idx": 2,
+          "name": "Content Placeholder 3",
+          "x": 488.0,
+          "y": 168.0,
+          "w": 424.0,
+          "h": 475.167,
+          "emu": {
+            "x": 4648200,
+            "y": 1600200,
+            "w": 4038600,
+            "h": 4525963
+          },
+          "style": {
+            "font": "+mn-lt",
+            "sizePt": 18,
+            "bold": false,
+            "color": "000000",
+            "align": "left",
+            "anchor": "top",
+            "autofit": "none"
+          }
+        },
+        {
+          "type": "dt",
+          "idx": 10,
+          "name": "Date Placeholder 4",
+          "x": 48.0,
+          "y": 667.333,
+          "w": 224.0,
+          "h": 38.333,
+          "emu": {
+            "x": 457200,
+            "y": 6356350,
+            "w": 2133600,
+            "h": 365125
+          },
+          "style": {
+            "font": "+mn-lt",
+            "sizePt": 18,
+            "bold": false,
+            "color": "000000",
+            "align": "left",
+            "anchor": "top",
+            "autofit": "none"
+          }
+        },
+        {
+          "type": "ftr",
+          "idx": 11,
+          "name": "Footer Placeholder 5",
+          "x": 328.0,
+          "y": 667.333,
+          "w": 304.0,
+          "h": 38.333,
+          "emu": {
+            "x": 3124200,
+            "y": 6356350,
+            "w": 2895600,
+            "h": 365125
+          },
+          "style": {
+            "font": "+mn-lt",
+            "sizePt": 18,
+            "bold": false,
+            "color": "000000",
+            "align": "left",
+            "anchor": "top",
+            "autofit": "none"
+          }
+        },
+        {
+          "type": "sldNum",
+          "idx": 12,
+          "name": "Slide Number Placeholder 6",
+          "x": 688.0,
+          "y": 667.333,
+          "w": 224.0,
+          "h": 38.333,
+          "emu": {
+            "x": 6553200,
+            "y": 6356350,
+            "w": 2133600,
+            "h": 365125
+          },
+          "style": {
+            "font": "+mn-lt",
+            "sizePt": 18,
+            "bold": false,
+            "color": "000000",
+            "align": "left",
+            "anchor": "top",
+            "autofit": "none"
+          }
+        }
+      ]
+    },
+    {
+      "id": "layout-05",
+      "name": "Comparison",
+      "masterIndex": 0,
+      "layoutIndex": 4,
+      "partName": "/ppt/slideLayouts/slideLayout5.xml",
+      "background": "layout-05.png",
+      "usage": "title + body",
+      "placeholders": [
+        {
+          "type": "title",
+          "idx": 0,
+          "name": "Title 1",
+          "x": 48.0,
+          "y": 28.833,
+          "w": 864.0,
+          "h": 120.0,
+          "emu": {
+            "x": 457200,
+            "y": 274638,
+            "w": 8229600,
+            "h": 1143000
+          },
+          "style": {
+            "font": "+mn-lt",
+            "sizePt": 18,
+            "bold": false,
+            "color": "000000",
+            "align": "left",
+            "anchor": "top",
+            "autofit": "none"
+          }
+        },
+        {
+          "type": "body",
+          "idx": 1,
+          "name": "Text Placeholder 2",
+          "x": 48.0,
+          "y": 161.167,
+          "w": 424.167,
+          "h": 67.167,
+          "emu": {
+            "x": 457200,
+            "y": 1535113,
+            "w": 4040188,
+            "h": 639762
+          },
+          "style": {
+            "font": "+mn-lt",
+            "sizePt": 18,
+            "bold": false,
+            "color": "000000",
+            "align": "left",
+            "anchor": "top",
+            "autofit": "none"
+          }
+        },
+        {
+          "type": "obj",
+          "idx": 2,
+          "name": "Content Placeholder 3",
+          "x": 48.0,
+          "y": 228.333,
+          "w": 424.167,
+          "h": 414.833,
+          "emu": {
+            "x": 457200,
+            "y": 2174875,
+            "w": 4040188,
+            "h": 3951288
+          },
+          "style": {
+            "font": "+mn-lt",
+            "sizePt": 18,
+            "bold": false,
+            "color": "000000",
+            "align": "left",
+            "anchor": "top",
+            "autofit": "none"
+          }
+        },
+        {
+          "type": "body",
+          "idx": 3,
+          "name": "Text Placeholder 4",
+          "x": 487.667,
+          "y": 161.167,
+          "w": 424.333,
+          "h": 67.167,
+          "emu": {
+            "x": 4645025,
+            "y": 1535113,
+            "w": 4041775,
+            "h": 639762
+          },
+          "style": {
+            "font": "+mn-lt",
+            "sizePt": 18,
+            "bold": false,
+            "color": "000000",
+            "align": "left",
+            "anchor": "top",
+            "autofit": "none"
+          }
+        },
+        {
+          "type": "obj",
+          "idx": 4,
+          "name": "Content Placeholder 5",
+          "x": 487.667,
+          "y": 228.333,
+          "w": 424.333,
+          "h": 414.833,
+          "emu": {
+            "x": 4645025,
+            "y": 2174875,
+            "w": 4041775,
+            "h": 3951288
+          },
+          "style": {
+            "font": "+mn-lt",
+            "sizePt": 18,
+            "bold": false,
+            "color": "000000",
+            "align": "left",
+            "anchor": "top",
+            "autofit": "none"
+          }
+        },
+        {
+          "type": "dt",
+          "idx": 10,
+          "name": "Date Placeholder 6",
+          "x": 48.0,
+          "y": 667.333,
+          "w": 224.0,
+          "h": 38.333,
+          "emu": {
+            "x": 457200,
+            "y": 6356350,
+            "w": 2133600,
+            "h": 365125
+          },
+          "style": {
+            "font": "+mn-lt",
+            "sizePt": 18,
+            "bold": false,
+            "color": "000000",
+            "align": "left",
+            "anchor": "top",
+            "autofit": "none"
+          }
+        },
+        {
+          "type": "ftr",
+          "idx": 11,
+          "name": "Footer Placeholder 7",
+          "x": 328.0,
+          "y": 667.333,
+          "w": 304.0,
+          "h": 38.333,
+          "emu": {
+            "x": 3124200,
+            "y": 6356350,
+            "w": 2895600,
+            "h": 365125
+          },
+          "style": {
+            "font": "+mn-lt",
+            "sizePt": 18,
+            "bold": false,
+            "color": "000000",
+            "align": "left",
+            "anchor": "top",
+            "autofit": "none"
+          }
+        },
+        {
+          "type": "sldNum",
+          "idx": 12,
+          "name": "Slide Number Placeholder 8",
+          "x": 688.0,
+          "y": 667.333,
+          "w": 224.0,
+          "h": 38.333,
+          "emu": {
+            "x": 6553200,
+            "y": 6356350,
+            "w": 2133600,
+            "h": 365125
+          },
+          "style": {
+            "font": "+mn-lt",
+            "sizePt": 18,
+            "bold": false,
+            "color": "000000",
+            "align": "left",
+            "anchor": "top",
+            "autofit": "none"
+          }
+        }
+      ]
+    },
+    {
+      "id": "layout-06",
+      "name": "Title Only",
+      "masterIndex": 0,
+      "layoutIndex": 5,
+      "partName": "/ppt/slideLayouts/slideLayout6.xml",
+      "background": "layout-06.png",
+      "usage": "title",
+      "placeholders": [
+        {
+          "type": "title",
+          "idx": 0,
+          "name": "Title 1",
+          "x": 48.0,
+          "y": 28.833,
+          "w": 864.0,
+          "h": 120.0,
+          "emu": {
+            "x": 457200,
+            "y": 274638,
+            "w": 8229600,
+            "h": 1143000
+          },
+          "style": {
+            "font": "+mn-lt",
+            "sizePt": 18,
+            "bold": false,
+            "color": "000000",
+            "align": "left",
+            "anchor": "top",
+            "autofit": "none"
+          }
+        },
+        {
+          "type": "dt",
+          "idx": 10,
+          "name": "Date Placeholder 2",
+          "x": 48.0,
+          "y": 667.333,
+          "w": 224.0,
+          "h": 38.333,
+          "emu": {
+            "x": 457200,
+            "y": 6356350,
+            "w": 2133600,
+            "h": 365125
+          },
+          "style": {
+            "font": "+mn-lt",
+            "sizePt": 18,
+            "bold": false,
+            "color": "000000",
+            "align": "left",
+            "anchor": "top",
+            "autofit": "none"
+          }
+        },
+        {
+          "type": "ftr",
+          "idx": 11,
+          "name": "Footer Placeholder 3",
+          "x": 328.0,
+          "y": 667.333,
+          "w": 304.0,
+          "h": 38.333,
+          "emu": {
+            "x": 3124200,
+            "y": 6356350,
+            "w": 2895600,
+            "h": 365125
+          },
+          "style": {
+            "font": "+mn-lt",
+            "sizePt": 18,
+            "bold": false,
+            "color": "000000",
+            "align": "left",
+            "anchor": "top",
+            "autofit": "none"
+          }
+        },
+        {
+          "type": "sldNum",
+          "idx": 12,
+          "name": "Slide Number Placeholder 4",
+          "x": 688.0,
+          "y": 667.333,
+          "w": 224.0,
+          "h": 38.333,
+          "emu": {
+            "x": 6553200,
+            "y": 6356350,
+            "w": 2133600,
+            "h": 365125
+          },
+          "style": {
+            "font": "+mn-lt",
+            "sizePt": 18,
+            "bold": false,
+            "color": "000000",
+            "align": "left",
+            "anchor": "top",
+            "autofit": "none"
+          }
+        }
+      ]
+    },
+    {
+      "id": "layout-07",
+      "name": "Blank",
+      "masterIndex": 0,
+      "layoutIndex": 6,
+      "partName": "/ppt/slideLayouts/slideLayout7.xml",
+      "background": "layout-07.png",
+      "usage": "blank",
+      "placeholders": [
+        {
+          "type": "dt",
+          "idx": 10,
+          "name": "Date Placeholder 1",
+          "x": 48.0,
+          "y": 667.333,
+          "w": 224.0,
+          "h": 38.333,
+          "emu": {
+            "x": 457200,
+            "y": 6356350,
+            "w": 2133600,
+            "h": 365125
+          },
+          "style": {
+            "font": "+mn-lt",
+            "sizePt": 18,
+            "bold": false,
+            "color": "000000",
+            "align": "left",
+            "anchor": "top",
+            "autofit": "none"
+          }
+        },
+        {
+          "type": "ftr",
+          "idx": 11,
+          "name": "Footer Placeholder 2",
+          "x": 328.0,
+          "y": 667.333,
+          "w": 304.0,
+          "h": 38.333,
+          "emu": {
+            "x": 3124200,
+            "y": 6356350,
+            "w": 2895600,
+            "h": 365125
+          },
+          "style": {
+            "font": "+mn-lt",
+            "sizePt": 18,
+            "bold": false,
+            "color": "000000",
+            "align": "left",
+            "anchor": "top",
+            "autofit": "none"
+          }
+        },
+        {
+          "type": "sldNum",
+          "idx": 12,
+          "name": "Slide Number Placeholder 3",
+          "x": 688.0,
+          "y": 667.333,
+          "w": 224.0,
+          "h": 38.333,
+          "emu": {
+            "x": 6553200,
+            "y": 6356350,
+            "w": 2133600,
+            "h": 365125
+          },
+          "style": {
+            "font": "+mn-lt",
+            "sizePt": 18,
+            "bold": false,
+            "color": "000000",
+            "align": "left",
+            "anchor": "top",
+            "autofit": "none"
+          }
+        }
+      ]
+    },
+    {
+      "id": "layout-08",
+      "name": "Content with Caption",
+      "masterIndex": 0,
+      "layoutIndex": 7,
+      "partName": "/ppt/slideLayouts/slideLayout8.xml",
+      "background": "layout-08.png",
+      "usage": "title + body",
+      "placeholders": [
+        {
+          "type": "title",
+          "idx": 0,
+          "name": "Title 1",
+          "x": 48.0,
+          "y": 28.667,
+          "w": 315.833,
+          "h": 122.0,
+          "emu": {
+            "x": 457200,
+            "y": 273050,
+            "w": 3008313,
+            "h": 1162050
+          },
+          "style": {
+            "font": "+mn-lt",
+            "sizePt": 18,
+            "bold": false,
+            "color": "000000",
+            "align": "left",
+            "anchor": "top",
+            "autofit": "none"
+          }
+        },
+        {
+          "type": "obj",
+          "idx": 1,
+          "name": "Content Placeholder 2",
+          "x": 375.333,
+          "y": 28.667,
+          "w": 536.667,
+          "h": 614.5,
+          "emu": {
+            "x": 3575050,
+            "y": 273050,
+            "w": 5111750,
+            "h": 5853113
+          },
+          "style": {
+            "font": "+mn-lt",
+            "sizePt": 18,
+            "bold": false,
+            "color": "000000",
+            "align": "left",
+            "anchor": "top",
+            "autofit": "none"
+          }
+        },
+        {
+          "type": "body",
+          "idx": 2,
+          "name": "Text Placeholder 3",
+          "x": 48.0,
+          "y": 150.667,
+          "w": 315.833,
+          "h": 492.5,
+          "emu": {
+            "x": 457200,
+            "y": 1435100,
+            "w": 3008313,
+            "h": 4691063
+          },
+          "style": {
+            "font": "+mn-lt",
+            "sizePt": 18,
+            "bold": false,
+            "color": "000000",
+            "align": "left",
+            "anchor": "top",
+            "autofit": "none"
+          }
+        },
+        {
+          "type": "dt",
+          "idx": 10,
+          "name": "Date Placeholder 4",
+          "x": 48.0,
+          "y": 667.333,
+          "w": 224.0,
+          "h": 38.333,
+          "emu": {
+            "x": 457200,
+            "y": 6356350,
+            "w": 2133600,
+            "h": 365125
+          },
+          "style": {
+            "font": "+mn-lt",
+            "sizePt": 18,
+            "bold": false,
+            "color": "000000",
+            "align": "left",
+            "anchor": "top",
+            "autofit": "none"
+          }
+        },
+        {
+          "type": "ftr",
+          "idx": 11,
+          "name": "Footer Placeholder 5",
+          "x": 328.0,
+          "y": 667.333,
+          "w": 304.0,
+          "h": 38.333,
+          "emu": {
+            "x": 3124200,
+            "y": 6356350,
+            "w": 2895600,
+            "h": 365125
+          },
+          "style": {
+            "font": "+mn-lt",
+            "sizePt": 18,
+            "bold": false,
+            "color": "000000",
+            "align": "left",
+            "anchor": "top",
+            "autofit": "none"
+          }
+        },
+        {
+          "type": "sldNum",
+          "idx": 12,
+          "name": "Slide Number Placeholder 6",
+          "x": 688.0,
+          "y": 667.333,
+          "w": 224.0,
+          "h": 38.333,
+          "emu": {
+            "x": 6553200,
+            "y": 6356350,
+            "w": 2133600,
+            "h": 365125
+          },
+          "style": {
+            "font": "+mn-lt",
+            "sizePt": 18,
+            "bold": false,
+            "color": "000000",
+            "align": "left",
+            "anchor": "top",
+            "autofit": "none"
+          }
+        }
+      ]
+    },
+    {
+      "id": "layout-09",
+      "name": "Picture with Caption",
+      "masterIndex": 0,
+      "layoutIndex": 8,
+      "partName": "/ppt/slideLayouts/slideLayout9.xml",
+      "background": "layout-09.png",
+      "usage": "title + body + picture",
+      "placeholders": [
+        {
+          "type": "title",
+          "idx": 0,
+          "name": "Title 1",
+          "x": 188.167,
+          "y": 504.0,
+          "w": 576.0,
+          "h": 59.5,
+          "emu": {
+            "x": 1792288,
+            "y": 4800600,
+            "w": 5486400,
+            "h": 566738
+          },
+          "style": {
+            "font": "+mn-lt",
+            "sizePt": 18,
+            "bold": false,
+            "color": "000000",
+            "align": "left",
+            "anchor": "top",
+            "autofit": "none"
+          }
+        },
+        {
+          "type": "pic",
+          "idx": 1,
+          "name": "Picture Placeholder 2",
+          "x": 188.167,
+          "y": 64.333,
+          "w": 576.0,
+          "h": 432.0,
+          "emu": {
+            "x": 1792288,
+            "y": 612775,
+            "w": 5486400,
+            "h": 4114800
+          },
+          "style": {
+            "font": "+mn-lt",
+            "sizePt": 18,
+            "bold": false,
+            "color": "000000",
+            "align": "left",
+            "anchor": "top",
+            "autofit": "none"
+          }
+        },
+        {
+          "type": "body",
+          "idx": 2,
+          "name": "Text Placeholder 3",
+          "x": 188.167,
+          "y": 563.5,
+          "w": 576.0,
+          "h": 84.5,
+          "emu": {
+            "x": 1792288,
+            "y": 5367338,
+            "w": 5486400,
+            "h": 804862
+          },
+          "style": {
+            "font": "+mn-lt",
+            "sizePt": 18,
+            "bold": false,
+            "color": "000000",
+            "align": "left",
+            "anchor": "top",
+            "autofit": "none"
+          }
+        },
+        {
+          "type": "dt",
+          "idx": 10,
+          "name": "Date Placeholder 4",
+          "x": 48.0,
+          "y": 667.333,
+          "w": 224.0,
+          "h": 38.333,
+          "emu": {
+            "x": 457200,
+            "y": 6356350,
+            "w": 2133600,
+            "h": 365125
+          },
+          "style": {
+            "font": "+mn-lt",
+            "sizePt": 18,
+            "bold": false,
+            "color": "000000",
+            "align": "left",
+            "anchor": "top",
+            "autofit": "none"
+          }
+        },
+        {
+          "type": "ftr",
+          "idx": 11,
+          "name": "Footer Placeholder 5",
+          "x": 328.0,
+          "y": 667.333,
+          "w": 304.0,
+          "h": 38.333,
+          "emu": {
+            "x": 3124200,
+            "y": 6356350,
+            "w": 2895600,
+            "h": 365125
+          },
+          "style": {
+            "font": "+mn-lt",
+            "sizePt": 18,
+            "bold": false,
+            "color": "000000",
+            "align": "left",
+            "anchor": "top",
+            "autofit": "none"
+          }
+        },
+        {
+          "type": "sldNum",
+          "idx": 12,
+          "name": "Slide Number Placeholder 6",
+          "x": 688.0,
+          "y": 667.333,
+          "w": 224.0,
+          "h": 38.333,
+          "emu": {
+            "x": 6553200,
+            "y": 6356350,
+            "w": 2133600,
+            "h": 365125
+          },
+          "style": {
+            "font": "+mn-lt",
+            "sizePt": 18,
+            "bold": false,
+            "color": "000000",
+            "align": "left",
+            "anchor": "top",
+            "autofit": "none"
+          }
+        }
+      ]
+    },
+    {
+      "id": "layout-10",
+      "name": "Title and Vertical Text",
+      "masterIndex": 0,
+      "layoutIndex": 9,
+      "partName": "/ppt/slideLayouts/slideLayout10.xml",
+      "background": "layout-10.png",
+      "usage": "title + body",
+      "placeholders": [
+        {
+          "type": "title",
+          "idx": 0,
+          "name": "Title 1",
+          "x": 48.0,
+          "y": 28.833,
+          "w": 864.0,
+          "h": 120.0,
+          "emu": {
+            "x": 457200,
+            "y": 274638,
+            "w": 8229600,
+            "h": 1143000
+          },
+          "style": {
+            "font": "+mn-lt",
+            "sizePt": 18,
+            "bold": false,
+            "color": "000000",
+            "align": "left",
+            "anchor": "top",
+            "autofit": "none"
+          }
+        },
+        {
+          "type": "body",
+          "idx": 1,
+          "name": "Vertical Text Placeholder 2",
+          "x": 48.0,
+          "y": 168.0,
+          "w": 864.0,
+          "h": 475.167,
+          "emu": {
+            "x": 457200,
+            "y": 1600200,
+            "w": 8229600,
+            "h": 4525963
+          },
+          "style": {
+            "font": "+mn-lt",
+            "sizePt": 18,
+            "bold": false,
+            "color": "000000",
+            "align": "left",
+            "anchor": "top",
+            "autofit": "none"
+          }
+        },
+        {
+          "type": "dt",
+          "idx": 10,
+          "name": "Date Placeholder 3",
+          "x": 48.0,
+          "y": 667.333,
+          "w": 224.0,
+          "h": 38.333,
+          "emu": {
+            "x": 457200,
+            "y": 6356350,
+            "w": 2133600,
+            "h": 365125
+          },
+          "style": {
+            "font": "+mn-lt",
+            "sizePt": 18,
+            "bold": false,
+            "color": "000000",
+            "align": "left",
+            "anchor": "top",
+            "autofit": "none"
+          }
+        },
+        {
+          "type": "ftr",
+          "idx": 11,
+          "name": "Footer Placeholder 4",
+          "x": 328.0,
+          "y": 667.333,
+          "w": 304.0,
+          "h": 38.333,
+          "emu": {
+            "x": 3124200,
+            "y": 6356350,
+            "w": 2895600,
+            "h": 365125
+          },
+          "style": {
+            "font": "+mn-lt",
+            "sizePt": 18,
+            "bold": false,
+            "color": "000000",
+            "align": "left",
+            "anchor": "top",
+            "autofit": "none"
+          }
+        },
+        {
+          "type": "sldNum",
+          "idx": 12,
+          "name": "Slide Number Placeholder 5",
+          "x": 688.0,
+          "y": 667.333,
+          "w": 224.0,
+          "h": 38.333,
+          "emu": {
+            "x": 6553200,
+            "y": 6356350,
+            "w": 2133600,
+            "h": 365125
+          },
+          "style": {
+            "font": "+mn-lt",
+            "sizePt": 18,
+            "bold": false,
+            "color": "000000",
+            "align": "left",
+            "anchor": "top",
+            "autofit": "none"
+          }
+        }
+      ]
+    },
+    {
+      "id": "layout-11",
+      "name": "Vertical Title and Text",
+      "masterIndex": 0,
+      "layoutIndex": 10,
+      "partName": "/ppt/slideLayouts/slideLayout11.xml",
+      "background": "layout-11.png",
+      "usage": "title + body",
+      "placeholders": [
+        {
+          "type": "title",
+          "idx": 0,
+          "name": "Vertical Title 1",
+          "x": 696.0,
+          "y": 28.833,
+          "w": 216.0,
+          "h": 614.333,
+          "emu": {
+            "x": 6629400,
+            "y": 274638,
+            "w": 2057400,
+            "h": 5851525
+          },
+          "style": {
+            "font": "+mn-lt",
+            "sizePt": 18,
+            "bold": false,
+            "color": "000000",
+            "align": "left",
+            "anchor": "top",
+            "autofit": "none"
+          }
+        },
+        {
+          "type": "body",
+          "idx": 1,
+          "name": "Vertical Text Placeholder 2",
+          "x": 48.0,
+          "y": 28.833,
+          "w": 632.0,
+          "h": 614.333,
+          "emu": {
+            "x": 457200,
+            "y": 274638,
+            "w": 6019800,
+            "h": 5851525
+          },
+          "style": {
+            "font": "+mn-lt",
+            "sizePt": 18,
+            "bold": false,
+            "color": "000000",
+            "align": "left",
+            "anchor": "top",
+            "autofit": "none"
+          }
+        },
+        {
+          "type": "dt",
+          "idx": 10,
+          "name": "Date Placeholder 3",
+          "x": 48.0,
+          "y": 667.333,
+          "w": 224.0,
+          "h": 38.333,
+          "emu": {
+            "x": 457200,
+            "y": 6356350,
+            "w": 2133600,
+            "h": 365125
+          },
+          "style": {
+            "font": "+mn-lt",
+            "sizePt": 18,
+            "bold": false,
+            "color": "000000",
+            "align": "left",
+            "anchor": "top",
+            "autofit": "none"
+          }
+        },
+        {
+          "type": "ftr",
+          "idx": 11,
+          "name": "Footer Placeholder 4",
+          "x": 328.0,
+          "y": 667.333,
+          "w": 304.0,
+          "h": 38.333,
+          "emu": {
+            "x": 3124200,
+            "y": 6356350,
+            "w": 2895600,
+            "h": 365125
+          },
+          "style": {
+            "font": "+mn-lt",
+            "sizePt": 18,
+            "bold": false,
+            "color": "000000",
+            "align": "left",
+            "anchor": "top",
+            "autofit": "none"
+          }
+        },
+        {
+          "type": "sldNum",
+          "idx": 12,
+          "name": "Slide Number Placeholder 5",
+          "x": 688.0,
+          "y": 667.333,
+          "w": 224.0,
+          "h": 38.333,
+          "emu": {
+            "x": 6553200,
+            "y": 6356350,
+            "w": 2133600,
+            "h": 365125
+          },
+          "style": {
+            "font": "+mn-lt",
+            "sizePt": 18,
+            "bold": false,
+            "color": "000000",
+            "align": "left",
+            "anchor": "top",
+            "autofit": "none"
+          }
+        }
+      ]
+    }
+  ],
+  "assets": [],
+  "designNotes": "Generated from python-pptx's default template for the torture suite."
+}

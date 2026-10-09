@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<!--
+  Torture fixture: the `charts` family (WP3a). One `data-chart` per option group the emitter
+  supports, on the 16 × 9 test master's Blank layout (1280 × 720 px canvas, 1 px = 1/96 in).
+
+  Every chart here is a type PptxRender can draw, so the gate's reference and the export compare
+  like for like; the types it cannot draw (pie_of_pie / bar_of_pie, and the Path-A-unsupported
+  bubble / radar / stock / surface) are deliberately absent. Numbers are small and exact so the
+  embedded workbook can be compared with the spec digit for digit.
+
+  Paired with `charts.expect.json` (counts) and `ir/charts.json` (the same eight specs as a
+  hand-written IR, so WP4 can emit before WP1 lands). `engine/tests/test_charts_emit.py` asserts the
+  two files carry the same specs — a fixture that drifts from its IR tests nothing.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Charts — torture fixture</title>
+<style>
+  html, body {
+    margin: 0;
+    width: 1280px;
+    height: 720px;
+    overflow: hidden;
+    background: transparent;
+    font-family: Calibri, Arial, sans-serif;
+    color: #2E2E38;
+  }
+  h1 {
+    position: absolute;
+    left: 40px; top: 28px; width: 1200px; height: 40px;
+    margin: 0;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 40px;
+    color: #12233B;
+  }
+  .chart { position: absolute; }
+  .cap {
+    position: absolute;
+    height: 22px;
+    font-size: 13px;
+    line-height: 22px;
+    color: #516467;
+  }
+</style>
+</head>
+<body>
+
+<h1 data-placeholder="title">Native charts — every option the emitter supports</h1>
+
+<div class="chart" data-name="Stacked column with a gap slot"
+     style="left:40px;top:90px;width:285px;height:220px"
+     data-chart='{
+       "type": "column_stacked",
+       "categories": ["FY20", "FY21", "FY22", "FY23", "", "FY27E"],
+       "series": [{"name": "Internal", "values": [40, 52, 57, 71, null, 88]},
+                  {"name": "Partner", "values": [12, 9, 21, 18, null, 55]}],
+       "colors": ["#B9C7C9", "#1A9AFB"],
+       "options": {"dataLabels": true, "labelPosition": "inEnd", "numberFormat": "0",
+                   "gridlines": false, "legend": false, "gapWidth": 60,
+                   "valueAxis": {"min": 0, "max": 160, "majorUnit": 40, "visible": true},
+                   "categoryAxis": {"visible": true},
+                   "plotArea": {"x": 0.08, "y": 0.05, "w": 0.9, "h": 0.78},
+                   "referenceLines": [{"value": 90, "color": "#516467", "dash": [4, 3],
+                                       "label": "90k goal"}],
+                   "pointColors": {"1": {"5": "#7FC6FF"}}}
+     }'></div>
+<div class="cap" style="left:40px;top:316px;width:285px">Gap slot, reference line, point colour</div>
+
+<div class="chart" data-name="Waterfall"
+     style="left:345px;top:90px;width:285px;height:220px"
+     data-chart='{
+       "type": "waterfall",
+       "categories": ["2023", "Partner", "Internal", "Leakage", "", "2030"],
+       "series": [{"name": "Partners", "values": [300, 120, -45, 215, null, 590]}],
+       "colors": ["#1A9AFB", "#E4573D", "#516467"],
+       "options": {"numberFormat": "0", "legend": false, "gapWidth": 40,
+                   "totals": [0, 5],
+                   "connectors": {"color": "#8A9699", "width": 0.75, "dash": [3, 2]},
+                   "valueAxis": {"min": 0, "max": 600, "majorUnit": 200},
+                   "plotArea": {"x": 0.1, "y": 0.06, "w": 0.86, "h": 0.76}}
+     }'></div>
+<div class="cap" style="left:345px;top:316px;width:285px">Floating bars, signed steps, connectors</div>
+
+<div class="chart" data-name="Doughnut"
+     style="left:650px;top:90px;width:285px;height:220px"
+     data-chart='{
+       "type": "doughnut",
+       "categories": ["Upsell", "Business", "Referral"],
+       "series": [{"name": "Share", "values": [61, 27, 12]}],
+       "colors": ["#1A9AFB", "#B9C7C9", "#516467"],
+       "options": {"holeSize": 62, "dataLabels": true, "numberFormat": "0\"%\"",
+                   "legend": "topRight", "fontSize": 11}
+     }'></div>
+<div class="cap" style="left:650px;top:316px;width:285px">Hole size, per-slice colours, legend</div>
+
+<div class="chart" data-name="Line with markers"
+     style="left:955px;top:90px;width:285px;height:220px"
+     data-chart='{
+       "type": "line_markers",
+       "categories": ["Q1", "Q2", "Q3", "Q4"],
+       "series": [{"name": "Actual", "values": [12, 15, 14, 19], "lineWidth": 2.25},
+                  {"name": "Plan", "values": [11, 13, 16, 18], "dash": [6, 3], "lineWidth": 1.5}],
+       "colors": ["#1A9AFB", "#B9C7C9"],
+       "options": {"markers": "circle", "markerSize": 6, "smooth": false,
+                   "dataLabels": [true, false], "labelPosition": "above",
+                   "gridlines": {"color": "#E4E9F0", "width": 0.75, "dash": "sysDash"},
+                   "valueAxis": {"min": 0, "max": 20, "majorUnit": 5, "title": "Orders (k)"},
+                   "legend": "bottom"}
+     }'></div>
+<div class="cap" style="left:955px;top:316px;width:285px">Markers, per-series dash, gridlines, axis title</div>
+
+<div class="chart" data-name="Bar with a reversed category axis"
+     style="left:40px;top:380px;width:285px;height:220px"
+     data-chart='{
+       "type": "bar",
+       "categories": ["Rail", "Ads", "Road", "Sea"],
+       "series": [{"name": "2023", "values": [29, 24, 17, 9]}],
+       "colors": ["#1A9AFB"],
+       "options": {"dataLabels": true, "labelPosition": "outEnd", "labelFormat": "0.0",
+                   "gapWidth": 40, "overlap": 0, "legend": false,
+                   "categoryAxis": {"reverse": true},
+                   "valueAxis": {"min": 0, "max": 40, "majorUnit": 10, "visible": false},
+                   "referenceLines": [{"value": 25, "color": "#E4573D", "dash": "dash"}]}
+     }'></div>
+<div class="cap" style="left:40px;top:606px;width:285px">Horizontal value axis, reversed categories</div>
+
+<div class="chart" data-name="Stacked area"
+     style="left:345px;top:380px;width:285px;height:220px"
+     data-chart='{
+       "type": "area_stacked",
+       "categories": ["2021", "2022", "2023", "2024"],
+       "series": [{"name": "Internal", "values": [36, 41, 47, 55]},
+                  {"name": "Partner", "values": [10, 15, 22, 27]}],
+       "colors": ["#B9C7C9", "#1A9AFB"],
+       "options": {"dataLabels": false, "legend": "bottom", "gridlines": true,
+                   "font": "Calibri", "fontSize": 11, "fontColor": "#516467",
+                   "valueAxis": {"min": 0, "max": 100, "majorUnit": 25}}
+     }'></div>
+<div class="cap" style="left:345px;top:606px;width:285px">Labels off, legend, chart font and colour</div>
+
+<div class="chart" data-name="Scatter"
+     style="left:650px;top:380px;width:285px;height:220px"
+     data-chart='{
+       "type": "scatter",
+       "series": [{"name": "Cities", "x": [1, 2.5, 4, 5.5], "y": [3, 4.5, 4, 6],
+                   "marker": "circle", "markerSize": 7}],
+       "colors": ["#1A9AFB"],
+       "options": {"dataLabels": true, "labelPosition": "right", "numberFormat": "0.0",
+                   "legend": false,
+                   "valueAxis": {"min": 0, "max": 8, "majorUnit": 2},
+                   "categoryAxis": {"min": 0, "max": 6, "majorUnit": 2}}
+     }'></div>
+<div class="cap" style="left:650px;top:606px;width:285px">XY pairs, marker style, both axes numeric</div>
+
+<div class="chart" data-name="Exploded pie"
+     style="left:955px;top:380px;width:285px;height:220px"
+     data-chart='{
+       "type": "pie_exploded",
+       "categories": ["North", "South", "East", "West"],
+       "series": [{"name": "Mix", "values": [35, 25, 22, 18], "explosion": 8}],
+       "colors": ["#1A9AFB", "#B9C7C9", "#516467", "#7FC6FF"],
+       "options": {"dataLabels": true, "labelPosition": "bestFit", "numberFormat": "0\"%\"",
+                   "legend": false, "varyColors": true, "title": "Regional mix"}
+     }'></div>
+<div class="cap" style="left:955px;top:606px;width:285px">Explosion, vary colours, chart title</div>
+
+<aside class="notes" hidden>Eight authored charts, one per option group WP3a implements.</aside>
+
+</body>
+</html>

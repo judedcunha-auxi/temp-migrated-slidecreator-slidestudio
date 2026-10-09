@@ -1,0 +1,34 @@
+{
+  "family": "svg-charts",
+  "master": "test-16x9",
+  "layoutId": "layout-07",
+  "canvas": {
+    "w": 1280,
+    "h": 720
+  },
+  "kinds": {
+    "shape": 77,
+    "text": 95
+  },
+  "rasterAllowed": [],
+  "charts": {
+    "authored": 0,
+    "recognised": 6
+  },
+  "gateMaxPx2": 754,
+  "notes": [
+    "kinds are the element counts of the extracted IR BEFORE classification; after",
+    "recognise_charts the same IR is {shape: 42, text: 35, chart: 6}.",
+    "9 of the 95 texts are HTML (the slide title and the eight panel headings); the other 86 are",
+    "SVG <text>. Counted by the master brief §11 rule: one text element per maximal run of",
+    "inline-only sibling blocks.",
+    "The six recognised charts are panels A-F: column, column_stacked (with a gap slot), bar,",
+    "waterfall, doughnut, line_markers. Panels G and H must be REFUSED, each with one info",
+    "diagnostic: G has no numbers at all, H has only annotations (FY27E, 350->420k, n/a).",
+    "tests/engine/fixtures/torture/ir/svg-charts.json is the hand-written IR of this page, so WP3c can be",
+    "tested before WP1/WP2 land. Its text boxes use an approximate Arial metric; when WP2 extracts",
+    "this page for real the counts above must still hold and the values in",
+    "tests/engine/classify/test_charts_recognise.py must come out the same.",
+    "gateMaxPx2 754 = max(measured x 1.2, measured + 60) over the measured 628 px2 masked non-chart area on fidelity-w3 (2314d7f), 2026-09-25 (plan §11; Peter #16: measured + 20 %, with the 60 px2 per-slide noise tolerance as the floor). A regression guard, not a target."
+  ]
+}

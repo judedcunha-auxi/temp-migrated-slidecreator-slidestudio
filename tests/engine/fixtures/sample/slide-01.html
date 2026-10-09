@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>sample · growth by channel</title>
+<style>
+html,body{margin:0;width:1280px;height:720px;overflow:hidden;background:transparent;
+  font-family:Arial,Helvetica,sans-serif;color:#2E2E38}
+.title{position:absolute;left:48px;top:36px;width:864px;height:96px}
+.title h1{font-size:28px;font-weight:700;line-height:1.15;margin:0}
+.chip{display:inline-block;font-size:10px;font-weight:700;padding:2px 6px;vertical-align:3px;
+  margin-left:8px;background:#F5C518;color:#2E2E38;letter-spacing:.3px}
+.stand{position:absolute;left:48px;top:140px;width:720px;font-size:15px;line-height:1.4;color:#4A4A55;margin:0}
+.kpi{position:absolute;top:200px;width:220px;height:96px;border-left:3px solid #1A9AFA;padding-left:12px}
+.kpi .n{font-size:30px;font-weight:700;color:#1A9AFA;line-height:1.1}
+.kpi .l{font-size:12px;font-weight:700;margin-top:6px;line-height:1.25}
+.kpi .s{font-size:10px;color:#747480;margin-top:3px;line-height:1.4}
+.panel{position:absolute;top:330px;height:300px}
+.legend{position:absolute;left:720px;top:600px;font-size:11px;color:#4A4A55}
+.legend i{display:inline-block;width:10px;height:10px;margin:0 5px 0 12px;vertical-align:-1px}
+.foot{position:absolute;left:48px;top:660px;width:640px;font-size:9px;color:#747480;margin:0}
+</style></head><body>
+
+<div class="title" data-placeholder="title" data-name="title">
+  <h1>Growth by channel, 2020 to 2024<span class="chip">ILLUSTRATIVE</span></h1>
+</div>
+<p class="stand" data-name="standfirst">Every channel grew, and the partner channel more than doubled its share of
+new revenue over the period.</p>
+
+<div class="kpi" data-name="kpi-1" style="left:48px">
+  <div class="n">42%</div><div class="l">Partner share of new revenue</div><div class="s">Up from 19% in 2020</div>
+</div>
+<div class="kpi" data-name="kpi-2" style="left:320px">
+  <div class="n">3.1x</div><div class="l">Online orders since 2020</div><div class="s">Synthetic figures for tests</div>
+</div>
+<div class="kpi" data-name="kpi-3" style="left:592px">
+  <div class="n">18</div><div class="l">New markets opened</div><div class="s">Across four regions</div>
+</div>
+
+<svg class="panel" data-name="revenue-chart" style="left:48px" width="560" height="300" viewBox="0 0 560 300">
+  <text x="0" y="14" font-size="13" font-weight="700" fill="#2E2E38">Revenue by year, millions</text>
+  <line x1="40" y1="260" x2="540" y2="260" stroke="#C4C4CD" stroke-width="1"/>
+  <rect x="60" y="200" width="60" height="60" fill="#1A9AFA"/>
+  <rect x="160" y="170" width="60" height="90" fill="#1A9AFA"/>
+  <rect x="260" y="140" width="60" height="120" fill="#1A9AFA"/>
+  <rect x="360" y="100" width="60" height="160" fill="#1A9AFA"/>
+  <rect x="460" y="60" width="60" height="200" fill="#1A9AFA"/>
+  <text x="90" y="192" font-size="12" text-anchor="middle" fill="#2E2E38">30</text>
+  <text x="190" y="162" font-size="12" text-anchor="middle" fill="#2E2E38">45</text>
+  <text x="290" y="132" font-size="12" text-anchor="middle" fill="#2E2E38">60</text>
+  <text x="390" y="92" font-size="12" text-anchor="middle" fill="#2E2E38">80</text>
+  <text x="490" y="52" font-size="12" text-anchor="middle" fill="#2E2E38">100</text>
+  <text x="90" y="278" font-size="11" text-anchor="middle" fill="#747480">2020</text>
+  <text x="190" y="278" font-size="11" text-anchor="middle" fill="#747480">2021</text>
+  <text x="290" y="278" font-size="11" text-anchor="middle" fill="#747480">2022</text>
+  <text x="390" y="278" font-size="11" text-anchor="middle" fill="#747480">2023</text>
+  <text x="490" y="278" font-size="11" text-anchor="middle" fill="#747480">2024</text>
+</svg>
+
+<svg class="panel" data-name="share-donut" style="left:720px" width="260" height="260" viewBox="0 0 260 260">
+  <circle cx="130" cy="130" r="90" fill="none" stroke="#E1E1E6" stroke-width="36"/>
+  <circle cx="130" cy="130" r="90" fill="none" stroke="#1A9AFA" stroke-width="36"
+          stroke-dasharray="237.5 565.5" transform="rotate(-90 130 130)"/>
+  <text x="130" y="140" font-size="28" font-weight="700" text-anchor="middle" fill="#2E2E38">42%</text>
+</svg>
+<div class="legend" data-name="legend"><i style="background:#1A9AFA"></i>Partner<i style="background:#E1E1E6"></i>Other channels</div>
+
+<p class="foot" data-name="source">Source: synthetic data generated for the engine tests; no real company is described.</p>
+
+<aside class="notes">The partner channel is the story: lead with its share, then the trend.</aside>
+</body></html>

@@ -1,0 +1,145 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><style>
+/* WP-A (docs/archive/engine/fidelity/10-WPA-tables.md §8.2): everything that can sit in a cell. The harness
+   forces the master's fonts (Arial/Arial), so every line count and wrap here is Arial's. */
+html,body{margin:0;width:1280px;height:720px;overflow:hidden;background:transparent;
+  font-family:Arial,Helvetica,sans-serif;color:#1D2433}
+
+/* Table A: collapsed, a caption above the grid, a tfoot written before the tbody. */
+.ta{position:absolute;left:48px;top:40px;width:1184px;border-collapse:collapse;table-layout:fixed;
+  font-size:11px;line-height:14px;background:#FFFFFF}
+.ta caption{text-align:left;font-size:14px;font-weight:700;line-height:18px;margin-bottom:6px}
+.ta th,.ta td{padding:5px 8px;vertical-align:top;text-align:left;border-bottom:1px solid #D8DDE6}
+.ta th{font-weight:700}
+.ta thead tr{background:#0B2545;color:#FFFFFF;border-bottom:2px solid #1A9AFB}
+.ta tfoot tr{border-top:2px solid #0B2545}
+.ta tfoot td{font-weight:700}
+.ta tbody tr:nth-child(even){background:#F3F5F9}
+.ta tr.hl{background:#DCF5E6}
+.ta tr.tint{background:rgba(11,92,173,.2)}
+.ta tr.dashed{border-bottom:2px dashed #999999}   /* wider than the td rule, so it wins the collapse */
+.ta tr.grad{background:linear-gradient(90deg,#EAF2FF,#FFFFFF)}
+
+.pill{display:inline-block;padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;color:#FFFFFF;background:#1E9E5A}
+.num{display:inline-block;width:18px;height:18px;border-radius:50%;background:#0B5CAD;color:#FFFFFF;
+  text-align:center;line-height:18px;font-weight:700;margin-right:6px}
+.bar{height:6px;background:#E1E6EE;border-radius:3px;margin-top:3px}
+.bar i{display:block;height:6px;background:#0B5CAD;border-radius:3px}
+.chip{display:inline-block;padding:0 4px;border-radius:3px;background:#FDE2E2;color:#9B1C1C}
+.corner{position:absolute;right:2px;top:2px;padding:0 3px;font-size:8px;line-height:10px;background:#D64545;color:#FFFFFF}
+.flag{width:16px;height:12px;vertical-align:middle}
+ul{margin:0;padding-left:14px}
+
+/* Table C: text that shares its lines with what leaves the cell (the kinds review, findings 1-5). */
+.tc{position:absolute;left:48px;top:384px;width:1000px;border-collapse:collapse;table-layout:fixed;
+  font-size:11px;line-height:14px}
+.tc td{padding:5px 8px;vertical-align:top;text-align:left;border-bottom:1px solid #D8DDE6}
+.tag{display:inline-block;padding:0 4px;background:#FFF4E5;border-left:3px solid #D97706;color:#92400E}
+/* The centring idiom of the app's heat maps: a zero-padding cell whose block fills it, line-height = height. */
+.tc tr.heat td{padding:0;height:30px;text-align:center}
+.heat .c{display:block;height:30px;line-height:30px;font-size:10px;font-weight:700}
+
+/* Table B: separate borders with the default 2 px spacing, a rounded filled and stroked table; fixed
+   layout, so its columns derive by hand: 1 border + 2 spacing + 200 + 2 | 190 + 2 | 200 + 2 + 1. */
+.tb{position:absolute;left:48px;top:600px;width:600px;table-layout:fixed;border-radius:8px;background:#F7F9FC;
+  border:1px solid #C9D2DF;font-size:12px;line-height:16px}
+.tb td{border:1px solid #D9D9E0;padding:4px 8px}
+</style></head><body>
+
+<table class="ta" data-name="rich">
+  <caption>Programme scorecard</caption>
+  <colgroup>
+    <col style="width:170px"><col style="width:150px;background:#FFF8E1"><col style="width:260px">
+    <col style="width:210px"><col style="width:200px"><col style="width:194px">
+  </colgroup>
+  <thead>
+    <tr><th>Item</th><th>Region</th><th>Detail</th><th>Score</th><th>Notes</th><th>Status</th></tr>
+  </thead>
+  <tfoot>
+    <tr><td>Total</td><td>All</td><td>Eight programmes</td><td>71</td><td>Reviewed</td><td>Final</td></tr>
+  </tfoot>
+  <tbody>
+    <tr>
+      <td><span class="num">3</span> Singapore</td>
+      <td>Asia</td>
+      <td><ul><li>Sandbox</li><li>Talent visas</li><li>Compute</li></ul></td>
+      <td><div>92</div><div class="bar"><i style="width:92%"></i></div></td>
+      <td>Plain text</td>
+      <td><span class="pill">Leader</span></td>
+    </tr>
+    <tr>
+      <td><img class="flag" src="../../fixtures/torture/assets/logo-160x160.png" alt=""> Brazil</td>
+      <td>Americas</td>
+      <td><svg width="12" height="12" viewBox="0 0 12 12" style="vertical-align:middle"><circle cx="6" cy="6" r="5" fill="#1E9E5A"/></svg> Sovereign GPU cluster of twenty thousand accelerators</td>
+      <td><div style="display:flex;justify-content:space-between"><span>Label</span><span>Value</span></div></td>
+      <td><span class="pill"><svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="#FFFFFF"/></svg> Active</span></td>
+      <td></td>
+    </tr>
+    <tr class="hl">
+      <td rowspan="2">Merged across two rows</td>
+      <td style="padding:6px"><div style="background:#FDE68A">42</div></td>
+      <td>Revenue <span class="chip">+12%</span> YoY</td>
+      <td style="position:relative">Pilot<span class="corner">NEW</span></td>
+      <td style="padding:0"><div class="inner" style="background:#EEEEFF;padding:6px">Folded</div></td>
+      <td style="white-space:nowrap">One line only</td>
+    </tr>
+    <tr class="dashed">
+      <td>Europe</td><td>Regulation first</td><td>61</td><td>Medium</td><td>Watch</td>
+    </tr>
+    <tr class="tint">
+      <td>India</td><td>South Asia</td><td>Scale via public goods</td><td>55</td><td>High</td><td>Emerging</td>
+    </tr>
+    <tr>
+      <td>Kenya</td><td>Africa</td><td>Mobile money rails</td><td>48</td><td>Low</td><td>Early</td>
+    </tr>
+    <tr class="grad">
+      <td>Chile</td><td>Americas</td><td>Copper and data centres</td><td>52</td><td>Medium</td><td>Early</td>
+    </tr>
+    <tr>
+      <td>Japan</td><td>Asia</td><td>Robotics and chips</td><td>83</td><td>High</td><td>Leader</td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="tc" data-name="flow">
+  <colgroup>
+    <col style="width:170px"><col style="width:230px"><col style="width:160px"><col style="width:230px"><col style="width:210px">
+  </colgroup>
+  <tr>
+    <td>Status <svg width="12" height="12" viewBox="0 0 12 12" style="vertical-align:middle"><circle cx="6" cy="6" r="5" fill="#1E9E5A"/></svg> Done</td>
+    <td>Rated <img class="flag" src="../../fixtures/torture/assets/logo-160x160.png" alt=""> by analysts</td>
+    <td>Revenue grew strongly this <span class="chip">+12%</span> year on year</td>
+    <td><ul><li><span class="pill">New</span> Sandbox pilots across three regions</li><li>Talent visas</li></ul></td>
+    <td>Intro text<div>Block</div>Revenue <span class="chip">+12%</span> YoY</td>
+  </tr>
+  <tr>
+    <td><span class="tag">Risk</span> Supply chain</td>
+    <td><div style="display:grid;grid-template-columns:100px 100px"><span>Alpha</span><span></span><span></span><span>Delta wraps onto two lines</span></div></td>
+    <td><div>Alpha</div><div style="margin-left:24px">Indented text that wraps onto two lines</div></td>
+    <td style="text-align:right">1,284 <svg width="10" height="10" viewBox="0 0 10 10" style="vertical-align:middle"><path d="M5 1 L9 9 L1 9 Z" fill="#1E9E5A"/></svg></td>
+    <td style="text-align:center">Up <span class="chip">+3</span> pts</td>
+  </tr>
+  <tr class="heat">
+    <td style="line-height:30px;vertical-align:middle">Plant supply</td>
+    <td style="vertical-align:middle"><span class="c" style="background:#FFE600">Moderate</span></td>
+    <td><span class="c" style="background:#FF4136;color:#FFFFFF">Critical</span></td>
+    <td style="vertical-align:top"><span class="c" style="background:#2DB757;color:#FFFFFF">Low</span></td>
+    <td style="line-height:30px;vertical-align:bottom">3–5 yrs</td>
+  </tr>
+  <tr>
+    <td>Three lines of text make this row tall enough to anchor in</td>
+    <td style="vertical-align:middle">Middle</td>
+    <td style="vertical-align:bottom">Bottom</td>
+    <td style="vertical-align:middle">Middle-anchored text that wraps onto two lines</td>
+    <td style="vertical-align:bottom;line-height:22px">Bottom, a 22 px line</td>
+  </tr>
+</table>
+
+<table class="tb" data-name="separate">
+  <colgroup><col style="width:200px"><col style="width:190px"><col style="width:200px"></colgroup>
+  <tr><td>Stage</td><td>Owner</td><td>Weeks</td></tr>
+  <tr><td>Discovery</td><td>Strategy</td><td>4</td></tr>
+  <tr><td>Build</td><td>Delivery</td><td>9</td></tr>
+</table>
+
+</body></html>

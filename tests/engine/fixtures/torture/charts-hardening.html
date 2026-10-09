@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<!--
+  Torture fixture: the `charts-hardening` family (WP-C, docs/engine/fidelity/12-WPC-charts.md §8.1), on the
+  16 × 9 test master's Blank layout (1280 × 720 px canvas, 1 px = 1/96 in).
+
+  Every totals spelling on p05-A's data (indices, series.types, booleans), a two-series stacked
+  waterfall that never crosses zero, the model-written waterfall of prj_844d2914db (a list of
+  pointColors, a hidden value axis, its own plotArea), p11-A's bridge near 3,400, and a clustered
+  column with a reference line at exactly its third bar's value. Every spec lints clean: the
+  lenient spellings are advisories, never errors.
+
+  Paired with `charts-hardening.expect.json` (counts) and `ir/charts-hardening.json` (the same specs as a hand-written
+  IR, written by `make_ir.py`). `engine/tests/test_charts_emit.py` asserts the two files carry the same
+  specs, so the table in `make_ir.py` is where a chart is changed.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Charts — spellings the engine now reads one way</title>
+<style>
+  html, body {
+    margin: 0;
+    width: 1280px;
+    height: 720px;
+    overflow: hidden;
+    background: transparent;
+    font-family: Calibri, Arial, sans-serif;
+    color: #2E2E38;
+  }
+  h1 {
+    position: absolute;
+    left: 40px; top: 24px; width: 1200px; height: 36px;
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 36px;
+    color: #12233B;
+  }
+  .chart { position: absolute; font-size: 11px; color: #333333; }
+  .cap {
+    position: absolute;
+    height: 22px;
+    font-size: 13px;
+    line-height: 22px;
+    color: #516467;
+  }
+</style>
+</head>
+<body>
+
+<h1>Charts — spellings the engine now reads one way</h1>
+<div class="chart" data-name="A totals as indices"
+     style="left:40px;top:84px;width:285px;height:250px"
+     data-chart='{"type": "waterfall", "categories": ["Standalone", "Cost syn.", "Revenue syn.", "Subtotal", "Integration", "Tax", "Combined"], "series": [{"name": "Value", "values": [8.1, 2.4, 1.6, 12.1, -0.9, 1.2, 12.4]}], "colors": ["#1E9E5A", "#D64545", "#0B2545"], "options": {"dataLabels": true, "numberFormat": "0.0", "gridlines": false, "legend": false, "totals": [0, 3, 6]}}'></div>
+<div class="cap" style="left:40px;top:340px;width:285px">A · p05-A: totals as indices, no plotArea</div>
+
+<div class="chart" data-name="B totals as types"
+     style="left:345px;top:84px;width:285px;height:250px"
+     data-chart='{"type": "waterfall", "categories": ["Standalone", "Cost syn.", "Revenue syn.", "Subtotal", "Integration", "Tax", "Combined"], "series": [{"name": "Value", "values": [8.1, 2.4, 1.6, 12.1, -0.9, 1.2, 12.4], "types": ["total", "increase", "increase", "total", "decrease", "increase", "total"]}], "colors": ["#1E9E5A", "#D64545", "#0B2545"], "options": {"dataLabels": true, "numberFormat": "0.0", "gridlines": false, "legend": false}}'></div>
+<div class="cap" style="left:345px;top:340px;width:285px">B · p05-B: totals from series.types</div>
+
+<div class="chart" data-name="C totals as flags"
+     style="left:650px;top:84px;width:285px;height:250px"
+     data-chart='{"type": "waterfall", "categories": ["Standalone", "Cost syn.", "Revenue syn.", "Subtotal", "Integration", "Tax", "Combined"], "series": [{"name": "Value", "values": [8.1, 2.4, 1.6, 12.1, -0.9, 1.2, 12.4]}], "colors": ["#1E9E5A", "#D64545", "#0B2545"], "options": {"dataLabels": true, "numberFormat": "0.0", "gridlines": false, "legend": false, "totals": [true, false, false, true, false, false, true]}}'></div>
+<div class="cap" style="left:650px;top:340px;width:285px">C · p05-C: totals as per-point booleans</div>
+
+<div class="chart" data-name="E stacked waterfall"
+     style="left:955px;top:84px;width:285px;height:250px"
+     data-chart='{"type": "waterfall", "categories": ["FY23", "Price", "Volume", "Mix", "FY24"], "series": [{"name": "Internal", "values": [36, 9, 14, -11, 48]}, {"name": "Partner", "values": [13, 5, 6, -4, 20]}], "colors": ["#0B2545", "#1A9AFA"], "options": {"dataLabels": true, "numberFormat": "0", "gridlines": false, "totals": [0, 4]}}'></div>
+<div class="cap" style="left:955px;top:340px;width:285px">E · two series stacked, no bar crosses zero</div>
+
+<div class="chart" data-name="G model-written waterfall"
+     style="left:40px;top:392px;width:590px;height:250px"
+     data-chart='{"type": "waterfall", "categories": ["Baseline revenue value", "+ Partner growth", "+ Longer terms", "+ Higher spend", "+ New marketplaces", "+ Private investment"], "series": [{"name": "Index", "values": [100, 30, 12, 18, 15, 20]}], "options": {"dataLabels": true, "numberFormat": "0", "gridlines": false, "legend": false, "pointColors": ["#C4C4CD", "#1A9AFA", "#1A9AFA", "#1A9AFA", "#1A9AFA", "#1A9AFA"], "valueAxis": {"min": 0, "max": 220, "majorUnit": 55, "visible": false}, "plotArea": {"x": 0.03, "y": 0.03, "w": 0.95, "h": 0.86}}}'></div>
+<div class="cap" style="left:40px;top:648px;width:590px">G · a model's waterfall: list pointColors, plotArea</div>
+
+<div class="chart" data-name="H near 2750"
+     style="left:650px;top:392px;width:285px;height:250px"
+     data-chart='{"type": "waterfall", "categories": ["FY23", "Services", "Products", "Lending", "FX & other", "FY24"], "series": [{"name": "Revenue", "values": [2750, 140, 95, 55, -70, 2970]}], "colors": ["#1E9E5A", "#D64545", "#0B3D2E"], "options": {"dataLabels": true, "numberFormat": "#,##0", "gridlines": false, "legend": false, "totals": [0, 5]}}'></div>
+<div class="cap" style="left:650px;top:648px;width:285px">H · p11-A: a bridge near 2,750</div>
+
+<div class="chart" data-name="I reference line"
+     style="left:955px;top:392px;width:285px;height:250px"
+     data-chart='{"type": "column", "categories": ["North", "South", "East", "West"], "series": [{"name": "Sales", "values": [42, 55, 61, 48]}], "colors": ["#1A9AFA"], "options": {"dataLabels": true, "numberFormat": "0", "gridlines": false, "legend": false, "valueAxis": {"min": 0, "max": 80, "majorUnit": 20}, "referenceLines": [{"value": 61, "label": "target"}]}}'></div>
+<div class="cap" style="left:955px;top:648px;width:285px">I · a reference line at the third bar's value</div>
+
+<aside class="notes" hidden>Seven authored charts; every spec lints clean.</aside>
+
+</body>
+</html>

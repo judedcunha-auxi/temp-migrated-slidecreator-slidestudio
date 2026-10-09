@@ -1,0 +1,252 @@
+{
+  "version": 1,
+  "canvas": {
+    "w": 1280,
+    "h": 720,
+    "pxPerIn": 96
+  },
+  "slide": {
+    "id": "tor_images",
+    "title": "torture · images",
+    "layoutId": "layout-07",
+    "notes": null
+  },
+  "fonts": {
+    "forced": {
+      "major": "Calibri Light",
+      "minor": "Calibri"
+    },
+    "used": [
+      "Calibri",
+      "Calibri Light"
+    ],
+    "substituted": []
+  },
+  "groups": [],
+  "elements": [
+    {
+      "id": "e1",
+      "kind": "image",
+      "box": {
+        "x": 40.0,
+        "y": 70.0,
+        "w": 180.0,
+        "h": 140.0
+      },
+      "z": 0,
+      "name": "cover-landscape",
+      "source": {
+        "path": "body > [data-name=cover-landscape]",
+        "tag": "img",
+        "svg": null
+      },
+      "src": "tests/engine/fixtures/torture/assets/photo-400x300.png",
+      "fit": "cover",
+      "crop": {
+        "l": 0.018,
+        "t": 0.0,
+        "r": 0.018,
+        "b": 0.0
+      },
+      "radius": 0.0,
+      "circle": false
+    },
+    {
+      "id": "e2",
+      "kind": "image",
+      "box": {
+        "x": 245.0,
+        "y": 70.0,
+        "w": 180.0,
+        "h": 140.0
+      },
+      "z": 1,
+      "name": "contain-landscape",
+      "source": {
+        "path": "body > [data-name=contain-landscape]",
+        "tag": "img",
+        "svg": null
+      },
+      "src": "tests/engine/fixtures/torture/assets/photo-400x300.png",
+      "fit": "contain",
+      "crop": {
+        "l": 0.0,
+        "t": 0.0,
+        "r": 0.0,
+        "b": 0.0
+      },
+      "radius": 0.0,
+      "circle": false
+    },
+    {
+      "id": "e3",
+      "kind": "image",
+      "box": {
+        "x": 450.0,
+        "y": 70.0,
+        "w": 180.0,
+        "h": 140.0
+      },
+      "z": 2,
+      "name": "fill-landscape",
+      "source": {
+        "path": "body > [data-name=fill-landscape]",
+        "tag": "img",
+        "svg": null
+      },
+      "src": "tests/engine/fixtures/torture/assets/photo-400x300.png",
+      "fit": "fill",
+      "crop": {
+        "l": 0.0,
+        "t": 0.0,
+        "r": 0.0,
+        "b": 0.0
+      },
+      "radius": 0.0,
+      "circle": false
+    },
+    {
+      "id": "e4",
+      "kind": "image",
+      "box": {
+        "x": 655.0,
+        "y": 70.0,
+        "w": 180.0,
+        "h": 140.0
+      },
+      "z": 3,
+      "name": "cover-portrait",
+      "source": {
+        "path": "body > [data-name=cover-portrait]",
+        "tag": "img",
+        "svg": null
+      },
+      "src": "tests/engine/fixtures/torture/assets/photo-300x400.jpg",
+      "fit": "cover",
+      "crop": {
+        "l": 0.0,
+        "t": 0.208,
+        "r": 0.0,
+        "b": 0.208
+      },
+      "radius": 0.0,
+      "circle": false
+    },
+    {
+      "id": "e5",
+      "kind": "image",
+      "box": {
+        "x": 860.0,
+        "y": 70.0,
+        "w": 180.0,
+        "h": 140.0
+      },
+      "z": 4,
+      "name": "radius-14",
+      "source": {
+        "path": "body > [data-name=radius-14]",
+        "tag": "img",
+        "svg": null
+      },
+      "src": "tests/engine/fixtures/torture/assets/photo-400x300.png",
+      "fit": "cover",
+      "crop": {
+        "l": 0.018,
+        "t": 0.0,
+        "r": 0.018,
+        "b": 0.0
+      },
+      "radius": 14.0,
+      "circle": false
+    },
+    {
+      "id": "e6",
+      "kind": "image",
+      "box": {
+        "x": 1065.0,
+        "y": 70.0,
+        "w": 140.0,
+        "h": 140.0
+      },
+      "z": 5,
+      "name": "circle",
+      "source": {
+        "path": "body > [data-name=circle]",
+        "tag": "img",
+        "svg": null
+      },
+      "src": "tests/engine/fixtures/torture/assets/logo-160x160.png",
+      "fit": "cover",
+      "crop": {
+        "l": 0.0,
+        "t": 0.0,
+        "r": 0.0,
+        "b": 0.0
+      },
+      "radius": 70.0,
+      "circle": true
+    },
+    {
+      "id": "e7",
+      "kind": "image",
+      "box": {
+        "x": 40.0,
+        "y": 300.0,
+        "w": 180.0,
+        "h": 140.0
+      },
+      "z": 6,
+      "opacity": 0.5,
+      "name": "opacity-50",
+      "source": {
+        "path": "body > [data-name=opacity-50]",
+        "tag": "img",
+        "svg": null
+      },
+      "src": "tests/engine/fixtures/torture/assets/photo-400x300.png",
+      "fit": "cover",
+      "crop": {
+        "l": 0.018,
+        "t": 0.0,
+        "r": 0.018,
+        "b": 0.0
+      },
+      "radius": 0.0,
+      "circle": false
+    },
+    {
+      "id": "e8",
+      "kind": "image",
+      "box": {
+        "x": 820.0,
+        "y": 270.0,
+        "w": 300.0,
+        "h": 225.0
+      },
+      "z": 7,
+      "clip": {
+        "x": 860.0,
+        "y": 300.0,
+        "w": 180.0,
+        "h": 140.0
+      },
+      "name": "clipped-image",
+      "source": {
+        "path": "body > [data-name=clipped-image]",
+        "tag": "img",
+        "svg": null
+      },
+      "src": "tests/engine/fixtures/torture/assets/photo-400x300.png",
+      "fit": "fill",
+      "crop": {
+        "l": 0.0,
+        "t": 0.0,
+        "r": 0.0,
+        "b": 0.0
+      },
+      "radius": 0.0,
+      "circle": false
+    }
+  ],
+  "diagnostics": []
+}

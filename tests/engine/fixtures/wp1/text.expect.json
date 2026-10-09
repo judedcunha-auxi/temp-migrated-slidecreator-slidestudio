@@ -1,0 +1,11 @@
+{
+  "master": "test-16x9",
+  "layoutId": "layout-05",
+  "kinds": {"text": 11, "shape": 1},
+  "rasterAllowed": [],
+  "charts": {"authored": 0, "recognised": 0},
+  "notes": [
+    "#clipbox (WP-F, F-D): the sentence is cut where the 120 px clip cuts it, by the x-centre rule ('This sentence is muc' in Arial), with no ellipsis (the box sets no text-overflow); the element keeps clip.w 120, x-wpf-clipped says what is hidden, and the counts are unchanged.",
+    "D14, final (WP-A, rebased onto F): re-taken on the merged engine (G-1, C, D, E, B, F, A) under master brief section 11 as amended by WP-B: text 11, shape 1, unchanged. The family has no table and no detached inline box beside text, so the amended rule's first sentence (a maximal run of stacked, horizontally overlapping in-flow blocks and anonymous runs under one parent) gives every count, and WP-A's cell reading (10-WPA section 8.1) does not apply."
+  ]
+}

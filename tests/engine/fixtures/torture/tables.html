@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>torture · tables</title>
+<style>
+html,body{margin:0;width:1280px;height:720px;overflow:hidden;background:transparent;
+  font-family:"Calibri",Arial,sans-serif;color:#2E2E38;font-size:14px}
+.cap{font-size:16px;font-weight:700;margin:0 0 10px 0}
+
+/* table-layout:fixed so colWidthsPx is decided by the CSS and not by the text. */
+table{border-collapse:collapse;table-layout:fixed}
+th,td{padding:7px 10px;vertical-align:top;text-align:left}
+.num{text-align:right}
+
+.t1{width:560px}
+.t1 th{background:#2E2E38;color:#FFFFFF;font-weight:700;border-bottom:2px solid #1A9AFA}
+.t1 td{border-bottom:1px solid #E6E6EC}
+.t1 .span{vertical-align:middle;background:#F2F8FE;border-right:1px solid #C9DCEB;font-weight:700}
+.t1 .foot td{border-top:2px solid #2E2E38;border-bottom:none;font-weight:700;vertical-align:bottom}
+
+.t2{width:420px}
+.t2 th{background:#E6F6EC;color:#12703A;border:1px solid #9FD8B4;font-weight:700}
+.t2 td{border:1px solid #D9D9E0}
+.t2 .alt td{background:#F7F7FA}
+</style></head><body>
+
+<!-- 1 text element (the caption) + 1 table element. -->
+<div style="position:absolute;left:48px;top:80px;width:560px">
+  <div class="cap">Partners by segment, millions</div>
+  <table class="t1">
+    <colgroup><col style="width:130px"><col style="width:170px"><col style="width:130px"><col style="width:130px"></colgroup>
+    <tr>
+      <th colspan="2">Market</th>
+      <th class="num">2023</th>
+      <th class="num">FY27E</th>
+    </tr>
+    <tr>
+      <td class="span" rowspan="2">Partner</td>
+      <td>Upsell and referred customers</td>
+      <td class="num">12.4</td>
+      <td class="num">31.0</td>
+    </tr>
+    <tr>
+      <td>Business and events</td>
+      <td class="num">8.1</td>
+      <td class="num">17.5</td>
+    </tr>
+    <tr>
+      <td class="span" rowspan="2">Internal</td>
+      <td>Upsell</td>
+      <td class="num">51.2</td>
+      <td class="num">62.0</td>
+    </tr>
+    <tr class="foot">
+      <td>Other purposes</td>
+      <td class="num">27.8</td>
+      <td class="num">18.0</td>
+    </tr>
+  </table>
+</div>
+
+<!-- 1 text element (the caption) + 1 table element. -->
+<div style="position:absolute;left:680px;top:80px;width:420px">
+  <div class="cap">Delivery plan</div>
+  <table class="t2">
+    <colgroup><col style="width:170px"><col style="width:150px"><col style="width:100px"></colgroup>
+    <tr><th>Stage</th><th>Owner</th><th class="num">Weeks</th></tr>
+    <tr><td>Discovery</td><td>Strategy</td><td class="num">4</td></tr>
+    <tr class="alt"><td>Build</td><td>Delivery</td><td class="num">9</td></tr>
+    <tr><td>Scale</td><td>Operations</td><td class="num">12</td></tr>
+  </table>
+</div>
+
+<aside class="notes" style="display:none">Table torture: colspan in the header, two rowspans, per-cell
+borders and backgrounds, right-aligned numeric columns, three vertical alignments and a footer row
+whose top border differs from every other cell.</aside>
+
+</body></html>

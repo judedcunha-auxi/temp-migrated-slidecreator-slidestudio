@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<!--
+  Torture fixture: the `charts-rendercheck` family (docs/engine/rendercheck/00-PLAN.md §2, defects 3-6), on the
+  16 × 9 test master's Blank layout (1280 × 720 px canvas, 1 px = 1/96 in).
+
+  The shapes of the chart specs Slide Forge's model wrote in the render check's decks, which the engine read
+  wrongly (numbers and labels invented, same shapes):
+  A  d2_s07: a one-category bar_stacked_100 with valueAxis 0–100 (was a 1 % sliver) and label strings
+     per point (were dropped);
+  B  a column_stacked_100 whose visible percent axis prints 0%–100% (not the data's "0.0%" format on 0–1);
+  C  d2_s08: a one-colour waterfall with no totals declared (was green rises, a red fall, grey totals);
+  D  d1_s06: a two-colour waterfall whose last bar is a total by its name and by the authored axis max
+     (was a step, clipped at the top);
+  E  a hand-drawn bar chart: recognised, and it must read top-down in the file as on the slide;
+  F  d1_s04's "fit matrix": equal cells with a score column beside them — a table, not a bar chart.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Charts — the render check's specs</title>
+<style>
+  html, body {
+    margin: 0;
+    width: 1280px;
+    height: 720px;
+    overflow: hidden;
+    background: transparent;
+    font-family: Calibri, Arial, sans-serif;
+    color: #2E2E38;
+  }
+  h1 {
+    position: absolute;
+    left: 40px; top: 24px; width: 1200px; height: 36px;
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 36px;
+    color: #12233B;
+  }
+  .chart { position: absolute; font-size: 11px; color: #333333; }
+  .panel { position: absolute; width: 380px; height: 250px; }
+  .panel svg { position: absolute; left: 0; top: 0; }
+  .cap {
+    position: absolute;
+    height: 22px;
+    font-size: 13px;
+    line-height: 22px;
+    color: #516467;
+  }
+</style>
+</head>
+<body>
+
+<h1>Charts — the render check's specs</h1>
+
+<div class="chart" data-name="A financing mix"
+     style="left:40px;top:84px;width:380px;height:250px"
+     data-chart='{"type": "bar_stacked_100", "categories": ["Funding Mix"], "series": [{"name": "Equity", "values": [31.4], "dataLabels": ["$48.2B (31.4%)"]}, {"name": "Cash", "values": [9], "dataLabels": ["$13.8B"]}, {"name": "Term loan", "values": [46.8], "dataLabels": ["$72B (46.8%)"]}, {"name": "Bridge", "values": [8.2], "dataLabels": [""]}, {"name": "Disposals", "values": [4.6], "dataLabels": [null]}], "colors": ["#00AECF", "#CDEDF7", "#021D44", "#9CC3EB", "#DDEAF7"], "options": {"dataLabels": true, "labelPosition": "center", "legend": false, "gridlines": false, "gapWidth": 30, "fontSize": 9, "numberFormat": "0.0\"%\"", "categoryAxis": {"visible": false}, "valueAxis": {"visible": false, "min": 0, "max": 100}, "plotArea": {"x": 0.01, "y": 0.06, "w": 0.98, "h": 0.88}}}'></div>
+<div class="cap" style="left:40px;top:340px;width:380px">A · d2_s07: 100 % bar, axis 0–100, own label texts</div>
+
+<div class="chart" data-name="B percent axis"
+     style="left:450px;top:84px;width:380px;height:250px"
+     data-chart='{"type": "column_stacked_100", "categories": ["FY22", "FY23", "FY24"], "series": [{"name": "Owned", "values": [30, 45, 60]}, {"name": "Leased", "values": [70, 55, 40]}], "colors": ["#021D44", "#00AECF"], "options": {"dataLabels": true, "numberFormat": "0\"%\"", "legend": "bottom", "gridlines": true, "valueAxis": {"min": 0, "max": 100, "majorUnit": 25, "visible": true}}}'></div>
+<div class="cap" style="left:450px;top:340px;width:380px">B · 100 % columns, a visible percent axis</div>
+
+<div class="chart" data-name="C one colour waterfall"
+     style="left:860px;top:84px;width:380px;height:250px"
+     data-chart='{"type": "waterfall", "categories": ["Base", "Sourcing", "Overhead", "Systems", "Pricing", "Tax", "One-offs", "Pro-Forma Net"], "series": [{"name": "Savings ($B)", "values": [11.6, 3.2, 2.4, 1.7, 5.9, 1.3, -4.5, 21.6]}], "colors": ["#00AECF"], "options": {"dataLabels": true, "numberFormat": "0.0", "gridlines": false, "legend": false, "gapWidth": 40, "fontSize": 9, "valueAxis": {"min": 0, "max": 35, "majorUnit": 5}}}'></div>
+<div class="cap" style="left:860px;top:340px;width:380px">C · d2_s08: one colour, no totals declared</div>
+
+<div class="chart" data-name="D two colour waterfall"
+     style="left:40px;top:392px;width:380px;height:250px"
+     data-chart='{"type": "waterfall", "categories": ["Entry", "Debt", "Partners", "Cost", "Growth", "WC", "Pro-forma EV"], "series": [{"name": "Value bridge ($B)", "values": [180, -97, -28, 10, 11, 7, 214]}], "colors": ["#021D44", "#00AECF"], "options": {"dataLabels": true, "numberFormat": "0", "gridlines": false, "legend": false, "gapWidth": 40, "fontSize": 9, "valueAxis": {"visible": false, "min": 0, "max": 240}}}'></div>
+<div class="cap" style="left:40px;top:648px;width:380px">D · d1_s06: two colours, the last bar a total</div>
+
+<div class="panel" data-name="E hand-drawn bars" style="left:450px;top:392px">
+  <svg width="380" height="250" viewBox="0 0 380 250">
+    <g font-size="11">
+      <text x="0" y="44" fill="#2E2E38">Renewal</text>
+      <rect x="72" y="32" width="164" height="16" fill="#021D44"/>
+      <text x="242" y="44" fill="#516467">41%</text>
+      <text x="0" y="88" fill="#2E2E38">Referral</text>
+      <rect x="72" y="76" width="116" height="16" fill="#021D44"/>
+      <text x="194" y="88" fill="#516467">29%</text>
+      <text x="0" y="132" fill="#2E2E38">Upsell</text>
+      <rect x="72" y="120" width="72" height="16" fill="#021D44"/>
+      <text x="150" y="132" fill="#516467">18%</text>
+      <text x="0" y="176" fill="#2E2E38">Business</text>
+      <rect x="72" y="164" width="48" height="16" fill="#00AECF"/>
+      <text x="126" y="176" fill="#516467">12%</text>
+    </g>
+  </svg>
+</div>
+<div class="cap" style="left:450px;top:648px;width:380px">E · hand-drawn bars: read top-down in the file</div>
+
+<div class="panel" data-name="F fit matrix" style="left:860px;top:392px">
+  <svg width="380" height="250" viewBox="0 0 380 250">
+    <g>
+      <rect x="0" y="0" width="120" height="36" fill="#EEF1F5"/>
+      <rect x="0" y="42" width="120" height="36" fill="#EEF1F5"/>
+      <rect x="0" y="84" width="120" height="36" fill="#EEF1F5"/>
+      <rect x="0" y="126" width="120" height="36" fill="#EEF1F5"/>
+      <rect x="0" y="168" width="120" height="36" fill="#EEF1F5"/>
+    </g>
+    <g font-size="11" font-weight="bold" fill="#021D44">
+      <text x="8" y="22">Purchasing</text>
+      <text x="8" y="64">Field service</text>
+      <text x="8" y="106">Distribution</text>
+      <text x="8" y="148">Treasury</text>
+      <text x="8" y="190">Legal</text>
+    </g>
+    <g>
+      <rect x="126" y="0" width="60" height="36" fill="#021D44"/><rect x="190" y="0" width="60" height="36" fill="#00AECF"/><rect x="254" y="0" width="60" height="36" fill="#021D44"/>
+      <rect x="126" y="42" width="60" height="36" fill="#00AECF"/><rect x="190" y="42" width="60" height="36" fill="#021D44"/><rect x="254" y="42" width="60" height="36" fill="#021D44"/>
+      <rect x="126" y="84" width="60" height="36" fill="#021D44"/><rect x="190" y="84" width="60" height="36" fill="#021D44"/><rect x="254" y="84" width="60" height="36" fill="#00AECF"/>
+      <rect x="126" y="126" width="60" height="36" fill="#00AECF"/><rect x="190" y="126" width="60" height="36" fill="#00AECF"/><rect x="254" y="126" width="60" height="36" fill="#021D44"/>
+      <rect x="126" y="168" width="60" height="36" fill="#021D44"/><rect x="190" y="168" width="60" height="36" fill="#00AECF"/><rect x="254" y="168" width="60" height="36" fill="#00AECF"/>
+    </g>
+    <g font-size="13" font-weight="bold" fill="#00AECF">
+      <text x="330" y="23">8</text>
+      <text x="330" y="65">6</text>
+      <text x="330" y="107">10</text>
+      <text x="330" y="149">7</text>
+      <text x="330" y="191">3</text>
+    </g>
+  </svg>
+</div>
+<div class="cap" style="left:860px;top:648px;width:380px">F · d1_s04: equal cells and scores — a table</div>
+
+<aside class="notes" hidden>Four authored charts and two hand-drawn figures: the render check's chart specs.</aside>
+
+</body>
+</html>

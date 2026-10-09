@@ -1,0 +1,48 @@
+{
+  "family": "charts-rendercheck",
+  "master": "test-16x9",
+  "layoutId": "layout-07",
+  "canvas": {
+    "w": 1280,
+    "h": 720
+  },
+  "kinds": {
+    "text": 25,
+    "shape": 24,
+    "chart": 4
+  },
+  "rasterAllowed": [],
+  "charts": {
+    "authored": 4,
+    "recognised": 1
+  },
+  "gateMaxPx2": 1327,
+  "notes": [
+    "Render check 2026-09-29 (docs/engine/rendercheck/00-PLAN.md §2, defects 3-6): the chart specs Slide Forge's",
+    "model wrote in the render check's decks (numbers and labels invented, same shapes), which the engine read",
+    "wrongly, and the two hand-drawn figures the",
+    "recogniser misread. 25 text elements: the h1, six captions, E's four names and four values, F's five row",
+    "names and five scores. 24 shapes: E's four bars, F's five name cells and fifteen grid cells.",
+    "A (d2_s07): bar_stacked_100 with valueAxis 0-100, written as 0-1 on the percentStacked axis (it was 0-100:",
+    "a 1 % sliver in PowerPoint); series[k].dataLabels become c:dLbl rich text ('' deletes Bridge's label, null",
+    "keeps Disposals' 4.6%).",
+    "B: a visible percent axis: 0-1 in the file with ticks formatted 0% (not the data's 0\"%\", which would print",
+    "0%-1% on fractions).",
+    "C (d2_s08): one colour, nothing declared: rises and the fall in #00AECF, the totals (first bar, and",
+    "'Pro-Forma Net', equal to the running sum and named as a total) in the theme's dark tx2 (test-16x9: 1F497D).",
+    "D (d1_s06): two colours: rises and totals #021D44, falls #00AECF; 214 after a running 83 would run off",
+    "max 240 as a step, and 'Pro-forma EV' names a total: it stands on the axis.",
+    "E: a hand-drawn bar chart with its values beside the bars: recognised (recognised 1), categories top-down",
+    "with categoryAxis.reverse, so the file reads Renewal first, as the slide does (it exported upside down).",
+    "F (d1_s04): equal cells with a score column beside them: a table, not a bar chart (it was recognised as",
+    "one, R^2 = 1.0 on zero spread) - nothing recognised and no 'possible chart' diagnostic.",
+    "Lint: one hand-drawn-chart warning (panel E). Emit: two warnings about E's chart leaving its SVG group.",
+    "PptxRender (the gate's renderer) does not normalise a percentStacked series, so it draws A and B as full",
+    "bars on the 0-1 axis; PowerPoint draws them as shares with 0%-100% ticks (this family's export and the",
+    "render-check fixture rendered with COM, 2026-09-29). Chart frames are masked in the gate either way.",
+    "gateMaxPx2 1,327 = max(measured x 1.2, measured + 60) over the measured 1,106 px2 masked non-chart area on",
+    "r2/charts, 2026-09-29: the h1 in Calibri Light vs the file's Calibri (test-16x9's manifest/theme mismatch)",
+    "and E's value-axis tick labels, which PowerPoint draws below the plot where the design has none. A",
+    "regression guard, not a target."
+  ]
+}

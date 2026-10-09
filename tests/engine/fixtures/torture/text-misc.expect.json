@@ -1,0 +1,59 @@
+{
+  "family": "text-misc",
+  "master": "test-16x9",
+  "layoutId": "layout-06",
+  "canvas": {"w": 1280, "h": 720},
+  "kinds": {"text": 19, "shape": 8},
+  "groups": 0,
+  "rasterAllowed": [],
+  "charts": {"authored": 0, "recognised": 0},
+  "gateMaxPx2": 4241,
+  "lineage": "fidelity probe p10_more, 2026-09-24 (promoted by WP-G G-2, 2026-09-25)",
+  "notes": [
+    "Findings F5 (gradient text, CSS columns) and F2b/F2d (docs/engine/fidelity/01-FINDINGS.md): A gradient text",
+    "(background-clip:text); B a two-column CSS multicol paragraph; C a display:contents wrapper inside a flex row;",
+    "D a number and its unit on one baseline; E a legend of swatch + label pairs. Each case also exists in the",
+    "family of the package that fixed it (paint's grad-text, as-seen's .cols, rows' contents / unit / legend); this",
+    "family keeps the five together on one slide, as the probe showed them. The HTML is the probe's but for one",
+    "line: the heading has width:872px, to layout-06's title zone's right edge (see flexgrid's notes; this title did not",
+    "overhang on 2026-09-25, the width is set for the same reason as in the other promoted families).",
+    "Counts follow master brief 11 as amended by B, and torture/README.md rule 3 for multicol (F):",
+    "text 19 = title 1 + the five case labels 5 + A 1 + B 2 + C 4 + D 2 + E 4:",
+    "  A: '$12.4B' is 1 element; the paint package (E) writes the gradient as the run's own fill",
+    "    (extras x-wpe-run-fills), no slab shape - info 'gradient text: the gradient is stretched over the text box'.",
+    "  B: one text element per column box that received a line, in column order: 6 lines in the left column, 5 in",
+    "    the right (x 400 and 672: the 520 px box less the 24 px gap, 248 px each); the one paragraph straddles the",
+    "    break and is one paragraph in each element - info 'exported as 2 text boxes, one per column'.",
+    "  C: display:contents is transparent (B's R5), so Sources, Uses, Valuation and Comps are four flex items of",
+    "    the row, never stacked: 4 elements, each over its own roundRect fill (the two inside the wrapper included).",
+    "  D: '6.2' (44 px) and '$B SOM' (16 px) are two flex items; the unit's line box sits inside the number's",
+    "    (it is not below it), so they do not stack: 2 elements, the unit right of the number.",
+    "  E: each label is an anonymous run beside its swatch in a flex item and hugs its own line (x >= swatch x2 + 6).",
+    "shape 8 = C's four E8F1FB cell roundRects + E's four 10 x 10 swatches (2 px radius; 0B2545, 0B5CAD, 1E9E5A,",
+    "F59E0B).",
+    "Lint: gradient-text (info) for the background-clip:text.",
+    "gateMaxPx2 4,241 = 3,534 px2 masked, measured 2026-09-25 on main 4ab1be8 (fidelity-w2 + X, plan 16 #22) + G-2, references rendered in Calibri / Calibri Light; two runs, identical, + 20 % (Peter #16, plan 11). Of it:",
+    "3,036 px2 are the gradient text (PptxRender draws a run gradFill as its first stop - the paint package's",
+    "renderer gap; the file is right and PowerPoint draws the gradient) and 498 px2 (14 %) the title - test-16x9's manifest/theme mismatch (G-1 open item 14, D item 17): the browser draws the 700 heading in Calibri Light with synthetic bold, advances unchanged (Edge, measured in weights' notes), while PptxRender, like PowerPoint, draws the file's +mj-lt b=1 through the theme part's major font as Calibri Bold, ~3 % wider and heavier.",
+    "The columns, cells, number/unit and legend are clean at the gate's settings (blur 2, delta E 8, 60 px2 minimum area).",
+    "gateMaxPx2 4,241 = max(measured x 1.2, measured + 60) over the measured 3,534 px2 masked non-chart area on fidelity-w3 (2314d7f), 2026-09-25 (plan §11; Peter #16: measured + 20 %, with the 60 px2 per-slide noise tolerance as the floor). A regression guard, not a target."
+  ],
+  "elements": [
+    {"name": null, "kind": "text", "paragraphs": 1, "lines": 1, "placeholder": {"type": "title", "idx": 0}, "note": "the heading", "startsWith": "More constructs"},
+    {"case": "labels", "kind": "text", "count": 5, "paragraphs": 1, "lines": 1, "note": "A-E captions"},
+    {"case": "A", "kind": "text", "paragraphs": 1, "lines": 1, "note": "gradient text: a run fill, no slab"},
+    {"case": "B", "kind": "text", "count": 2, "paragraphs": 1, "lines": [6, 5], "note": "one element per column, left then right"},
+    {"case": "C", "kind": "shape", "count": 4},
+    {"case": "C", "kind": "text", "count": 4, "paragraphs": 1, "lines": 1, "note": "each cell over its own fill, display:contents transparent"},
+    {"case": "D", "kind": "text", "count": 2, "paragraphs": 1, "lines": 1, "note": "number, then unit to its right"},
+    {"case": "E", "kind": "shape", "count": 4},
+    {"case": "E", "kind": "text", "count": 4, "paragraphs": 1, "lines": 1, "note": "UAE, KSA, Qatar, Bahrain, each right of its swatch"}
+  ],
+  "expectedDiagnostics": [
+    {"level": "info", "match": "gradient text: the gradient is stretched over the text box"},
+    {"level": "info", "match": "exported as 2 text boxes, one per column"}
+  ],
+  "expectedLint": [
+    {"level": "info", "rule": "gradient-text", "count": 1}
+  ]
+}

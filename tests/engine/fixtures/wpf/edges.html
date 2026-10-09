@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>wpf · edges</title>
+<style>
+html,body{margin:0;width:1280px;height:720px;overflow:hidden;background:transparent;
+  font-family:"Calibri",Arial,sans-serif;color:#2E2E38;font-size:13px;line-height:1.4}
+p{margin:0}
+ul{margin:0;padding:0;list-style:none}
+.at{position:absolute}
+.clamp2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+</style></head><body>
+
+<!-- (a) three paragraphs, a box that shows two -->
+<div class="at" id="a" style="left:40px;top:40px;width:160px;height:40px;overflow:hidden"><p>one</p><p>two</p><p>three</p></div>
+
+<!-- (b) a fixed-height list whose third card is wholly outside it -->
+<ul class="at" id="b" style="left:240px;top:40px;width:140px;height:60px;overflow:hidden">
+  <li style="height:30px"><div>Card one</div></li>
+  <li style="height:30px"><div>Card two</div></li>
+  <li style="height:30px"><div>Card three is hidden</div></li>
+</ul>
+
+<!-- (d) right-to-left, nowrap, ellipsis, 120 px -->
+<div class="at" id="d" dir="rtl" style="left:420px;top:40px;width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">This sentence is much wider than its box</div>
+
+<!-- (e) a clamp whose last kept run is bold -->
+<div class="at" style="left:580px;top:40px;width:220px"><div class="clamp2" id="e">Plain words that run on for a while and then <b>bold words carry the second line past its end and further still, onto a third line</b></div></div>
+
+<!-- (f) a clamp with letter-spacing -->
+<div class="at" style="left:840px;top:40px;width:220px"><div class="clamp2" id="f" style="letter-spacing:1px">Letter-spaced words that run on long enough to be clamped after two lines by the browser, which hides the rest</div></div>
+
+<!-- (g) one short sentence balanced to one line per column (orphans/widows 1 allow the split) -->
+<div class="at" id="g" style="left:40px;top:140px;width:520px;columns:2;column-gap:24px;orphans:1;widows:1">One sentence long enough to need two lines in one column balances to a line each.</div>
+
+<!-- (h) a spanner above two columns -->
+<div class="at" id="h" style="left:640px;top:140px;width:520px;columns:2;column-gap:24px"><h3 style="column-span:all;margin:0;font-size:16px">Spanner</h3><p>The paragraph under the spanner is long enough to be balanced over both of the columns below it, in reading order.</p></div>
+
+<!-- (i) overflow columns: hidden by the multicol's own clip, then visible beside the box -->
+<div class="at" id="ihidden" style="left:640px;top:300px;width:520px;height:40px;columns:2;column-gap:24px;overflow:hidden">Private credit funds now write most sponsor-backed unitranche loans in the mid-market. Banks retain the revolver and the treasury relationship, but lose the term debt. Pricing is wider, which borrowers accept for certainty and speed of execution.</div>
+<div class="at" id="ivisible" style="left:40px;top:300px;width:360px;height:40px;columns:2;column-gap:24px">Private credit funds now write most sponsor-backed unitranche loans in the mid-market. Banks retain the revolver.</div>
+
+<!-- (j) a decorated block that straddles a column break -->
+<div class="at" id="j" style="left:40px;top:460px;width:520px;columns:2;column-gap:24px"><div style="background:#E8F1FB">This decorated block straddles a column break, so its background is split into two fragments that the export draws as one box around both of them.</div></div>
+
+<!-- (k) a chip fitted to its text: line-height 1 makes the glyph rects overhang the clip, nothing is cut -->
+<div class="at" id="k" style="left:700px;top:460px;height:20px;line-height:1;font-size:20px;overflow:hidden;padding:0 6px;background:#E8F1FB">Tight chip gyq</div>
+
+<!-- (l) three paragraphs down one column flow: the second straddles the break, so each column box holds two -->
+<div class="at" id="l" style="left:880px;top:460px;width:360px;columns:2;column-gap:24px;orphans:1;widows:1"><p>The first paragraph is short.</p><p>The second paragraph is long enough to straddle the column break of this narrow flow.</p><p>The third one closes it.</p></div>
+
+<!-- (c) a title whose last line straddles the canvas bottom by more than half -->
+<div class="at" id="c" style="left:40px;top:690px;width:300px;font-size:20px;line-height:24px">A title long enough to wrap onto a second line</div>
+
+</body></html>

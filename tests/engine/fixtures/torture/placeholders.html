@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>torture · placeholders</title>
+<style>
+html,body{margin:0;width:1280px;height:720px;overflow:hidden;background:transparent;
+  font-family:"Calibri",Arial,sans-serif;color:#2E2E38}
+h2{font-family:"Calibri Light",Arial,sans-serif;font-size:30px;font-weight:400;margin:0;line-height:1.2}
+.lede{font-size:15px;font-weight:700;color:#0B5FA5;margin:0}
+.body{font-size:14px;line-height:1.45;margin:0}
+.small{font-size:11px;color:#747480;margin:0}
+</style></head><body>
+
+<!-- Explicit: data-placeholder wins over geometry. Zone 'title' idx 0 = (48, 28.833, 864, 120). -->
+<div data-placeholder="title" data-name="deck-title"
+     style="position:absolute;left:48px;top:36px;width:864px;height:70px">
+  <h2>Placeholder mapping on the Comparison layout</h2>
+</div>
+
+<!-- Implicit: no attribute, 100 % inside 'body' idx 1 = (48, 161.167, 424.167, 67.167). -->
+<div data-name="left-lede" style="position:absolute;left:48px;top:166px;width:424px;height:56px">
+  <p class="lede">Left column heading, mapped by overlap alone</p>
+</div>
+
+<!-- Implicit: no attribute, inside 'obj' idx 2 = (48, 228.333, 424.167, 414.833). -->
+<div data-name="left-body" style="position:absolute;left:48px;top:240px;width:424px;height:120px">
+  <p class="body">This block carries no data-placeholder. It lies entirely inside the second zone of
+  the layout, so the classifier must place it there by the sixty-per-cent overlap rule and locate the
+  shape by its idx.</p>
+</div>
+
+<!-- Explicit: data-placeholder="body" onto 'body' idx 3 = (487.667, 161.167, 424.333, 67.167). -->
+<div data-placeholder="body" data-name="right-lede"
+     style="position:absolute;left:488px;top:166px;width:424px;height:56px">
+  <p class="lede">Right column heading, mapped by attribute</p>
+</div>
+
+<!-- Implicit: inside 'obj' idx 4 = (487.667, 228.333, 424.333, 414.833). -->
+<div data-name="right-body" style="position:absolute;left:488px;top:240px;width:424px;height:160px">
+  <p class="body">Two zones share the type 'obj' on this layout, so the emitter cannot find the right
+  shape by type alone: it has to use idx 4. A manifest with idx null must report the ambiguity rather
+  than pick one.</p>
+</div>
+
+<!-- Outside every mappable zone: stays an ordinary text box. -->
+<div data-name="source-note" style="position:absolute;left:48px;top:660px;width:400px;height:28px">
+  <p class="small">Source: torture fixture — this line maps to no placeholder.</p>
+</div>
+
+<!-- Deliberately just under the threshold: 13 % of this box lies inside 'obj' idx 2. -->
+<div data-name="below-threshold" style="position:absolute;left:380px;top:600px;width:300px;height:100px">
+  <p class="small">Only 13 per cent of this box overlaps the second zone, which is below the sixty
+  per cent rule, so it must stay an ordinary text box.</p>
+</div>
+
+<div data-name="rule" style="position:absolute;left:48px;top:152px;width:864px;height:2px;background:#1A9AFA"></div>
+
+<!-- data-pptx="group" makes a real PowerPoint group out of the two children. -->
+<div data-name="badges" data-pptx="group" style="position:absolute;left:950px;top:240px;width:280px;height:120px">
+  <div data-name="badge-a" style="position:absolute;left:0;top:0;width:130px;height:120px;
+       background:#E8F4FE;border-radius:8px"></div>
+  <div data-name="badge-b" style="position:absolute;left:150px;top:0;width:130px;height:120px;
+       background:#E6F6EC;border-radius:8px"></div>
+</div>
+
+<aside class="notes" style="display:none">Placeholder torture on the Comparison layout: one explicit
+title, one explicit body, two implicit zones found by overlap, one element outside every zone and one
+just under the sixty-per-cent threshold, plus a named rule and a two-child group.</aside>
+
+</body></html>

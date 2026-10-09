@@ -1,0 +1,53 @@
+{
+  "family": "colours",
+  "master": "test-16x9",
+  "layoutId": "layout-06",
+  "canvas": {"w": 1280, "h": 720},
+  "kinds": {"text": 14, "shape": 14},
+  "groups": 0,
+  "rasterAllowed": [],
+  "charts": {"authored": 0, "recognised": 0},
+  "gateMaxPx2": 554,
+  "lineage": "fidelity probe p04_colours, 2026-09-24 (promoted by WP-G G-2, 2026-09-25)",
+  "notes": [
+    "Finding F5 (modern colour functions, docs/engine/fidelity/01-FINDINGS.md): tinted fills written every way a",
+    "model writes them - hex, rgba, color-mix (srgb, and oklab with transparent), oklch, hsl, 8-digit hex,",
+    "color(display-p3), a gradient of color-mix, rgb(... / 8%) - and text coloured by color-mix and oklch on dark",
+    "boxes, plus a color-mix banner with a var() left edge. Before the paint package (E) every modern function came",
+    "back null: fills vanished and the text went black. paint.html carries the modern syntaxes in isolation; this",
+    "family keeps the probe's side-by-side control (swatch 1) and the alpha forms (2, 4, 7, 10), which paint does not.",
+    "The HTML is the probe's but for one line: the heading has width:872px, to layout-06's title zone's right edge (see",
+    "flexgrid's notes; here the probe's title overhung by 3 px through the test masters' manifest/theme mismatch).",
+    "text 14 = title 1 + 12 swatch texts + banner 1. A swatch whose <b> (display:block) is followed by loose text",
+    "is 1 element of 2 paragraphs - the block and the anonymous run stack (1, 2, 3, 11, 12); the others are 1",
+    "paragraph. The banner's inline <b> and the text after it are 1 paragraph of 2 runs.",
+    "shape 14 = 12 swatch roundRects (6 px radius, each with its uniform 1 px BBBBBB border as the stroke) + the",
+    "banner's roundRect fill + its 6 px left border (a per-side border is its own shape, 1E9E5A from var(--accent)).",
+    "Fill values, measured on the merged engine (E's color.js normaliser): 1 E3F4EA; 2 1E9E5A alpha 0.12;",
+    "3 E4F3EB (= 0.12 x 1E9E5A + 0.88 x FFFFFF); 4 0B5CAD alpha 0.1 (mixing with transparent keeps the colour and",
+    "scales alpha); 5 DCF7E1; 6 E7F9F0; 7 1E9E5A alpha 0.12 (0x1F / 255); 8 E1F8EA; 9 a linear gradient",
+    "CEDEEF -> FFFFFF at 90 degrees (the first stop = 0.2 x 0B5CAD + 0.8 x FFFFFF); 10 0B5CAD alpha 0.08;",
+    "banner E9F5EE. Text runs: 11 DADEE3 (= 0.85 x FFFFFF + 0.15 x 0B2545), 12 F8F8F8 (oklch(0.98 0 0)); every",
+    "other run 1D2433.",
+    "Diagnostics: swatch 9's gradient is interpolated in oklab by the browser and in sRGB by PowerPoint, so E",
+    "reports it as approximated (info). Lint: three info colour-gamut findings, one per colour written in a",
+    "wide-gamut space - oklch() fill (5), color(display-p3) fill (8), oklch() text (12); color-mix(in oklab ...)",
+    "is not matched because its result is sRGB.",
+    "gateMaxPx2 553 = 461 px2 masked, measured 2026-09-25 on main 4ab1be8 (fidelity-w2 + X, plan 16 #22) + G-2, references rendered in Calibri / Calibri Light; two runs, identical, + 20 % (Peter #16, plan 11). Of it:",
+    "all 461 px2 are the title - test-16x9's manifest/theme mismatch (G-1 open item 14, D item 17): the browser draws the 700 heading in Calibri Light with synthetic bold, advances unchanged (Edge, measured in weights' notes), while PptxRender, like PowerPoint, draws the file's +mj-lt b=1 through the theme part's major font as Calibri Bold, ~3 % wider and heavier. Every swatch, text colour and the banner is clean at the gate's settings (blur 2, delta E 8, 60 px2 minimum area).",
+    "gateMaxPx2 554 = max(measured x 1.2, measured + 60) over the measured 461 px2 masked non-chart area on fidelity-w3 (2314d7f), 2026-09-25 (plan §11; Peter #16: measured + 20 %, with the 60 px2 per-slide noise tolerance as the floor). A regression guard, not a target."
+  ],
+  "elements": [
+    {"name": null, "kind": "text", "paragraphs": 1, "lines": 1, "placeholder": {"type": "title", "idx": 0}, "note": "the heading", "startsWith": "Tinted fills"},
+    {"case": "swatches", "kind": "shape", "count": 12, "note": "280 x 110 roundRects with the fills listed in the notes, none dropped"},
+    {"case": "swatches", "kind": "text", "count": 12, "note": "2 paragraphs for 1, 2, 3, 11, 12; 1 for the others; no run left black"},
+    {"case": "banner", "kind": "shape", "count": 2, "note": "E9F5EE roundRect + 6 px 1E9E5A left border"},
+    {"case": "banner", "kind": "text", "count": 1, "paragraphs": 1, "lines": 1, "note": "bold 'Takeaway banner' + the sentence, 2 runs"}
+  ],
+  "expectedDiagnostics": [
+    {"level": "info", "match": "gradient interpolated in oklab by the browser and in sRGB by PowerPoint"}
+  ],
+  "expectedLint": [
+    {"level": "info", "rule": "colour-gamut", "count": 3, "note": "oklch fill, display-p3 fill, oklch text"}
+  ]
+}

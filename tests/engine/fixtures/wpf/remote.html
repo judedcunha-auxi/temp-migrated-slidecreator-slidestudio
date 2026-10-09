@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>wpf · remote (breaks the authoring contract on purpose)</title>
+<link rel="stylesheet" href="https://remote.test/slide.css">
+<style>
+@font-face { font-family: "Remote Face"; src: url(https://remote.test/f.woff2) format("woff2"); }
+html,body{margin:0;width:1280px;height:720px;overflow:hidden;background:transparent;
+  font-family:"Calibri",Arial,sans-serif;color:#2E2E38;font-size:13px;line-height:1.4}
+.at{position:absolute}
+.face{font-family:"Remote Face",Calibri,sans-serif}
+</style></head><body>
+
+<!-- p07 A: a remote <img>, the case that cannot be a torture family -->
+<img class="at" id="map" src="https://remote.test/map.png" width="560" height="290" style="left:40px;top:40px">
+
+<!-- a remote background image behind a coloured box that holds text -->
+<div class="at" id="bg" style="left:640px;top:40px;width:240px;height:120px;background-color:#E8F1FB;background-image:url(https://remote.test/bg.png);background-size:cover"><div style="padding:12px;color:#0B2545">Child text over a remote background</div></div>
+
+<!-- protocol-relative: under file:// this is file://remote.test/pr.png, a file share -->
+<img class="at" id="pr" src="//remote.test/pr.png" width="80" height="60" style="left:920px;top:40px">
+
+<!-- a remote iframe: Chromium would paint its error page into the deck -->
+<iframe class="at" id="embed" src="https://remote.test/embed" style="left:640px;top:200px;width:300px;height:150px;border:0"></iframe>
+
+<!-- an SVG image with a remote href -->
+<svg class="at" id="logo" style="left:40px;top:380px" width="200" height="80" viewBox="0 0 200 80">
+  <image href="https://remote.test/logo.png" x="10" y="10" width="120" height="40"/>
+</svg>
+
+<!-- a private address: never public, whatever the policy -->
+<img class="at" id="private" src="https://10.0.0.1/x.png" width="80" height="60" style="left:1000px;top:200px">
+
+<div class="at face" style="left:40px;top:500px;width:600px">Text set in a remote web font the export never loads.</div>
+
+</body></html>

@@ -1,0 +1,151 @@
+<!doctype html>
+<!-- Torture family: svg-shapes (WP2).
+     One case per row of 12-WP2's mapping table that is not a <path>: primitives, inherited
+     presentation attributes through <g>, styling that only a CSS class carries, gradients,
+     markers, use/symbol, an embedded image, clipping, and every construct the contract declares
+     raster-only. Nothing here uses JavaScript and every top-level block is absolutely positioned
+     and otherwise unstyled, so the only IR elements this slide produces come from its <svg> roots
+     and the counts in svg-shapes.expect.json are exactly the SVG expansion. -->
+<html><head><meta charset="utf-8"><style>
+html,body{margin:0;width:1280px;height:720px;overflow:hidden;background:transparent;
+  font-family:Arial,Helvetica,sans-serif;color:#2E2E38}
+.block{position:absolute}
+/* Styling that lives only in a CSS class: the extractor must read it through getComputedStyle,
+   never from an attribute (12-WP2 §Principle). The size is in pt on purpose. */
+.lbl{font-size:6pt;fill:#516467;font-weight:bold}
+</style></head><body>
+
+<!-- ============ A: primitives, in a viewBox that scales everything by 2 ============ -->
+<div class="block" style="left:40px;top:40px">
+  <svg width="600" height="300" viewBox="0 0 300 150">
+    <rect x="10" y="10" width="60" height="30" fill="#1A9AFA"/>
+    <rect x="80" y="10" width="60" height="30" rx="6" fill="#2E2E38"/>
+    <rect x="150" y="10" width="60" height="30" rx="10" ry="4" fill="#747480"/>
+
+    <circle cx="30" cy="70" r="20" fill="#2DB757"/>
+    <ellipse cx="100" cy="70" rx="24" ry="12" fill="#FFE600" transform="rotate(30 100 70)"/>
+
+    <line x1="150" y1="60" x2="250" y2="60" stroke="#2E2E38" stroke-width="2" stroke-dasharray="6 3"/>
+    <polyline points="150,80 180,95 210,75 250,90" fill="none" stroke="#1A9AFA" stroke-width="1.5"
+              stroke-linecap="round" stroke-linejoin="round"/>
+    <polygon points="20,110 60,110 40,140" fill="#FF4136"/>
+
+    <!-- stroke inherited from a presentation attribute on the g, like client gridline bands -->
+    <g stroke="#E6E6EC" stroke-width="1">
+      <line x1="80" y1="112" x2="280" y2="112"/>
+      <line x1="80" y1="126" x2="280" y2="126"/>
+    </g>
+
+    <!-- effective opacity is the product: 0.5 × 0.5 = 0.25 -->
+    <g opacity="0.5">
+      <rect x="230" y="100" width="50" height="40" fill="#2E2E38" opacity="0.5"/>
+    </g>
+
+    <text class="lbl" x="80" y="146">CSS class only</text>
+  </svg>
+</div>
+
+<!-- ============ B: paint servers, markers, use/symbol, image ============ -->
+<div class="block" style="left:40px;top:370px">
+  <svg width="600" height="150" viewBox="0 0 600 150">
+    <defs>
+      <linearGradient id="gradBox">
+        <stop offset="0" stop-color="#1A9AFA"/>
+        <stop offset="1" stop-color="#2E2E38" stop-opacity="0.6"/>
+      </linearGradient>
+      <linearGradient id="gradUser" gradientUnits="userSpaceOnUse" x1="120" y1="10" x2="120" y2="50">
+        <stop offset="0%" stop-color="#FFE600"/>
+        <stop offset="100%" stop-color="#FF4136"/>
+      </linearGradient>
+      <linearGradient id="gradTurned" gradientTransform="rotate(90 0.5 0.5)">
+        <stop offset="0" stop-color="#FFFFFF"/>
+        <stop offset="1" stop-color="#2DB757"/>
+      </linearGradient>
+      <radialGradient id="gradRadial">
+        <stop offset="0" stop-color="#FFFFFF"/>
+        <stop offset="1" stop-color="#1A9AFA"/>
+      </radialGradient>
+      <marker id="mTriangle" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+        <path d="M0,0 L8,4 L0,8 Z" fill="#2E2E38"/>
+      </marker>
+      <marker id="mDot" markerWidth="6" markerHeight="6" refX="3" refY="3">
+        <circle cx="3" cy="3" r="3" fill="#2E2E38"/>
+      </marker>
+      <marker id="mOdd" markerWidth="8" markerHeight="8" refX="4" refY="4">
+        <rect x="0" y="0" width="4" height="8" fill="#FF4136"/>
+        <rect x="4" y="0" width="4" height="8" fill="#FFE600"/>
+      </marker>
+      <symbol id="badge" viewBox="0 0 10 10">
+        <circle cx="5" cy="5" r="4" fill="#2DB757"/>
+      </symbol>
+    </defs>
+
+    <rect x="10" y="10" width="80" height="40" fill="url(#gradBox)"/>
+    <rect x="110" y="10" width="80" height="40" fill="url(#gradUser)"/>
+    <rect x="210" y="10" width="80" height="40" fill="url(#gradTurned)"/>
+    <circle cx="340" cy="30" r="20" fill="url(#gradRadial)"/>
+
+    <line x1="10" y1="80" x2="120" y2="80" stroke="#2E2E38" stroke-width="2"
+          marker-start="url(#mDot)" marker-end="url(#mTriangle)"/>
+    <!-- an unclassifiable marker: the line has to become a picture, with a reason -->
+    <line x1="150" y1="80" x2="260" y2="80" stroke="#FF4136" stroke-width="2" marker-end="url(#mOdd)"/>
+
+    <use href="#badge" x="300" y="65" width="30" height="30"/>
+
+    <image x="360" y="65" width="32" height="32" preserveAspectRatio="none"
+           href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAIAAAAmkwkpAAAAEUlEQVR4nGOQmvULjhiI4wAArRIa4ROWPe4AAAAASUVORK5CYII="/>
+
+    <text x="10" y="130" font-size="11" fill="#2E2E38">plain <tspan font-weight="bold">bold</tspan> tail</text>
+    <text x="470" y="120" font-size="10" fill="#747480" text-anchor="middle"
+          transform="rotate(-90 470 120)">Rotated −90°</text>
+  </svg>
+</div>
+
+<!-- ============ C: clipping, a real shadow, and the raster-only constructs ============ -->
+<div class="block" style="left:700px;top:370px">
+  <svg width="520" height="150" viewBox="0 0 520 150">
+    <defs>
+      <clipPath id="clipRect"><rect x="10" y="10" width="40" height="40"/></clipPath>
+      <clipPath id="clipRound"><circle cx="100" cy="100" r="18"/></clipPath>
+      <filter id="fBlur"><feGaussianBlur stdDeviation="2"/></filter>
+      <filter id="fShadow"><feDropShadow dx="2" dy="3" stdDeviation="2"
+                                         flood-color="#2E2E38" flood-opacity="0.35"/></filter>
+      <mask id="mFade"><rect x="0" y="0" width="520" height="150" fill="#808080"/></mask>
+      <pattern id="pStripe" width="6" height="6" patternUnits="userSpaceOnUse">
+        <rect x="0" y="0" width="3" height="6" fill="#C4C4CD"/>
+      </pattern>
+      <path id="curve" d="M340,130 Q400,80 460,130"/>
+    </defs>
+
+    <!-- a rectangular clipPath is a clip; the shape stays native -->
+    <rect x="10" y="10" width="80" height="40" fill="#1A9AFA" clip-path="url(#clipRect)"/>
+    <!-- feDropShadow is a real shadow, never a raster -->
+    <rect x="120" y="10" width="60" height="40" fill="#FFE600" filter="url(#fShadow)"/>
+    <!-- …every other filter is -->
+    <rect x="210" y="10" width="60" height="40" fill="#2DB757" filter="url(#fBlur)"/>
+    <rect x="300" y="10" width="60" height="40" fill="#FF4136" mask="url(#mFade)"/>
+    <rect x="390" y="10" width="60" height="40" fill="url(#pStripe)"/>
+    <circle cx="100" cy="100" r="25" fill="#747480" clip-path="url(#clipRound)"/>
+    <foreignObject x="200" y="80" width="120" height="50">
+      <div xmlns="http://www.w3.org/1999/xhtml" style="font:10px Arial;color:#2E2E38">foreign</div>
+    </foreignObject>
+    <!-- text on a path: PowerPoint has no equivalent, so the text becomes a picture -->
+    <text font-size="11" fill="#2E2E38"><textPath href="#curve">text on a curve</textPath></text>
+    <!-- sticks 40px out of the viewport: the svg's own overflow clips it -->
+    <rect x="460" y="90" width="100" height="40" fill="#C4C4CD"/>
+  </svg>
+</div>
+
+<!-- ============ D: a ring segment drawn as a dashed circle (a client donut) ============ -->
+<div class="block" style="left:700px;top:40px">
+  <svg width="300" height="300" viewBox="0 0 300 300">
+    <g transform="translate(150,150)">
+      <circle r="100" fill="none" stroke="#C4C4CD" stroke-width="24"/>
+      <circle r="100" fill="none" stroke="#1A9AFA" stroke-width="24"
+              stroke-dasharray="157.08 471.24" transform="rotate(-90)"/>
+    </g>
+  </svg>
+</div>
+
+<aside class="notes" hidden>svg-shapes torture slide: every non-path row of the WP2 mapping table.</aside>
+</body></html>
