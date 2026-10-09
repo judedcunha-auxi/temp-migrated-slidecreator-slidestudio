@@ -12,6 +12,8 @@ Job types registered here:
 | `slides.design_and_export` | `/api/pptx-submit`, `/api/image-to-slide` | `app/core/slides/jobs.py` |
 | `exports.stitch_deck`, `brand.extract`, `masters.render_layouts` | (not yet by a Darwin route) | `app/core/slides/jobs.py` |
 | `darwin.pptx_deck` | `/api/pptx-deck-submit` | `app/core/darwin/exports.py` |
+| `darwin.brand_pptx`, `darwin.brand_guidelines` | `/api/brand-pptx`, `/api/brand-extract` | `app/core/darwin/brand_jobs.py` |
+| `darwin.brand_preview` | `/api/brand-preview` | `app/core/darwin/brand_preview.py` |
 
 Every type is registered NOT expensive: Darwin had no per-user in-flight limit, and the queue's limit
 of 3 would add a 429 to its routes. TODO-P5 in-flight: Phase 5 turns it on, with the rate limits.
@@ -34,6 +36,7 @@ from app.config.darwin import DarwinSettings, darwin_settings
 from app.config.engine import EngineSettings, engine_settings
 from app.config.settings import Settings
 from app.config.storyline import StorylineSettings, storyline_settings
+from app.core.darwin import brand_jobs, brand_preview
 from app.core.darwin import exports as darwin_exports
 from app.core.darwin.image_gen import ImageGenerator, OpenAIImageGenerator
 from app.core.darwin.usage import KIND_DESIGN, KIND_STORYLINE, record_usage_quietly
@@ -164,6 +167,15 @@ def build_runtime(
     design = darwin_exports.SLIDE_JOB
     registry.handlers[design] = ledgered(registry.handlers[design], storage, kind=KIND_DESIGN,
                                          model=ai.llm_design_model)
+
+    # --- brand routes (brand_jobs.py, brand_preview.py): were the brand -background functions (D31) -----
+    # TODO-P5 in-flight: registered NOT expensive, as the rest (Darwin had no per-user in-flight limit).
+    images = images if images is not None else OpenAIImageGenerator(darwin)
+    brand_jobs.register(registry, brand_jobs.BrandJobDeps(
+        storage=storage, renderer_factory=renderer_factory or _renderer_factory(engine),
+        guidelines_model=model, storyline=storyline))
+    brand_preview.register(registry, brand_preview.PreviewDeps(storage=storage, redis=redis, images=images,
+                                                               darwin=darwin))
 
     queue = JobQueue(redis, storage)
     handlers = registry.install(queue)

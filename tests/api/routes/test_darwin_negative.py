@@ -12,6 +12,7 @@ Expected codes and texts are today's (contract/INDEX.md), not the standard's.
 
 from __future__ import annotations
 
+import base64
 from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
@@ -100,6 +101,99 @@ ROUTES = [
           lambda env, h: env.client.post("/api/image-to-slide", json={"file": "x"}, headers=h),
           (400, 'Send the image as multipart/form-data with a "file" field'), None),
 ]
+
+# --- feature/darwin-brands: the brand routes and the admin routes ------------------------------------
+# A brand that is not the caller's is "Brand not found" (404), never 403: Darwin cannot tell a brand
+# you may not see from one that does not exist. Admin routes: a signed-in non-admin is 403.
+PNG_B64 = base64.b64encode(tiny_png()).decode()
+PDF_B64 = base64.b64encode(b"%PDF-1.4 x").decode()
+PPTX_FILE = {"file": ("t.pptx", b"PK\x03\x04" + b"\0" * 32, "application/octet-stream")}
+BOX = {"left": 0.1, "top": 0.1, "width": 0.5, "height": 0.1}
+
+
+def _alice_brand(env: DarwinEnv) -> str:
+    return env.seed_brand("alice")
+
+
+def _alice_job(path: str, *, files: Any = None, body: Callable[[DarwinEnv], Any] | None = None) -> Callable[[DarwinEnv], str]:
+    """A job alice submitted to `path` (multipart `files`, or the JSON `body(env)` builds)."""
+    def submit(env: DarwinEnv) -> str:
+        if files is not None:
+            r = env.client.post(path, headers=env.auth("alice"), files=files)
+        else:
+            r = env.client.post(path, headers=env.auth("alice"), json=body(env) if body else {})
+        return str(r.json()["jobId"])
+    return submit
+
+
+def _admin(env: DarwinEnv) -> dict[str, str]:
+    env.user("root", admin=True)
+    return env.auth("root")
+
+
+ROUTES += [
+    Route("/api/brands", lambda env, h: env.client.get("/api/brands", headers=h),
+          lambda env, h: env.client.post("/api/brands", json={"kit": {}}, headers=h),
+          (400, "name is required (1-120 characters)"),
+          lambda env: env.client.patch("/api/brands", json={"brandId": _alice_brand(env), "name": "x"},
+                                       headers=env.auth("bob")), (404, "Brand not found")),
+    Route("/api/brand-asset", lambda env, h: env.client.get("/api/brand-asset?kind=style-default", headers=h),
+          lambda env, h: env.client.get("/api/brand-asset?kind=favicon", headers=h),
+          (400, "kind must be one of logo, master, titleMaster, dividerMaster"),
+          lambda env: env.client.post("/api/brand-asset", headers=env.auth("bob"), json={
+              "brandId": _alice_brand(env), "kind": "logo", "b64": PNG_B64}), (404, "Brand not found")),
+    Route("/api/brand-pptx", lambda env, h: env.client.post("/api/brand-pptx", files=PPTX_FILE, headers=h),
+          lambda env, h: env.client.post("/api/brand-pptx", json={"file": "x"}, headers=h),
+          (415, "Expected multipart/form-data"),
+          lambda env: env.client.post("/api/brand-pptx", data={"brandId": _alice_brand(env)}, files=PPTX_FILE,
+                                      headers=env.auth("bob")), (404, "Brand not found")),
+    Route("/api/brand-pptx-status", lambda env, h: env.client.get(f"/api/brand-pptx-status?jobId={UNKNOWN}", headers=h),
+          lambda env, h: env.client.get("/api/brand-pptx-status", headers=h), (400, "jobId is required"),
+          lambda env: env.client.get(f"/api/brand-pptx-status?jobId={_alice_job('/api/brand-pptx', files=PPTX_FILE)(env)}",
+                                     headers=env.auth("bob")), (403, "Not your job")),
+    Route("/api/brand-archetypes", lambda env, h: env.client.post("/api/brand-archetypes", json={}, headers=h),
+          lambda env, h: env.client.post("/api/brand-archetypes", json={}, headers=h), (400, "brandId required"),
+          lambda env: env.client.post("/api/brand-archetypes", headers=env.auth("bob"), json={
+              "brandId": _alice_brand(env), "layouts": {"cover": 0, "divider": 0, "content": 0}}),
+          (404, "Brand not found")),
+    Route("/api/brand-heading", lambda env, h: env.client.post("/api/brand-heading", json={}, headers=h),
+          lambda env, h: env.client.post("/api/brand-heading", json={"brandId": UNKNOWN, "archetype": "x"}, headers=h),
+          (400, "archetype must be cover, divider or content"),
+          lambda env: env.client.post("/api/brand-heading", headers=env.auth("bob"), json={
+              "brandId": _alice_brand(env), "archetype": "cover", "box": BOX}), (404, "Brand not found")),
+    Route("/api/brand-extract", lambda env, h: env.client.post("/api/brand-extract", json={"b64": PDF_B64}, headers=h),
+          lambda env, h: env.client.post("/api/brand-extract", json={"b64": PNG_B64}, headers=h),
+          (400, "Guidelines must be a PDF"),
+          lambda env: env.client.post("/api/brand-extract", headers=env.auth("bob"), json={
+              "b64": PDF_B64, "brandId": _alice_brand(env)}), (404, "Brand not found")),
+    Route("/api/brand-extract-status",
+          lambda env, h: env.client.get(f"/api/brand-extract-status?jobId={UNKNOWN}", headers=h),
+          lambda env, h: env.client.get("/api/brand-extract-status?jobId=", headers=h), (400, "jobId is required"),
+          lambda env: env.client.get(
+              f"/api/brand-extract-status?jobId={_alice_job('/api/brand-extract', body=lambda e: {'b64': PDF_B64})(env)}",
+              headers=env.auth("bob")), (403, "Not your job")),
+    Route("/api/brand-preview", lambda env, h: env.client.post("/api/brand-preview", json={"brandId": UNKNOWN}, headers=h),
+          lambda env, h: env.client.post("/api/brand-preview", json={}, headers=h), (400, "brandId required"),
+          lambda env: env.client.post("/api/brand-preview", json={"brandId": _alice_brand(env)},
+                                      headers=env.auth("bob")), (404, "Brand not found")),
+    Route("/api/brand-preview-status",
+          lambda env, h: env.client.get(f"/api/brand-preview-status?jobId={UNKNOWN}", headers=h),
+          lambda env, h: env.client.get("/api/brand-preview-status", headers=h), (400, "jobId is required"),
+          lambda env: env.client.get(
+              f"/api/brand-preview-status?jobId={_alice_job('/api/brand-preview', body=lambda e: {'brandId': _alice_brand(e)})(env)}",
+              headers=env.auth("bob")), (403, "Not your job")),
+    # Admin routes: "another user's object" is the admin route itself, called by a non-admin.
+    # admin-metrics takes no input that can be invalid (a junk ?days= is 30), so its "invalid input"
+    # row is the same refusal: a non-admin never reaches the parsing.
+    Route("/api/admin-metrics", lambda env, h: env.client.get("/api/admin-metrics", headers=h),
+          lambda env, h: env.client.get("/api/admin-metrics?days=abc", headers=h), (403, "Admin access required"),
+          lambda env: env.client.get("/api/admin-metrics", headers=env.auth("alice")), (403, "Admin access required")),
+    Route("/api/admin-org-brands", lambda env, h: env.client.get("/api/admin-org-brands", headers=h),
+          lambda env, h: env.client.post("/api/admin-org-brands", json={"action": "rename"}, headers=_admin(env)),
+          (400, "action must be createBrand or addDomain"),
+          lambda env: env.client.delete("/api/admin-org-brands?domain=acme.com", headers=env.auth("alice")),
+          (403, "Admin access required")),
+]
 IDS = [r.path for r in ROUTES]
 
 
@@ -148,3 +242,32 @@ def test_5_invalid_input(route: Route, tmp_path: Path) -> None:
 @pytest.mark.xfail(reason="TODO-P5 over the limit: Redis rate limits and in-flight caps arrive in Phase 5", run=False)
 def test_6_over_the_limit(route: Route, tmp_path: Path) -> None:
     raise NotImplementedError
+
+
+# --- feature/darwin-brands: the two routes the six-test pattern does not fit -------------------------
+def test_analytics_event_negatives(tmp_path: Path) -> None:
+    """Auth as everywhere; invalid input is Darwin's SILENT 200 (fire-and-forget), never a 400; no
+    per-user object (every batch is the caller's own)."""
+    with darwin_env(tmp_path) as env:
+        def post(headers: dict[str, str], **kwargs: Any) -> Any:
+            return env.client.post("/api/analytics-event", headers=headers, **kwargs)
+
+        assert (post({}, json={"events": []}).json()) == {"error": "Missing bearer token"}
+        assert post(env.auth("alice", expired=True), json={"events": []}).status_code == 401
+        assert post(env.auth("alice", audience="another-service"), json={"events": []}).status_code == 401
+        r = post(env.auth("alice"), content=b"{not json")
+        assert (r.status_code, r.json()) == (200, {"ok": True})
+
+
+def test_userinfo_does_not_verify_by_design(tmp_path: Path) -> None:
+    """`/api/userinfo` is Supabase Auth's OIDC userinfo shim (C8): it decodes, it does not verify. So a
+    missing token is its own 401, and an expired or foreign-audience token still decodes (200)."""
+    with darwin_env(tmp_path) as env:
+        r = env.client.get("/api/userinfo")
+        assert (r.status_code, r.json()) == (401, {"error": "Unauthorized"})
+        for token in (env.issuer.token("alice", email="a@acme.com", expired=True),
+                      env.issuer.token("alice", email="a@acme.com", audience="another-service")):
+            r = env.client.get("/api/userinfo", headers={"Authorization": f"Bearer {token}"})
+            assert (r.status_code, r.json()["email"]) == (200, "a@acme.com")
+        r = env.client.get("/api/userinfo", headers={"Authorization": "Bearer not-a-jwt"})
+        assert r.status_code == 401 and r.json()["error"] == "Invalid token"

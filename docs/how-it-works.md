@@ -17,8 +17,8 @@ place, written in Python and run on Azure:
   answered by this service instead of Netlify.
 
 The frame (Phase 1), the export engine (Phase 2) and the AI design core (Phase 3) are here, and
-the first of Darwin's routes have moved in (Phase 7a): the storyline, the intake chat, and the
-PowerPoint exports.
+the first of Darwin's routes have moved in (Phase 7a): the storyline, the intake chat, the
+PowerPoint exports, brand setup, the admin pages, usage events and the sign-in helper.
 
 ## 2. What is here today
 
@@ -164,13 +164,24 @@ structured data"; in the service that is Claude, through the same model layer th
 and in the tests a scripted stand-in, so they cost nothing. [architecture.md](architecture.md#the-storyline-phase-3) has the design.
 
 **Darwin's first routes.** Darwin's web app and the auxi Connector call addresses like
-`/api/storyline` and `/api/pptx-submit`. The first ten of them are answered here now, exactly as
+`/api/storyline` and `/api/pptx-submit`. Twenty-four of the thirty-seven are answered here now, exactly as
 Netlify answers them today, down to the odd corners (an unknown job id says "pending" forever; a
 broken request body gets "Internal error", not "Bad request"), because the callers depend on them.
 The plan's recorded contract for each route is the test: every documented answer is reproduced, or
 the test says why it can no longer happen. Behind the routes, the old background functions are
 jobs on the queue, and "send it to Slide Studio" is a call to the design pipeline inside this
 service. [darwin-api.md](darwin-api.md) explains the layer and how to move the remaining routes.
+
+**Brands.** A brand is a company's look: colours, fonts, logo, slide masters and the "furniture"
+(logo, footer, header band) lifted from its PowerPoint template. A brand is either personal or an
+organisation's: an admin creates it and maps an email domain to it, and everyone who signs in with a
+confirmed address at that domain can use it but not change it. Uploading a template reads it inside
+the service (colours, fonts, every layout's furniture) and draws a picture of each layout through the
+PowerPoint renderer, so the person can pick which layout is the cover, the section divider and the
+content slide. A brand-guidelines PDF is read by the AI for colours, fonts and a style note, and a
+preview renders one sample slide in the brand's look (cached until the brand changes). Every one of
+these runs as a background job in the name of the person who asked, so the service checks again,
+when the job runs, that they may still touch that brand.
 
 **Who is calling.** Darwin's routes need a signed-in user. The caller sends a token from the
 identity provider; the service checks its signature against the provider's published keys, that
