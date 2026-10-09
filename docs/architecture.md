@@ -102,7 +102,24 @@ The same input gives a byte-identical `.pptx`.
 `emit/pptx.py: finalize` rewrites the saved package: every zip entry dated 1980-01-01 and written
 in a fixed order, `dcterms:created/modified` pinned (in the deck and in every embedded chart
 workbook), PNG metadata chunks stripped from our images, and the master's own bytes restored for
-its masters, layouts and theme.
+its masters, layouts and theme. New slide parts get the first free `slideN.xml` names
+(`_rename_new_slides`), so the names depend only on the package.
+
+### Masters that keep slides alive: the duplicate-parts fix
+
+`strip_slides` empties the master before the new slides go in. Two kinds of master used to make
+the saved zip contain two entries with the same name (and PowerPoint offer a repair):
+
+- a **custom show** (`p:custShowLst`) refers to slides by the same relationship id as the slide
+  list, so python-pptx's `drop_rel` (which keeps a relationship referenced twice) kept the old
+  slide part, and the new slide took its name;
+- a **layout that links to a slide** (a "back to agenda" button) keeps the old slide part
+  reachable even once the slide list is empty.
+
+The fix: the section list and custom shows go first, each slide relationship is popped
+unconditionally, and after the new slides are added each is renamed to the first
+`/ppt/slides/slideN.xml` no surviving part uses. Regression tests:
+`tests/engine/emit/test_strip_slides.py` (synthetic masters).
 
 ### Licence-gated modules
 
@@ -134,7 +151,7 @@ K = kept, R = rewritten, D = dropped (migration plan §4.2).
 | `renderer.py` | same | R | `Renderer` protocol + HTTP client + offline renderer; `info` and the global stand-in dropped; filename join is the real path, `index.json` optional. |
 | `classify/*` | same | K | |
 | `extract/*` (incl. `page.js`) | same | K/R | Derived dir per workspace; browser from `app/core/browser_pool.py`. |
-| `emit/pptx.py`, `template.py`, `text.py`, `shapes.py` | same | K + fixes | Fixes follow (plan: duplicate parts, RTL). |
+| `emit/pptx.py`, `template.py`, `text.py`, `shapes.py` | same | K + fixes | Duplicate-parts fix. |
 | `emit/charts.py`, `emit/draw.py` | same | K (licence-gated) | D3. |
 | `verify/lint.py`, `text_layout.py`, `fit.py`, `text_deck.py`, `coverage.py` | same | K | |
 | `verify/gate.py`, `suite.py`, `torture.py`, `torture_expect.py` | same | K (CI/staging) | Take a `Renderer`; need `/render` + `/verify`. |

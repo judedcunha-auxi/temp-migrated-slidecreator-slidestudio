@@ -31,6 +31,7 @@ from pathlib import Path
 from typing import Any
 
 from pptx import Presentation
+from pptx.opc.packuri import PackURI
 
 from app.engine.emit import shapes as shape_emitter
 from app.engine.emit import template as template_module
@@ -62,23 +63,59 @@ def strip_slides(prs: Any) -> int:
     """Delete every slide, and the bookkeeping that still points at them.
 
     Sections and custom shows reference slides; leaving a stale reference behind is a PowerPoint
-    repair prompt, which silently drops shapes and makes every downstream count wrong.
-    """
-    slide_id_list = prs.slides._sldIdLst
-    removed = 0
-    for entry in list(slide_id_list):
-        rid = entry.get(f"{{{_R_NS}}}id")
-        prs.part.drop_rel(rid)
-        slide_id_list.remove(entry)
-        removed += 1
+    repair prompt, which silently drops shapes and makes every downstream count wrong. Order matters
+    (the duplicate-parts fix, plan §4.2 "K + fixes"):
 
+    1. The section list (`p14:sectionLst` in an `ext`) and `p:custShowLst` go **first**. A custom
+       show refers to a slide by the same `r:id` as `sldIdLst`, so while it is there each slide
+       relationship is referenced twice.
+    2. Each slide relationship is then **popped unconditionally**. `part.drop_rel(rId)` only drops a
+       relationship whose reference count is below 2, so with a custom show still counted it kept
+       the old slide part in the package, and the new slide written under the same name produced a
+       duplicate zip entry (and a repair prompt).
+
+    A slide part can still survive, legitimately, when something the template keeps (a layout or
+    master hyperlink to a slide, say) relates to it; `emit` gives the new slides names no surviving
+    part uses (`_rename_new_slides`).
+    """
     root = prs.part._element
     for ext in root.findall(f".//{{{_P_NS}}}ext"):
         if ext.find(f"{{{_P14_NS}}}sectionLst") is not None:
             ext.getparent().remove(ext)
     for custom_shows in root.findall(f"{{{_P_NS}}}custShowLst"):
         root.remove(custom_shows)
+
+    slide_id_list = prs.slides._sldIdLst
+    removed = 0
+    for entry in list(slide_id_list):
+        rid = entry.get(f"{{{_R_NS}}}id")
+        slide_id_list.remove(entry)
+        if rid is not None and rid in prs.part.rels:
+            prs.part.rels.pop(rid)
+        removed += 1
     return removed
+
+
+def _rename_new_slides(prs: Any, new_slides: list[Any]) -> None:
+    """Name each new slide part `/ppt/slides/slideN.xml` with the first N no other part uses.
+
+    python-pptx names a new slide `slide<count + 1>.xml` without looking at the package, so when an
+    old slide part is still reachable (a layout's hyperlink to a slide, kept because the template is
+    restored byte for byte), the new slide takes the same name and the saved zip has two entries
+    called `ppt/slides/slide1.xml`. The new slides are renamed, never the old ones: the template's
+    own relationships must keep pointing where they pointed. Deterministic: the same package always
+    gets the same names.
+    """
+    new_parts = {id(slide.part) for slide in new_slides}
+    used = {str(part.partname) for part in prs.part.package.iter_parts() if id(part) not in new_parts}
+    number = 1
+    for slide in new_slides:
+        while f"/ppt/slides/slide{number}.xml" in used:
+            number += 1
+        name = f"/ppt/slides/slide{number}.xml"
+        slide.part.partname = PackURI(name)
+        used.add(name)
+        number += 1
 
 
 def resolve_layout(prs: Any, manifest: Manifest, layout: Layout) -> Any:
@@ -129,9 +166,11 @@ def emit(
     prs = open_master(master_path)
     strip_slides(prs)
 
+    new_slides: list[Any] = []
     for index, ir in enumerate(irs, start=1):
         layout = manifest.layout(ir.slide.layoutId) if ir.slide.layoutId else manifest.layouts[0]
         slide = prs.slides.add_slide(resolve_layout(prs, manifest, layout))
+        new_slides.append(slide)
         context = EmitContext(
             manifest=manifest,
             layout=layout,
@@ -144,6 +183,7 @@ def emit(
         )
         _emit_slide(slide, ir, context)
 
+    _rename_new_slides(prs, new_slides)
     out_path = Path(out_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     prs.save(str(out_path))
