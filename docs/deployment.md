@@ -68,9 +68,13 @@ an instance can take traffic.
 >   system libraries Chromium needs). The engine launches it with `--no-sandbox` and
 >   `--disable-dev-shm-usage` (`app/core/browser_pool.py`), so it runs as root and with the small
 >   `/dev/shm` a container gets.
-> - **Fonts**, from Debian/Ubuntu packages: `fonts-crosextra-carlito` (metric-compatible with
->   Calibri), `fonts-liberation` (Arial, Times New Roman, Courier New), `fonts-dejavu-core` (the
->   last resort). The engine measures a Microsoft family that is not installed in its stand-in
+> - **Fonts**, from Debian/Ubuntu packages, as Slide Studio's image does:
+>   `ttf-mscorefonts-installer` (the Microsoft core fonts: Arial, Arial Black, Times New Roman,
+>   Georgia, Verdana, Courier New...; on Debian it needs the `contrib` component and the EULA
+>   pre-accepted with `debconf-set-selections`, or the install hangs; the fonts are downloaded at
+>   build time and never committed), `fonts-crosextra-carlito` (metric-compatible with Calibri,
+>   which no Linux package carries), `fonts-liberation` and `fonts-dejavu-core` (fallbacks), then
+>   `fc-cache -f`. The engine measures a Microsoft family that is not installed in its stand-in
 >   (`app/engine/emit/text.py: METRIC_ALIASES`) and still writes the original family into the
 >   file, so PowerPoint draws the real face at the same widths. Without these packages every line
 >   is measured in a fallback and text wraps differently in PowerPoint.

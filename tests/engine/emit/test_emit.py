@@ -33,6 +33,7 @@ from app.engine.ir import IR, Box, Canvas, Element, Slide, assign_ids_and_z
 from app.engine.manifest import Manifest
 from app.engine.reports import EmitOptions
 from tests.engine import helpers as renderer
+from tests.engine.helpers import available, require_faces
 
 A = "http://schemas.openxmlformats.org/drawingml/2006/main"
 P = "http://schemas.openxmlformats.org/presentationml/2006/main"
@@ -437,7 +438,10 @@ def test_face_choice_matches_the_measuring_browser():
     """
     from app.engine.extract.html import measuring_page
 
-    families = ["Segoe UI", "Arial", "Calibri", "Calibri Light"]
+    # Segoe UI and Calibri ship only with Windows/Office; on Linux CI the rule is checked on Arial
+    # (ttf-mscorefonts-installer), which carries the Black face the 800 tie rule needs.
+    families = available(["Segoe UI", "Arial", "Calibri", "Calibri Light"])
+    assert "Arial" in families, "Arial is not installed (CI installs ttf-mscorefonts-installer)"
     with measuring_page(Canvas(320, 200)) as page:
         page.set_content("<html><body></body></html>")
         widths = page.evaluate(
@@ -470,8 +474,9 @@ def test_face_choice_matches_the_measuring_browser():
                 problems.append(f"{family} {weight}: browser {browser:.2f}px ~ {nearest.path.name}, "
                                 f"face_for_exact chose {chosen.path.name} ({ours:.2f}px)")
     assert not problems, "\n".join(problems)
-    assert widths["Calibri Light"][6] == pytest.approx(widths["Calibri Light"][3], abs=0.01), \
-        "the browser no longer synthesises bold on Calibri Light at 700"
+    if "Calibri Light" in widths:
+        assert widths["Calibri Light"][6] == pytest.approx(widths["Calibri Light"][3], abs=0.01), \
+            "the browser no longer synthesises bold on Calibri Light at 700"
 
 
 def test_the_browser_emboldens_calibri_light_at_700():
@@ -489,6 +494,7 @@ def test_the_browser_emboldens_calibri_light_at_700():
 
     from app.engine.extract.html import measuring_page
 
+    require_faces("Calibri Light")
     sample = "Why balance-sheet banks are losing share"
     weights = (300, 700)
     html = "<html><body style='margin:0;background:#fff'>" + "".join(
@@ -515,7 +521,9 @@ def test_browser_centres_glyphs_with_the_metrics_the_calibration_assumes():
 
     with measuring_page(Canvas(800, 400)) as page:
         page.set_content("<html><body style='margin:0'></body></html>")
-        for family in ("Calibri", "Calibri Light", "Arial", "Segoe UI", "Times New Roman"):
+        families = available(("Calibri", "Calibri Light", "Arial", "Segoe UI", "Times New Roman"))
+        assert {"Arial", "Times New Roman"} <= set(families), "CI installs ttf-mscorefonts-installer"
+        for family in families:
             top = page.evaluate(
                 """(family) => {
                     document.body.replaceChildren();
@@ -589,8 +597,8 @@ def _run_properties(pptx: Path, name: str) -> tuple[str | None, str | None, str 
 
 def test_weights_become_installed_faces(tmp_path):
     """Each weight names the face the browser drew, with `b` only for a Bold member or synthetic bold."""
-    for family in ("Segoe UI", "Calibri", "Arial", "Arial Rounded MT Bold", "Bahnschrift"):
-        assert text_engine.face_for_exact(family) is not None, f"{family} is not installed here"
+    # The matrix is of Windows/Office faces (Segoe UI's five weights, Calibri, a variable Bahnschrift).
+    require_faces("Segoe UI", "Calibri", "Calibri Light", "Arial", "Arial Rounded MT Bold", "Bahnschrift")
     assert text_engine.face_for_exact("Bahnschrift").variable
     assert text_engine.face_for_exact("Lexend") is None, "Lexend must stay absent here (Peter #10)"
 
@@ -1506,6 +1514,7 @@ def test_the_gap_keeps_every_baseline_where_the_browser_drew_it(stack):
     """Under a change of face, size or leading between paragraphs, every line after the first sits the
     browser's distance below it — the first line's own placement residual (`_first_line_dy`) is common to
     the frame. The old gap, `Δc − (L₁ + L₂)/2`, put a client deck's KPI label 2.6 px low in both renderers."""
+    require_faces(*sorted({block[0] for block in LEADING_STACKS[stack]}))
     element = _stacked_element(LEADING_STACKS[stack])
     layout = _plan_with(element)
     browser, renderer_rows = _browser_baselines(element), _renderer_baselines(layout)
@@ -1549,9 +1558,12 @@ def test_the_browser_rounds_ascent_and_descent_to_whole_pixels():
     0.75 / 0.25), and not unrounded (Arial 11 px: 9.96 / 2.33 → 10 / 2)."""
     from app.engine.extract.html import measuring_page
 
-    cases = sorted(EDGE_CONTENT_AREAS) + [(family, 400, size) for family in ("Arial", "Calibri", "Segoe UI",
-                                                                          "Times New Roman")
-                                          for size in (7.5, 8.5, 10.5, 13.0, 16.0, 25.0, 34.0)]
+    # Only the faces installed here: Calibri and Segoe UI ship with Windows/Office only.
+    families = available(("Arial", "Calibri", "Calibri Light", "Segoe UI", "Times New Roman"))
+    assert {"Arial", "Times New Roman"} <= set(families), "CI installs ttf-mscorefonts-installer"
+    cases = [case for case in sorted(EDGE_CONTENT_AREAS) if case[0] in families] + [
+        (family, 400, size) for family in families if family != "Calibri Light"
+        for size in (7.5, 8.5, 10.5, 13.0, 16.0, 25.0, 34.0)]
     with measuring_page(Canvas(640, 200)) as page:
         page.set_content("<html><body></body></html>")
         measured = page.evaluate(

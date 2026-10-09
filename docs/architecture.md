@@ -125,11 +125,15 @@ unconditionally, and after the new slides are added each is renamed to the first
 
 ### Fonts in the container
 
-The Linux container has no Microsoft fonts. It installs metric-compatible stand-ins (Carlito for
-Calibri, Liberation for Arial / Times New Roman / Courier New, DejaVu as the last resort), and the
-engine measures a family that is not installed in its stand-in (`emit/text.py: METRIC_ALIASES`,
-used by the emitter's metrics and the fit predictor). The file still names the family the slide
-asked for, so PowerPoint on the client's machine draws the real face at the same widths. See
+The Linux container (and CI) installs the Microsoft core fonts (`ttf-mscorefonts-installer`:
+Arial, Times New Roman, Georgia, Verdana and the rest of that set), as Slide Studio's image does, so
+those faces are measured as themselves. Calibri, Calibri Light, Cambria and Segoe UI ship only with
+Windows or Office and cannot be installed there, so it also installs metric-compatible stand-ins
+(Carlito for Calibri, Liberation and DejaVu as fallbacks), and the engine measures a family that is
+not installed in its stand-in (`emit/text.py: METRIC_ALIASES`, used by the emitter's metrics and the
+fit predictor). The file still names the family the slide asked for, so PowerPoint on the client's
+machine draws the real face at the same widths. Engine tests that measure a Windows-only face
+itself skip on Linux with that reason (`tests/engine/helpers.py: require_faces`). See
 [deployment.md](deployment.md) for the packages the image needs.
 
 ### Licence-gated modules

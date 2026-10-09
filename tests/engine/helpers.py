@@ -74,3 +74,50 @@ def render_layouts(pptx: Path, width: int, out_dir: Path) -> dict[str, Path]:
 
 def verify(pptx: Path, references: list[Path], out_dir: Path) -> GateReport:
     return renderer().verify(pptx, references, out_dir)
+
+
+# ------------------------------------------------------------------------------- installed fonts
+
+#: Why a test that needs one of these faces skips on Linux: they ship only with Windows or Office.
+#: They are not in `ttf-mscorefonts-installer` (which CI installs, as Slide Studio's CI and image do:
+#: Arial, Arial Black, Times New Roman, Georgia, Verdana, Courier New, Trebuchet MS, Comic Sans MS,
+#: Impact, Webdings, Andale Mono), and their licences forbid redistributing them, so no Linux runner
+#: can have them. The measurements those tests make are of the faces themselves, so a metric-compatible
+#: stand-in (Carlito for Calibri) cannot replace them.
+WINDOWS_ONLY_REASON = ("needs {missing}, which ship only with Windows or Office (not in "
+                       "ttf-mscorefonts-installer, not redistributable): platform-dependent")
+
+
+def installed(family: str, weight: int = 400, italic: bool = False) -> bool:
+    """Whether `family` itself (not a stand-in) is installed in the font folders the engine scans."""
+    from app.engine.emit.text import face_for_exact
+
+    return face_for_exact(family, weight, italic) is not None
+
+
+def available(families: Any) -> list[str]:
+    """The subset of `families` installed here, in order."""
+    return [family for family in families if installed(family)]
+
+
+def require_faces(*families: str) -> None:
+    """Skip the calling test, with the platform reason, unless every one of `families` is installed."""
+    import pytest
+
+    missing = [family for family in families if not installed(family)]
+    if missing:
+        pytest.skip(WINDOWS_ONLY_REASON.format(missing=", ".join(missing)))
+
+
+def measuring_face(family: str, weight: int = 400, italic: bool = False) -> Any:
+    """The face a run in `family` is measured in here: the family itself, else its metric-compatible
+    stand-in (`METRIC_ALIASES`: Calibri -> Carlito on Linux), else None. No generic fallback: a test
+    that measures advances must measure the face the browser drew or one with identical metrics."""
+    from app.engine.emit.text import METRIC_ALIASES, face_for_exact
+
+    face = face_for_exact(family, weight, italic)
+    for alias in METRIC_ALIASES.get(family.strip().lower(), ()) if face is None else ():
+        face = face_for_exact(alias, weight, italic)
+        if face is not None:
+            break
+    return face

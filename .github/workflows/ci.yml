@@ -55,15 +55,20 @@ jobs:
           pip install -r requirements.txt
           pip install -r requirements-dev.txt
 
-      # The export engine measures slides in a real browser (app/engine/extract). Playwright's
-      # bundled Chromium, at the version requirements.txt pins, with its system libraries; plus
-      # the metric-compatible fonts the container ships (docs/deployment.md): Carlito for
-      # Calibri, Liberation for Arial / Times New Roman / Courier New, DejaVu as the last resort.
+      # The export engine measures slides in a real browser (app/engine/extract) with the font files
+      # themselves. Playwright's bundled Chromium, at the version requirements.txt pins, with its
+      # system libraries; and the fonts Slide Studio's CI and image install: the Microsoft core fonts
+      # (Arial, Times New Roman, Georgia, Verdana...; EULA pre-accepted, downloaded at install time,
+      # never committed), Liberation and DejaVu, plus Carlito (metric-compatible with Calibri, which
+      # no Linux package carries). The check fails the step if Arial did not install.
       - name: Install Playwright Chromium and fonts
         id: install-browser
         run: |
           python -m playwright install --with-deps chromium
-          sudo apt-get install -y --no-install-recommends fonts-crosextra-carlito fonts-liberation fonts-dejavu-core
+          echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" | sudo debconf-set-selections
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends             fontconfig ttf-mscorefonts-installer fonts-crosextra-carlito fonts-liberation fonts-dejavu-core
+          fc-cache -f
+          fc-list | grep -qi "/arial.ttf" || { echo "Arial is not installed"; exit 1; }
 
       - name: Verify dependency set is consistent
         id: dependency-check

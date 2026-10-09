@@ -923,7 +923,9 @@ def test_fit_measures_a_semibold_run_in_the_face_the_file_names(tmp_path: Path, 
     """
     from app.engine.emit import pptx as emit_module
     from app.engine.reports import EmitOptions
+    from tests.engine.helpers import require_faces
 
+    require_faces("Segoe UI")                          # Windows-only; its Semibold face is the subject
     semibold = emitter_face_for("Segoe UI", 600)
     assert semibold is not None and semibold.weight == 600, "Segoe UI Semibold is not installed"
     text = "Semibold is narrower than Bold by a few per cent here"

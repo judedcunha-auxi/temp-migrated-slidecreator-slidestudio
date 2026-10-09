@@ -15,7 +15,8 @@ BACKEND_STEPS = [
     ("Install dependencies", ["pip install -r requirements.txt", "pip install -r requirements-dev.txt"]),
     # Added in Phase 2 (not in the standard list): the engine's browser and fonts for the tests.
     ("Install Playwright Chromium and fonts", ["python -m playwright install --with-deps chromium",
-                                               "fonts-crosextra-carlito", "fonts-liberation"]),
+                                               "ttf-mscorefonts-installer", "fonts-crosextra-carlito",
+                                               "fonts-liberation"]),
     ("Verify dependency set is consistent", ["pip check"]),
     ("Import smoke test (app boots)", ['python -c "import app.main"']),
     ("Unit tests", ["pytest tests -v --junitxml=ci-reports/unit.xml"]),

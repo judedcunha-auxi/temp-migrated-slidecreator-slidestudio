@@ -406,8 +406,12 @@ def _runs(element: Element, paragraph: int = 0, line: int = 0) -> list[dict]:
 def _space_px(run: dict) -> float:
     """What a run of one space advances in the file: the face's space + its letter spacing (`spc`)."""
     from app.engine.emit import text as text_engine
-    face = text_engine.face_for_exact(run["font"], int(run.get("weight") or 400), bool(run.get("italic")))
-    assert face is not None, f"{run['font']} is not installed: the measurement needs the face"
+    from tests.engine.helpers import measuring_face
+
+    # The face itself, or its metric-compatible stand-in (Carlito for Calibri on Linux): the browser
+    # draws the stand-in there, and the space advance is identical by design.
+    face = measuring_face(run["font"], int(run.get("weight") or 400), bool(run.get("italic")))
+    assert face is not None, f"{run['font']} (or a metric-compatible stand-in) is not installed"
     return text_engine.face_width_px(face, " ", float(run["sizePx"])) + float(run.get("letterSpacingPx") or 0.0)
 
 
@@ -416,10 +420,10 @@ def _space_px(run: dict) -> float:
 SEAMS = {
     "seam-bullet": ["•", " ", "Severe leakage:", " net price fell 4.2% on discounting"],
     "seam-label": ["Target:", " ", "Business, events, premium upsell"],
-    "seam-formula": ["GROWTH", " ", "+", " ", "LONGER STAYS", " ", "=", " ", "IMPACT"],
+    "seam-formula": ["GROWTH", " ", "+", " ", "LONGER TERMS", " ", "=", " ", "IMPACT"],
     "seam-legend": ["Residual exposure:", " ", "High", " ", "Low"],
     "seam-unit": ["70M", " ", "intl"],
-    "seam-centred": ["VISION 2030", " ", "—", " ", "THE MANDATE"],
+    "seam-centred": ["PLAN FY2030", " ", "—", " ", "THE MANDATE"],
 }
 
 
