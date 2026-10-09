@@ -1,0 +1,30 @@
+{
+  "interaction": {
+    "id": "",
+    "status": "completed",
+    "created": "2026-09-20T17:19:21Z",
+    "model": "gemini-3.8-flash",
+    "object": "interaction",
+    "service_tier": "standard",
+    "updated": "2026-09-20T17:19:21Z",
+    "usage": {
+      "input_tokens_by_modality": [
+        {
+          "modality": "image",
+          "tokens": 1100
+        },
+        {
+          "modality": "text",
+          "tokens": 35921
+        }
+      ],
+      "total_cached_tokens": 0,
+      "total_input_tokens": 37021,
+      "total_output_tokens": 60,
+      "total_thought_tokens": 41,
+      "total_tokens": 37122,
+      "total_tool_use_tokens": 0
+    }
+  },
+  "event_type": "interaction.completed"
+}

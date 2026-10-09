@@ -11,6 +11,7 @@ import ast
 import re
 from pathlib import Path
 
+from app.config.ai import AISettings
 from app.config.engine import EngineSettings
 from app.config.settings import Settings
 
@@ -79,6 +80,18 @@ def test_every_engine_setting_is_in_env_example():
     missing = sorted(f"{prefix}{name.upper()}" for name in EngineSettings.model_fields
                      if f"{prefix}{name.upper()}" not in keys)
     assert not missing, f".env.example is missing: {missing}"
+
+
+def test_every_ai_setting_is_in_env_example():
+    keys = _example_keys()
+    assert not AISettings.model_config.get("env_prefix")
+    missing = sorted(name.upper() for name in AISettings.model_fields if name.upper() not in keys)
+    assert not missing, f".env.example is missing: {missing}"
+
+
+def test_provider_keys_are_empty_placeholders():
+    keys = _example_keys()
+    assert keys["ANTHROPIC_API_KEY"] == "" and keys["GEMINI_API_KEY"] == ""
 
 
 def test_every_direct_environment_read_is_in_env_example():

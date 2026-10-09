@@ -21,6 +21,7 @@ from urllib.parse import urlparse
 from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from app.config.ai import AISettings, ai_settings, check_ai_config, check_ai_production
 from app.config.engine import EngineSettings, check_engine_config, check_engine_production, engine_settings
 
 # Project root is three levels above this file:
@@ -115,10 +116,12 @@ def is_production(s: Settings) -> bool:
     return bool(s.website_instance_id)
 
 
-def secret_values(s: Settings) -> list[str]:
+def secret_values(s: Settings, ai: AISettings | None = None) -> list[str]:
     """Every secret this process holds, for the log scrubber (core/logging_config).
-    Nothing here is logged or returned anywhere else."""
-    values: list[str] = []
+    Nothing here is logged or returned anywhere else. `ai` defaults to the process's
+    AI settings (the provider keys)."""
+    ai = ai if ai is not None else ai_settings
+    values: list[str] = [ai.anthropic_key, ai.gemini_key]
     try:
         values.append(urlparse(s.redis_url).password or "")
     except ValueError:
@@ -147,11 +150,12 @@ def _origin_problem(origin: str, production: bool) -> str | None:
     return None
 
 
-def check_config(s: Settings, engine: EngineSettings | None = None) -> list[str]:
-    """Return the configuration problems in `s` and the engine settings (empty means all good).
+def check_config(s: Settings, engine: EngineSettings | None = None, ai: AISettings | None = None) -> list[str]:
+    """Return the configuration problems in `s`, the engine and the AI settings (empty means all good).
 
-    `engine` defaults to the process's `SLIDE_ENGINE_*` settings (app/config/engine.py); the
-    production-only engine rules apply when `s` is production-like. Pure function of its
+    `engine` defaults to the process's `SLIDE_ENGINE_*` settings (app/config/engine.py) and `ai` to
+    its AI settings (app/config/ai.py: provider keys, models, cost, fan-out); the production-only
+    rules of both apply when `s` is production-like. Pure function of its
     arguments, so tests construct inputs directly. Advisory: main.py
     logs the problems as errors and /readyz refuses traffic in production, but the
     process still boots, so a borderline rule cannot take a running service down.
@@ -160,7 +164,9 @@ def check_config(s: Settings, engine: EngineSettings | None = None) -> list[str]
     problems: list[str] = []
     production = is_production(s)
     engine = engine if engine is not None else engine_settings
+    ai = ai if ai is not None else ai_settings
     problems.extend(check_engine_config(engine))
+    problems.extend(check_ai_config(ai))
 
     # --- always, any environment ------------------------------------------------
     if s.environment and s.environment not in PRODUCTION_ENVIRONMENTS | NON_PRODUCTION_ENVIRONMENTS:
@@ -217,4 +223,5 @@ def check_config(s: Settings, engine: EngineSettings | None = None) -> list[str]
                 "could not call the API (decision D9)."
             )
         problems.extend(check_engine_production(engine))
+        problems.extend(check_ai_production(ai))
     return problems

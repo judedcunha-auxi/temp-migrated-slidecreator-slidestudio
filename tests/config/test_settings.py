@@ -6,7 +6,7 @@ from typing import Any
 
 from app.config.settings import Settings, is_production, secret_values
 from app.config.settings import check_config as _check_config
-from tests.conftest import build_engine_settings, build_settings
+from tests.conftest import build_ai_settings, build_engine_settings, build_settings
 
 GOOD_PROD = {
     "environment": "production",
@@ -22,9 +22,13 @@ GENERAL_SERVICE_PLACEHOLDER = "STORAGE_BACKEND=general: the General service adap
 GOOD_ENGINE_PROD = {"renderer_url": "https://render.example"}
 
 
+#: A production AI configuration: the provider key is required there (a placeholder, not a key).
+GOOD_AI_PROD = {"anthropic_api_key": "placeholder-anthropic-key"}
+
+
 def check_config(s: Settings, **engine: Any) -> list[str]:
     """check_config with explicit engine settings, so the process environment cannot leak in."""
-    return _check_config(s, build_engine_settings(**engine))
+    return _check_config(s, build_engine_settings(**engine), build_ai_settings(**GOOD_AI_PROD))
 
 
 def test_a_default_local_config_has_no_problems():

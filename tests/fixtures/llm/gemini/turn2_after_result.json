@@ -1,0 +1,100 @@
+[
+  {
+    "interaction": {
+      "id": "",
+      "status": "in_progress",
+      "model": "gemini-3.8-flash",
+      "object": "interaction"
+    },
+    "event_type": "interaction.created"
+  },
+  {
+    "interaction_id": "",
+    "status": "in_progress",
+    "event_type": "interaction.status_update"
+  },
+  {
+    "index": 0,
+    "step": {
+      "type": "thought"
+    },
+    "event_type": "step.start"
+  },
+  {
+    "delta": {
+      "signature": "Eq8CCqwCAWkUfRNtDTCMv1JKTLbImgdZw+8dbRWIZpMK3Ih2my54cf5EsN5kv5oLixP78DIvWsg5jkyfyNYR/MuJjmTZWduNJLfI9o+0DqHpjHD+fFAuxBh6ZdSvu9A8bnRJ+P42vVajmr0GLLG+HWYtIvzKqjzyeSg9MxQaXQnjbtm78dqymHOC3tCiwW0jMjMQOiXD1GCXoxAJX2yxA2TECyWs2Z1pzbp9NpJIgoimmj+Ii7qJtiamSubfrhqoHF61DoC8hIWSVfl3AP1IYv6CaqaIna59qnNhY3JSGlgz3DbpRYpkvWKT1x81i/PuAkLY/f5eSWcJ0kVUy2POG8IHIUsh4akb8h9tluVH6xfa8enrQKxvmpBpstYYu/wm7iyCGnpr3YLenw58yfG2s9uB",
+      "type": "thought_signature"
+    },
+    "index": 0,
+    "event_type": "step.delta"
+  },
+  {
+    "index": 0,
+    "event_type": "step.stop"
+  },
+  {
+    "index": 1,
+    "step": {
+      "type": "model_output"
+    },
+    "event_type": "step.start"
+  },
+  {
+    "delta": {
+      "text": "I created the deck's title slide on",
+      "type": "text"
+    },
+    "index": 1,
+    "event_type": "step.delta"
+  },
+  {
+    "delta": {
+      "text": " the `lay_title` master layout, placing the bold headline \"Market outlook 2027\" centered within",
+      "type": "text"
+    },
+    "index": 1,
+    "event_type": "step.delta"
+  },
+  {
+    "delta": {
+      "text": " the upper title container and nesting the subtitle \"Prepared for the board\" in high-contrast white text directly inside the blue accent bar.",
+      "type": "text"
+    },
+    "index": 1,
+    "event_type": "step.delta"
+  },
+  {
+    "index": 1,
+    "event_type": "step.stop"
+  },
+  {
+    "interaction": {
+      "id": "",
+      "status": "completed",
+      "created": "2026-09-20T17:19:21Z",
+      "model": "gemini-3.8-flash",
+      "object": "interaction",
+      "service_tier": "standard",
+      "updated": "2026-09-20T17:19:21Z",
+      "usage": {
+        "input_tokens_by_modality": [
+          {
+            "modality": "image",
+            "tokens": 1100
+          },
+          {
+            "modality": "text",
+            "tokens": 35921
+          }
+        ],
+        "total_cached_tokens": 0,
+        "total_input_tokens": 37021,
+        "total_output_tokens": 60,
+        "total_thought_tokens": 41,
+        "total_tokens": 37122,
+        "total_tool_use_tokens": 0
+      }
+    },
+    "event_type": "interaction.completed"
+  }
+]
