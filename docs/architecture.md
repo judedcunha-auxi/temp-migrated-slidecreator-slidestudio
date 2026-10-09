@@ -98,7 +98,7 @@ when `SLIDE_ENGINE_RENDERER_ENDPOINTS` lists them, and the tests that need them 
 
 ### Determinism
 
-The same input gives a byte-identical `.pptx`.
+The same input gives a byte-identical `.pptx` (`tests/engine/emit/test_determinism.py`).
 `emit/pptx.py: finalize` rewrites the saved package: every zip entry dated 1980-01-01 and written
 in a fixed order, `dcterms:created/modified` pinned (in the deck and in every embedded chart
 workbook), PNG metadata chunks stripped from our images, and the master's own bytes restored for
