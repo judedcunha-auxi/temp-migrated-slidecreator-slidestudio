@@ -23,6 +23,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from app.config.ai import AISettings, ai_settings, check_ai_config, check_ai_production
 from app.config.engine import EngineSettings, check_engine_config, check_engine_production, engine_settings
+from app.config.storyline import check_storyline_config, storyline_settings
 
 # Project root is three levels above this file:
 #   app/config/settings.py -> app/config/ -> app/ -> project root
@@ -165,6 +166,7 @@ def check_config(s: Settings, engine: EngineSettings | None = None, ai: AISettin
     production = is_production(s)
     engine = engine if engine is not None else engine_settings
     problems.extend(check_engine_config(engine))
+    problems.extend(check_storyline_config(storyline_settings))
 
     # --- always, any environment ------------------------------------------------
     if s.environment and s.environment not in PRODUCTION_ENVIRONMENTS | NON_PRODUCTION_ENVIRONMENTS:

@@ -138,6 +138,30 @@ dies, the lease runs out and another worker picks the job up. Nobody runs more t
 expensive jobs at once. What the user sees (queued, running, done) is kept with the General
 service, not in Redis. [architecture.md](architecture.md) has the design.
 
+**The storyline** (`app/core/storyline/`, Phase 3). Before any slide is designed, a deck needs a
+plan: a title, and for each slide a one-sentence conclusion, the kind of slide it is, the picture
+that proves it (a "framework" such as a 2x2 matrix or a waterfall chart), three or four bullets of
+evidence, and which section of the deck it belongs to. Darwin and Slide Studio each had their own
+version of this step; this is the two merged into one.
+
+1. **The intake chat.** A short interview: one question per reply, until the topic, audience, key
+   messages and slide count are pinned down. Each reply costs exactly one AI call (Darwin's version
+   could make two: a bug, C14).
+2. **The draft.** One AI call writes the whole plan as structured data. Two styles: *standard*
+   (Darwin's: 3-4 short bullets per slide) and *dense* (Slide Studio's: up to 6 bullets, for slides
+   that combine several exhibits). The plan can be a full deck, a set of slides, or a single slide.
+3. **The check and the repair.** The answer is checked against the rules (a standard slide with
+   five bullets is rejected, as Darwin rejects it). Then anything fixable is fixed and reported,
+   never failed: a "spider chart", which PowerPoint cannot build natively, becomes a scoring
+   matrix; a layout reference that does not exist is dropped; section-divider slides are added
+   between sections.
+
+Arabic decks get the same plan written in Arabic, with Western digits, and words like "left rail"
+mirrored in anything the AI reads about layout. The draft runs as a background job; its result is
+exactly what Darwin's web app reads today. No AI provider is wired in yet: the storyline asks for
+"a model that answers in structured data", and the tests use a scripted stand-in, so they cost
+nothing. [architecture.md](architecture.md#the-storyline-phase-3) has the design.
+
 ## 3. What happens to a request
 
 ```
