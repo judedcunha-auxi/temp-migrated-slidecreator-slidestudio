@@ -5,7 +5,7 @@ owns only its loader, never a second copy of the data.
 
 | File | What | Read by |
 |---|---|---|
-| `archetypes.json` | The 1,240 slide-layout archetypes in 42 categories (Darwin's `deckArchetypes.json`, de-identified by Slide Studio's `scripts/sync_design_refs.py`). Byte-identical to Slide Studio `server/design_refs/archetypes.json`. | `app/core/storyline/archetypes.py` (the storyline's layout catalog and `archetypeId` checks); `app/core/design_refs` should point its `DATA` path here rather than ship its own copy. |
+| `archetypes.json` | The 1,240 slide-layout archetypes in 42 categories (Darwin's `deckArchetypes.json`, de-identified by Slide Studio's `scripts/sync_design_refs.py`). The same content as Slide Studio `server/design_refs/archetypes.json` (stored with LF line endings). | `app/core/storyline/archetypes.py` (the storyline's layout catalog and `archetypeId` checks); `app/core/design_refs` should point its `DATA` path here rather than ship its own copy. |
 | `frameworks.json` | The 65 canonical framework names, in Darwin's order, and the 284 alias spellings (Darwin `frameworks.ts`; identical to Slide Studio `design_refs/vocabulary.py`). Names and aliases only: the per-framework hints are prompt material and stay with the prompts that use them. | `app/core/storyline/vocabulary.py`; `app/core/design_refs/vocabulary.py` can load `ALIASES` from here. |
 
 **No client material.** `archetypes.json` carries no deck names, page numbers or reference images:
