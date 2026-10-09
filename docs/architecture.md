@@ -121,6 +121,15 @@ unconditionally, and after the new slides are added each is renamed to the first
 `/ppt/slides/slideN.xml` no surviving part uses. Regression tests:
 `tests/engine/emit/test_strip_slides.py` (synthetic masters).
 
+### Fonts in the container
+
+The Linux container has no Microsoft fonts. It installs metric-compatible stand-ins (Carlito for
+Calibri, Liberation for Arial / Times New Roman / Courier New, DejaVu as the last resort), and the
+engine measures a family that is not installed in its stand-in (`emit/text.py: METRIC_ALIASES`,
+used by the emitter's metrics and the fit predictor). The file still names the family the slide
+asked for, so PowerPoint on the client's machine draws the real face at the same widths. See
+[deployment.md](deployment.md) for the packages the image needs.
+
 ### Licence-gated modules
 
 `engine/emit/charts.py` and `engine/emit/draw.py` are derived from StageFlow, third-party code
@@ -151,7 +160,7 @@ K = kept, R = rewritten, D = dropped (migration plan §4.2).
 | `renderer.py` | same | R | `Renderer` protocol + HTTP client + offline renderer; `info` and the global stand-in dropped; filename join is the real path, `index.json` optional. |
 | `classify/*` | same | K | |
 | `extract/*` (incl. `page.js`) | same | K/R | Derived dir per workspace; browser from `app/core/browser_pool.py`. |
-| `emit/pptx.py`, `template.py`, `text.py`, `shapes.py` | same | K + fixes | Duplicate-parts fix. |
+| `emit/pptx.py`, `template.py`, `text.py`, `shapes.py` | same | K + fixes | Duplicate-parts fix; Calibri -> Carlito metrics. |
 | `emit/charts.py`, `emit/draw.py` | same | K (licence-gated) | D3. |
 | `verify/lint.py`, `text_layout.py`, `fit.py`, `text_deck.py`, `coverage.py` | same | K | |
 | `verify/gate.py`, `suite.py`, `torture.py`, `torture_expect.py` | same | K (CI/staging) | Take a `Renderer`; need `/render` + `/verify`. |

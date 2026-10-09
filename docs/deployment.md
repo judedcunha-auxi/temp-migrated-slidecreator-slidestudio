@@ -58,6 +58,33 @@ container, the Dockerfile copies `build_info.json` in, so `/healthz` keeps repor
 The platform's health check must point at **`/readyz`**, not `/healthz`: readiness is what says
 an instance can take traffic.
 
+## The container image
+
+> **TODO (Phase 2 follow-up: the Dockerfile is a later task).** The image must install, besides
+> `requirements.txt`:
+>
+> - **Playwright's Chromium, matching the pinned `playwright`**:
+>   `python -m playwright install --with-deps chromium` (the `--with-deps` part installs the
+>   system libraries Chromium needs). The engine launches it with `--no-sandbox` and
+>   `--disable-dev-shm-usage` (`app/core/browser_pool.py`), so it runs as root and with the small
+>   `/dev/shm` a container gets.
+> - **Fonts**, from Debian/Ubuntu packages: `fonts-crosextra-carlito` (metric-compatible with
+>   Calibri), `fonts-liberation` (Arial, Times New Roman, Courier New), `fonts-dejavu-core` (the
+>   last resort). The engine measures a Microsoft family that is not installed in its stand-in
+>   (`app/engine/emit/text.py: METRIC_ALIASES`) and still writes the original family into the
+>   file, so PowerPoint draws the real face at the same widths. Without these packages every line
+>   is measured in a fallback and text wraps differently in PowerPoint.
+> - Brand fonts, when a customer's master uses one, go in `/usr/share/fonts/` too; the engine
+>   scans font folders recursively (`SLIDE_ENGINE_FONT_DIRS` overrides the folders).
+>
+> CI's backend job installs the same browser and fonts (step "Install Playwright Chromium and
+> fonts"), so the engine tests run against what the container will have.
+
+The engine's settings (`SLIDE_ENGINE_*`, all in `.env.example`) need one value in production:
+`SLIDE_ENGINE_RENDERER_URL`, the PptxRender service (https), which master import uses to render
+layout backgrounds. `check_config()` reports it missing, and `SLIDE_ENGINE_REMOTE_RESOURCES` set to
+anything but `block`, as production problems.
+
 ## Verifying a deploy
 
 ```bash

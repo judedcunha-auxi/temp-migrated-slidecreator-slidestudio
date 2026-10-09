@@ -90,7 +90,9 @@ complete and tested:
 The same slides always give exactly the same file, byte for byte. Each export works in its own
 scratch folder, and a small pool of browsers lets several exports run at once.
 
-One thing to know: two of the engine's files are derived from third-party code whose
+Two things to know: the server has no Microsoft fonts, so it measures Calibri in **Carlito** and
+Arial in **Liberation Sans**, look-alike fonts with identical letter widths, and still names the
+original font in the file. And two of the engine's files are derived from third-party code whose
 licence is not yet granted ([licensing.md](licensing.md)); they must not ship to production until
 that is settled. [architecture.md](architecture.md) has the details.
 

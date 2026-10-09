@@ -87,9 +87,25 @@ _MAX_TRACKING_RATIO = 0.12
 #: widening it to the floor costs nothing.
 MIN_BOX_WIDTH_PX = 0.2 * 96
 
-#: Substituted when a family is not installed. Everything downstream still measures *something*
-#: sane, and the substitution is reported rather than hidden.
-_FALLBACK_FAMILIES = ("Arial", "Helvetica", "Segoe UI", "Calibri", "DejaVu Sans")
+#: Metric-compatible stand-ins, tried before the generic fallbacks when a family is not installed.
+#: Each has the same advance widths as the family it stands in for, so a line measured in it breaks
+#: where PowerPoint (which has the real face on the client's machine) breaks it. The Linux container
+#: has no Microsoft fonts: it installs Carlito (Calibri), Liberation (Arial, Times New Roman, Courier
+#: New) and DejaVu (docs/deployment.md). Only *measurement* uses the stand-in; the file still names
+#: the family the slide asked for (`emitted_face` looks the face up exactly, never through here).
+METRIC_ALIASES: dict[str, tuple[str, ...]] = {
+    "calibri": ("Carlito",),
+    "calibri light": ("Carlito",),
+    "cambria": ("Caladea",),
+    "arial": ("Liberation Sans", "Arimo"),
+    "helvetica": ("Liberation Sans", "Arimo"),
+    "times new roman": ("Liberation Serif", "Tinos"),
+    "courier new": ("Liberation Mono", "Cousine"),
+}
+
+#: Substituted when a family (and its metric-compatible stand-in) is not installed. Everything
+#: downstream still measures *something* sane, and the substitution is reported rather than hidden.
+_FALLBACK_FAMILIES = ("Arial", "Helvetica", "Liberation Sans", "Segoe UI", "Calibri", "Carlito", "DejaVu Sans")
 
 
 # ---------------------------------------------------------------------------------- font metrics
@@ -231,12 +247,15 @@ def face_for_exact(family: str | None, weight: int = 400, italic: bool = False) 
 def face_for(family: str | None, weight: int = 400, italic: bool = False) -> Face | None:
     """The closest installed face, or `None` when neither the family nor a fallback is installed.
 
-    `face_for_exact` on the family, then on each of `_FALLBACK_FAMILIES` in turn: everything
-    downstream still measures *something* sane, and `plan_text` reports the substitution.
+    `face_for_exact` on the family, then on its metric-compatible stand-ins (`METRIC_ALIASES`:
+    Calibri -> Carlito), then on each of `_FALLBACK_FAMILIES` in turn: everything downstream still
+    measures *something* sane, and `plan_text` reports the substitution.
     """
     candidates: list[str] = []
     if family:
-        candidates.append(family.strip().strip("'\""))
+        wanted = family.strip().strip("'\"")
+        candidates.append(wanted)
+        candidates.extend(METRIC_ALIASES.get(wanted.lower(), ()))
     candidates.extend(_FALLBACK_FAMILIES)
     for candidate in candidates:
         face = face_for_exact(candidate, weight, italic)

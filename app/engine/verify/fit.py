@@ -35,7 +35,7 @@ from pptx.opc.constants import RELATIONSHIP_TYPE as RT
 from pptx.oxml.ns import qn
 
 from app.config import engine as config
-from app.engine.emit.text import Face, face_for_exact, face_width_px
+from app.engine.emit.text import METRIC_ALIASES, Face, face_for_exact, face_width_px
 from app.engine.ir import IR, Box, Element
 from app.engine.reports import FitIssue, FitReport
 
@@ -71,8 +71,19 @@ def resolve_face(family: str, bold: bool, italic: bool) -> Face | None:
     name ID and preferred the shortest subfamily, so it measured Arial as Arial Narrow, Calibri as
     Calibri Light and found no "Calibri Light" at all — every client run was predicted narrower than
     PowerPoint draws it.
+
+    When the family itself is not installed (the Linux container has no Microsoft fonts), its
+    metric-compatible stand-in is used (`text.METRIC_ALIASES`: Calibri -> Carlito), which predicts
+    the same widths.
     """
-    return face_for_exact(family, 700 if bold else 400, italic)
+    weight = 700 if bold else 400
+    face = face_for_exact(family, weight, italic)
+    if face is None and family:
+        for alias in METRIC_ALIASES.get(family.strip().strip("'\"").lower(), ()):
+            face = face_for_exact(alias, weight, italic)
+            if face is not None:
+                break
+    return face
 
 
 def text_width_px(
